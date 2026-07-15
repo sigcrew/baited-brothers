@@ -12,6 +12,8 @@ import {
 } from "react-native";
 import type { UserCatch } from "@/src/hooks/useUserCatches";
 import { FishThumb } from "@/components/collection/FishThumb";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { FIELD_COLORS, monoFont } from "@/src/theme/fieldJournal";
 
 type CardsPanelProps = {
   insetsBottom: number;
@@ -24,12 +26,7 @@ type CardsPanelProps = {
 };
 
 const formatCaughtAt = (iso: string) =>
-  new Date(iso).toLocaleString("ko-KR", {
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  new Date(iso).toLocaleDateString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" }).replace(/\. /g, ".").replace(/\.$/, "");
 
 const CatchCardTile = ({
   item,
@@ -45,15 +42,15 @@ const CatchCardTile = ({
     <TouchableOpacity
       onPress={onPress}
       activeOpacity={0.8}
-      className="mb-3 overflow-hidden rounded-xl border border-slate-200 bg-white"
-      style={{ width: "48%" }}
+      className="mb-5 overflow-hidden rounded-lg border bg-white"
+      style={{ width: "48%", borderColor: FIELD_COLORS.rule }}
     >
-      <View className="aspect-[3/4] bg-slate-100">
+      <View className="aspect-square bg-slate-100">
         {hasPhoto ? (
           <Image
             source={{ uri: item.image_url! }}
-            className="h-full w-full"
             resizeMode="cover"
+            style={{ width: "100%", height: "100%" }}
           />
         ) : (
           <View className="flex-1 items-center justify-center">
@@ -65,18 +62,17 @@ const CatchCardTile = ({
           </View>
         )}
       </View>
-      <View className="px-2.5 py-2.5">
-        <Text className="text-sm font-semibold text-slate-900" numberOfLines={1}>
+      <View className="px-3 py-3">
+        <View className="flex-row items-center justify-between"><Text className="text-xl font-black" style={{ color: FIELD_COLORS.ink }} numberOfLines={1}>
           {title}
-        </Text>
-        <Text className="mt-0.5 text-[11px] text-slate-400">
-          {formatCaughtAt(item.caught_at)}
-        </Text>
+        </Text><Text className="text-[10px]" style={{ color: FIELD_COLORS.ink }}>현장 인증</Text></View>
         {item.size_cm != null && (
-          <Text className="mt-1 text-[11px] font-medium text-teal-800">
-            {item.size_cm}cm
+          <Text className="mt-2 text-2xl font-black" style={{ color: FIELD_COLORS.teal }}>
+            {item.size_cm}<Text className="text-sm"> cm</Text>
           </Text>
         )}
+        <Text className="mt-2 text-[11px]" style={{ color: FIELD_COLORS.ink, fontFamily: monoFont }}>{formatCaughtAt(item.caught_at)} · {item.location_name ?? "현장 기록"}</Text>
+        <Text className="mt-2 text-[10px]" style={{ color: "#9CB0B3", fontFamily: monoFont }}>CAT-{item.id.slice(0, 8).toUpperCase()}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -108,8 +104,8 @@ const CatchDetailModal = ({
             {item.image_url ? (
               <Image
                 source={{ uri: item.image_url }}
-                className="h-full w-full"
                 resizeMode="cover"
+                style={{ width: "100%", height: "100%" }}
               />
             ) : (
               <View className="flex-1 items-center justify-center">
@@ -200,8 +196,8 @@ export const CardsPanel = ({
         numColumns={2}
         columnWrapperStyle={{ justifyContent: "space-between" }}
         contentContainerStyle={{
-          paddingHorizontal: 16,
-          paddingTop: 16,
+          paddingHorizontal: 20,
+          paddingTop: 0,
           paddingBottom: insetsBottom + 28,
         }}
         refreshControl={
@@ -212,14 +208,9 @@ export const CardsPanel = ({
           />
         }
         ListHeaderComponent={
-          <View className="mb-3">
-            <Text className="text-xs font-medium text-teal-800">앨범</Text>
-            <Text className="mt-0.5 text-base font-semibold text-slate-900">
-              {catches.length}장의 조과 카드
-            </Text>
-            <Text className="mt-1 text-sm text-slate-500">
-              현장에서 기록한 조과가 여기에 모입니다.
-            </Text>
+          <View className="mb-5 border-b py-5" style={{ borderColor: FIELD_COLORS.rule }}>
+            <View className="flex-row items-center justify-between"><Text className="text-xl font-black" style={{ color: FIELD_COLORS.ink }}>나의 조과 카드 <Text style={{ color: FIELD_COLORS.teal }}>{catches.length}</Text></Text><View className="flex-row items-center"><Text className="mr-2 font-semibold" style={{ color: FIELD_COLORS.teal }}>정렬</Text><FontAwesome name="sliders" size={18} color={FIELD_COLORS.teal} /></View></View>
+            <Text className="mt-5 text-[12px] tracking-[1.5px]" style={{ color: FIELD_COLORS.ink, fontFamily: monoFont }}>CATCH ARCHIVE 2026</Text>
           </View>
         }
         ListEmptyComponent={

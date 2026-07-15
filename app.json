@@ -32,7 +32,29 @@
     },
     "plugins": [
       "expo-router",
-      "expo-secure-store","expo-apple-authentication",["expo-web-browser",{"experimentalLauncherActivity":true}]
+      "expo-secure-store",
+      "expo-apple-authentication",
+      ["expo-web-browser", { "experimentalLauncherActivity": true }],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "물고기 조과를 현장에서 촬영하려면 카메라 접근이 필요합니다.",
+          "recordAudioAndroid": false,
+          "barcodeScannerEnabled": false
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "조과를 인증하려면 촬영 순간의 위치가 필요합니다."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "출조 일정의 홈 커버 사진을 선택하려면 사진 보관함 접근이 필요합니다."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

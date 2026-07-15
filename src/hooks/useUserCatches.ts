@@ -7,7 +7,7 @@ export type UserCatch = Tables<"user_catches"> & {
   fish?: Pick<Tables<"fishes">, "id" | "name" | "name_ko" | "image_url" | "category"> | null;
 };
 
-export const useUserCatches = () => {
+export const useUserCatches = (tripId?: string) => {
   const { session } = useAuth();
   const userId = session?.user?.id;
 
@@ -30,13 +30,18 @@ export const useUserCatches = () => {
       else setIsLoading(true);
       setError(null);
 
-      const { data, error: fetchError } = await supabase
+      let query = supabase
         .from("user_catches")
         .select(
           "*, fish:fishes(id, name, name_ko, image_url, category)"
         )
-        .eq("user_id", userId)
-        .order("caught_at", { ascending: false });
+        .eq("user_id", userId);
+
+      if (tripId) query = query.eq("trip_id", tripId);
+
+      const { data, error: fetchError } = await query.order("caught_at", {
+        ascending: false,
+      });
 
       if (fetchError) {
         setError(fetchError as Error);
@@ -48,7 +53,7 @@ export const useUserCatches = () => {
       if (isRefresh) setIsRefreshing(false);
       else setIsLoading(false);
     },
-    [userId]
+    [tripId, userId]
   );
 
   useEffect(() => {
@@ -58,7 +63,7 @@ export const useUserCatches = () => {
   const unlockedFishIds = useMemo(() => {
     const ids = new Set<string>();
     for (const item of catches) {
-      ids.add(item.fish_id);
+      if (item.verification_status === "verified") ids.add(item.fish_id);
     }
     return ids;
   }, [catches]);

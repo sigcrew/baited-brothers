@@ -2,7 +2,9 @@ import { useState } from "react";
 import {
   View,
   Text,
-  FlatList,
+  ScrollView,
+  Image,
+  ImageBackground,
   TouchableOpacity,
   TextInput,
   Modal,
@@ -13,12 +15,29 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import * as ImagePicker from "expo-image-picker";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import {
   useFishingTrips,
   type FishingTrip,
+  type TripCoverImage,
 } from "@/src/hooks/useFishingTrips";
+import { useUserCatches } from "@/src/hooks/useUserCatches";
+import { useImageContrast } from "@/src/hooks/useImageContrast";
+import { ArchiveTabHeader } from "@/components/design/ArchiveTabHeader";
+import {
+  FIELD_COLORS,
+  bodyExtraBoldFont,
+  bodySemiBoldFont,
+  dateKoreanFont,
+  dateNumberFont,
+  displayFont,
+  monoFont,
+} from "@/src/theme/fieldJournal";
+
+const DEFAULT_HERO_IMAGE = require("@/assets/images/design/first-trip-cover-v1.png");
 
 const formatTripDate = (iso: string) => {
   const date = new Date(iso);
@@ -56,6 +75,29 @@ const defaultScheduledInput = () => {
   date.setDate(date.getDate() + 1);
   date.setHours(6, 0, 0, 0);
   return toLocalInputValue(date);
+};
+
+const pickTripCover = async (): Promise<TripCoverImage | null> => {
+  const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  if (!permission.granted) {
+    Alert.alert("사진 권한 필요", "출조 커버를 선택하려면 사진 보관함 접근을 허용해 주세요.");
+    return null;
+  }
+
+  const result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ["images"],
+    allowsEditing: true,
+    aspect: [4, 3],
+    quality: 0.85,
+  });
+
+  if (result.canceled || !result.assets[0]) return null;
+  const asset = result.assets[0];
+  return {
+    uri: asset.uri,
+    fileName: asset.fileName,
+    mimeType: asset.mimeType,
+  };
 };
 
 const TripRow = ({
@@ -118,18 +160,21 @@ const AddTripModal = ({
     spotName: string;
     scheduledAt: Date;
     memo?: string;
+    coverImage?: TripCoverImage;
   }) => Promise<Error | null>;
   isSaving: boolean;
 }) => {
   const [spotName, setSpotName] = useState("");
   const [scheduledInput, setScheduledInput] = useState(defaultScheduledInput);
   const [memo, setMemo] = useState("");
+  const [coverImage, setCoverImage] = useState<TripCoverImage | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
 
   const reset = () => {
     setSpotName("");
     setScheduledInput(defaultScheduledInput());
     setMemo("");
+    setCoverImage(null);
     setFormError(null);
   };
 
@@ -153,6 +198,7 @@ const AddTripModal = ({
       spotName,
       scheduledAt,
       memo,
+      coverImage: coverImage ?? undefined,
     });
 
     if (error) {
@@ -217,6 +263,31 @@ const AddTripModal = ({
               className="mt-1 min-h-[72px] rounded-lg border border-gray-200 px-3 py-3 text-base text-gray-900"
             />
 
+            <Text className="mt-4 text-xs font-medium text-gray-400">
+              홈 커버 사진 (선택)
+            </Text>
+            <TouchableOpacity
+              onPress={async () => {
+                const image = await pickTripCover();
+                if (image) setCoverImage(image);
+              }}
+              className="mt-1 overflow-hidden rounded-lg border border-gray-200 bg-gray-50"
+            >
+              {coverImage ? (
+                <View>
+                  <Image source={{ uri: coverImage.uri }} className="h-36 w-full" resizeMode="cover" />
+                  <View className="absolute bottom-3 right-3 rounded bg-black/60 px-3 py-2">
+                    <Text className="text-xs font-semibold text-white">사진 다시 선택</Text>
+                  </View>
+                </View>
+              ) : (
+                <View className="h-24 flex-row items-center justify-center">
+                  <FontAwesome name="image" size={20} color={FIELD_COLORS.teal} />
+                  <Text className="ml-2 text-sm" style={{ color: FIELD_COLORS.teal }}>사진 선택</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+
             {formError ? (
               <Text className="mt-3 text-sm text-red-600">{formError}</Text>
             ) : null}
@@ -253,14 +324,17 @@ const HomeScreen = () => {
     isLoggedIn,
     refetch,
     createTrip,
+    updateTripCover,
     markDone,
     cancelTrip,
   } = useFishingTrips();
+  const { catches } = useUserCatches();
 
   const handleCreate = async (input: {
     spotName: string;
     scheduledAt: Date;
     memo?: string;
+    coverImage?: TripCoverImage;
   }) => {
     const { error: createError } = await createTrip(input);
     return createError;
@@ -293,120 +367,150 @@ const HomeScreen = () => {
     ]);
   };
 
-  if (!isLoggedIn) {
-    return (
-      <View
-        className="flex-1 items-center justify-center bg-gray-50 px-8"
-        style={{ paddingTop: insets.top }}
-      >
-        <Text className="text-2xl font-bold text-gray-900">출조 일정</Text>
-        <Text className="mt-3 text-center text-gray-600">
-          로그인하면 낚시터 일정을 계획하고, 다녀온 뒤 완료할 수 있어요.
-        </Text>
-        <TouchableOpacity
-          onPress={() => router.push("/(auth)/login")}
-          className="mt-6 rounded-xl bg-gray-900 px-6 py-3 active:bg-gray-800"
-        >
-          <Text className="font-medium text-white">로그인</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
+  const nextTrip = plannedTrips[0];
+  const heroSource = nextTrip?.cover_image_url
+    ? { uri: nextTrip.cover_image_url }
+    : DEFAULT_HERO_IMAGE;
+  const isDarkHero = useImageContrast(heroSource);
+  const heroTextColor = isDarkHero ? FIELD_COLORS.paper : FIELD_COLORS.ink;
+  const heroRuleColor = isDarkHero ? "rgba(255,255,255,0.72)" : FIELD_COLORS.rule;
+  const nextDate = nextTrip ? new Date(nextTrip.scheduled_at) : null;
+  const dateMonth = nextDate ? String(nextDate.getMonth() + 1) : "";
+  const dateDay = nextDate ? String(nextDate.getDate()) : "";
+  const dateWeekday = nextDate
+    ? new Intl.DateTimeFormat("ko-KR", { weekday: "long" }).format(nextDate)
+    : "";
+  const daysAway = nextDate
+    ? Math.max(0, Math.ceil((nextDate.getTime() - Date.now()) / 86400000))
+    : 0;
+  const handleRecord = () => isLoggedIn ? router.push("/record") : router.push("/(auth)/login");
+  const handleAddTrip = () => isLoggedIn ? setAddVisible(true) : router.push("/(auth)/login");
+  const handleChangeCover = async () => {
+    if (!nextTrip || isSaving) return;
+    const image = await pickTripCover();
+    if (!image) return;
+
+    const { error: coverError } = await updateTripCover(nextTrip.id, image);
+    if (coverError) Alert.alert("사진 변경 실패", coverError.message);
+  };
 
   return (
-    <View className="flex-1 bg-gray-50" style={{ paddingTop: insets.top }}>
-      <View className="border-b border-gray-200 bg-white px-4 pb-4 pt-2">
-        <Text className="text-sm text-teal-800">낚시당한 녀석들</Text>
-        <View className="mt-1 flex-row items-center justify-between">
-          <Text className="text-2xl font-bold text-gray-900">출조 일정</Text>
-          <TouchableOpacity
-            onPress={() => setAddVisible(true)}
-            className="rounded-lg bg-gray-900 px-3 py-2 active:bg-gray-800"
-          >
-            <Text className="text-sm font-medium text-white">추가</Text>
-          </TouchableOpacity>
-        </View>
-        <Text className="mt-1 text-sm text-gray-500">
-          계획해 두고, 다녀오면 완료하세요.
-        </Text>
-      </View>
-
-      {isLoading ? (
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#0f766e" />
-        </View>
-      ) : error ? (
-        <View className="flex-1 items-center justify-center px-6">
-          <Text className="text-center text-gray-600">
-            일정을 불러오지 못했습니다.{"\n"}
-            (DB 마이그레이션이 적용됐는지 확인해 주세요.)
-          </Text>
-          <Text className="mt-2 text-center text-xs text-gray-400">
-            {error.message}
-          </Text>
-          <TouchableOpacity
-            onPress={refetch}
-            className="mt-4 rounded-lg bg-gray-200 px-4 py-2"
-          >
-            <Text className="font-medium text-gray-700">다시 시도</Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        <FlatList
-          data={plannedTrips}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{
-            paddingHorizontal: 16,
-            paddingTop: 16,
-            paddingBottom: insets.bottom + 32,
-          }}
-          refreshControl={
-            <RefreshControl refreshing={isRefreshing} onRefresh={refetch} />
-          }
-          ListHeaderComponent={
-            <Text className="mb-3 text-sm font-semibold text-gray-700">
-              다가오는 일정
-            </Text>
-          }
-          ListEmptyComponent={
-            <View className="mb-6 items-center rounded-xl border border-dashed border-gray-300 bg-white px-4 py-10">
-              <Text className="font-medium text-gray-900">예정된 출조가 없어요</Text>
-              <Text className="mt-2 text-center text-sm text-gray-500">
-                낚시터와 날짜를 추가해 두세요.
-              </Text>
-              <TouchableOpacity
-                onPress={() => setAddVisible(true)}
-                className="mt-4 rounded-lg bg-gray-900 px-4 py-2.5"
-              >
-                <Text className="text-sm font-medium text-white">
-                  첫 일정 추가
-                </Text>
-              </TouchableOpacity>
-            </View>
-          }
-          renderItem={({ item }) => (
-            <TripRow
-              trip={item}
-              showActions
-              disabled={isSaving}
-              onDone={() => handleDone(item)}
-              onCancel={() => handleCancel(item)}
-            />
-          )}
-          ListFooterComponent={
-            recentDoneTrips.length > 0 ? (
-              <View className="mt-4">
-                <Text className="mb-3 text-sm font-semibold text-gray-700">
-                  최근 완료
-                </Text>
-                {recentDoneTrips.map((trip) => (
-                  <TripRow key={trip.id} trip={trip} />
-                ))}
+    <View className="flex-1" style={{ paddingTop: insets.top, backgroundColor: FIELD_COLORS.foam }}>
+      <ScrollView refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={refetch} tintColor={FIELD_COLORS.teal} />} contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}>
+        <ImageBackground
+          source={heroSource}
+          resizeMode="cover"
+          style={{ width: "100%", height: 650 }}
+        >
+          <ArchiveTabHeader
+            title="낚시당한 녀석들"
+            backgroundColor="transparent"
+            foregroundColor={heroTextColor}
+            ruleColor={heroRuleColor}
+            rightSlot={(
+              <Text className="text-[10px] tracking-[1.5px]" style={{ color: heroTextColor, fontFamily: monoFont }}>FIELD LOG 019</Text>
+            )}
+          />
+          <View className="px-7 pt-10">
+            {isLoading ? (
+              <View className="h-28 items-start justify-center">
+                <ActivityIndicator color={heroTextColor} />
               </View>
-            ) : null
-          }
-        />
-      )}
+            ) : nextTrip ? (
+              <>
+                <View className="h-[84px] flex-row items-end">
+                  <Text style={{ color: heroTextColor, fontFamily: dateNumberFont, fontSize: 82, lineHeight: 84 }}>{dateMonth}</Text>
+                  <Text style={{ color: heroTextColor, fontFamily: dateKoreanFont, fontSize: 39, lineHeight: 57 }}>월 </Text>
+                  <Text style={{ color: heroTextColor, fontFamily: dateNumberFont, fontSize: 82, lineHeight: 84 }}>{dateDay}</Text>
+                  <Text style={{ color: heroTextColor, fontFamily: dateKoreanFont, fontSize: 39, lineHeight: 57 }}>일, </Text>
+                  <Text style={{ color: heroTextColor, fontFamily: dateKoreanFont, fontSize: 47, lineHeight: 61 }}>{dateWeekday}</Text>
+                </View>
+                <Text className="mt-1 text-[25px] leading-[34px]" style={{ color: heroTextColor, fontFamily: displayFont }}>다음 출조는 {nextTrip.spot_name}입니다.</Text>
+                <Text className="mt-4 text-[15px] tracking-[1.6px]" style={{ color: heroTextColor, fontFamily: bodySemiBoldFont }}>새벽 5:30 · 우럭 목표</Text>
+              </>
+            ) : (
+              <View className="pt-3">
+                <Text className="max-w-[580px] text-[44px] leading-[54px] tracking-[-1.5px]" style={{ color: heroTextColor, fontFamily: displayFont }}>첫 출조를 기다리는 중</Text>
+                <Text className="mt-4 text-lg tracking-[-0.3px]" style={{ color: heroTextColor, fontFamily: bodySemiBoldFont }}>어디로 떠날지 기록해보세요</Text>
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  accessibilityLabel="첫 출조 추가하기"
+                  accessibilityHint="낚시터와 출조 날짜를 입력하는 화면을 엽니다"
+                  onPress={handleAddTrip}
+                  className="mt-6 w-full max-w-[280px] flex-row items-center px-5 py-4"
+                  style={{ backgroundColor: FIELD_COLORS.teal }}
+                >
+                  <FontAwesome name="calendar-plus-o" size={21} color="#fff" />
+                  <Text className="ml-3 flex-1 text-[17px] text-white" style={{ fontFamily: bodyExtraBoldFont }}>첫 출조 추가하기</Text>
+                  <FontAwesome name="long-arrow-right" size={22} color="#fff" />
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+          {nextTrip && isLoggedIn ? (
+            <TouchableOpacity
+              accessibilityLabel="출조 커버 사진 변경"
+              onPress={handleChangeCover}
+              disabled={isSaving}
+              className="absolute bottom-4 right-4 flex-row items-center bg-black/55 px-3 py-2"
+            >
+              {isSaving ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <FontAwesome name="camera" size={14} color="#fff" />
+              )}
+              <Text className="ml-2 text-xs font-semibold text-white">커버 변경</Text>
+            </TouchableOpacity>
+          ) : null}
+        </ImageBackground>
+        <View className="bg-white px-4 py-4">
+          <TouchableOpacity
+            onPress={handleRecord}
+            className="flex-row items-center px-5 py-5"
+            style={{ backgroundColor: FIELD_COLORS.teal }}
+          >
+            <FontAwesome name="camera" size={26} color="white" />
+            <Text className="ml-4 flex-1 text-xl text-white" style={{ fontFamily: bodyExtraBoldFont }}>현장에서 기록하기</Text>
+            <FontAwesome name="long-arrow-right" size={28} color="white" />
+          </TouchableOpacity>
+        </View>
+        <View className="px-4">
+          <View className="mt-7 flex-row items-center justify-between">
+            <Text className="text-xl" style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>다가오는 출조</Text>
+            {nextTrip ? (
+              <TouchableOpacity accessibilityRole="button" accessibilityLabel="출조 일지 전체 보기" onPress={() => router.push("/(tabs)/journal")}>
+                <Text className="text-[11px] tracking-[1px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>ALL LOGS →</Text>
+              </TouchableOpacity>
+            ) : null}
+          </View>
+          {isLoading ? (
+            <View className="mt-3 h-24 items-center justify-center border-y" style={{ borderColor: FIELD_COLORS.rule }}>
+              <ActivityIndicator color={FIELD_COLORS.teal} />
+            </View>
+          ) : nextTrip ? (
+            <View className="mt-3 flex-row items-center border-y py-4" style={{ borderColor: FIELD_COLORS.rule }}><FontAwesome name="map-signs" size={25} color={FIELD_COLORS.teal} /><View className="ml-4 flex-1"><Text className="text-lg" style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>{nextTrip.spot_name}</Text><Text className="mt-1 text-[11px] tracking-[1px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>{formatTripDate(nextTrip.scheduled_at)} · 우럭 목표</Text></View><View className="flex-row items-center" accessible accessibilityLabel={`D-${daysAway}`}><Text style={{ color: FIELD_COLORS.orange, fontFamily: dateNumberFont, fontSize: 48, lineHeight: 54 }}>D</Text><View style={{ width: 14, height: 4, marginHorizontal: 5, backgroundColor: FIELD_COLORS.orange }} /><Text style={{ color: FIELD_COLORS.orange, fontFamily: dateNumberFont, fontSize: 48, lineHeight: 54 }}>{daysAway}</Text></View></View>
+          ) : (
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel="첫 출조 추가"
+              accessibilityHint="낚시터와 출조 날짜를 입력하는 화면을 엽니다"
+              onPress={handleAddTrip}
+              className="mt-3 flex-row items-center px-5 py-6"
+              style={{ backgroundColor: FIELD_COLORS.teal }}
+            >
+              <FontAwesome name="calendar-plus-o" size={24} color="#fff" />
+              <Text className="ml-4 flex-1 text-[22px] text-white" style={{ fontFamily: bodyExtraBoldFont }}>첫 출조 추가 +</Text>
+              <FontAwesome name="long-arrow-right" size={25} color="#fff" />
+            </TouchableOpacity>
+          )}
+          <View className="mt-7 flex-row items-center justify-between"><Text className="text-xl" style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>최근 발견</Text><Text className="text-[11px] tracking-[1.2px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>SPECIMEN</Text></View>
+          <View className="mt-3 flex-row border-t pt-3" style={{ borderColor: FIELD_COLORS.rule }}>
+            {catches.slice(0, 3).map((item) => <View key={item.id} className="mr-2 w-[29%] overflow-hidden border" style={{ borderColor: FIELD_COLORS.rule }}>{item.image_url ? <Image source={{ uri: item.image_url }} resizeMode="cover" style={{ width: "100%", height: 96 }} /> : <View className="h-24 items-center justify-center" style={{ backgroundColor: FIELD_COLORS.locked }}><FontAwesome name="image" size={24} color={FIELD_COLORS.muted} /></View>}<View className="bg-white p-2"><Text className="font-bold" style={{ color: FIELD_COLORS.ink }}>{item.fish?.name_ko ?? "어종"}</Text></View></View>)}
+            <View className="flex-1 items-center justify-center border" style={{ minHeight: 126, borderColor: FIELD_COLORS.rule, backgroundColor: FIELD_COLORS.locked }}><FontAwesome name="lock" size={22} color={FIELD_COLORS.muted} /><Text className="mt-2 text-xs font-semibold" style={{ color: FIELD_COLORS.muted }}>{catches.length ? "미확인" : "첫 발견을 기록하세요"}</Text></View>
+          </View>
+          {error ? <Text className="mt-4 text-xs" style={{ color: FIELD_COLORS.orange }}>{error.message}</Text> : null}
+        </View>
+      </ScrollView>
 
       <AddTripModal
         visible={addVisible}

@@ -13,6 +13,8 @@ import {
 } from "react-native";
 import { useFishes, type Fish, CATEGORY_LABELS } from "@/src/hooks/useFishes";
 import { FishThumb } from "@/components/collection/FishThumb";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { FIELD_COLORS, monoFont } from "@/src/theme/fieldJournal";
 
 const CATEGORIES: (Fish["category"] | null)[] = [
   null,
@@ -48,50 +50,27 @@ const FishRow = ({
   <TouchableOpacity
     onPress={onPress}
     activeOpacity={0.75}
-    className="mb-2.5 flex-row overflow-hidden rounded-xl border border-slate-200/80 bg-white"
+    className="flex-row border-b py-4"
+    style={{ borderColor: FIELD_COLORS.rule }}
   >
-    <FishThumb
-      imageUrl={fish.image_url}
-      unlocked={unlocked}
-      size={80}
-    />
-    <View className="flex-1 justify-center px-3.5 py-3">
-      <View className="flex-row items-center justify-between">
+    <View className="h-36 w-[52%] overflow-hidden rounded-lg" style={{ backgroundColor: FIELD_COLORS.locked }}>
+      {unlocked && fish.image_url ? <Image source={{ uri: fish.image_url }} className="h-full w-full" resizeMode="cover" /> : <View className="flex-1 items-center justify-center"><View className="h-14 w-28 rounded-[50%]" style={{ backgroundColor: "#A9B8B9" }} />{!unlocked ? <FontAwesome name="lock" size={16} color={FIELD_COLORS.muted} style={{ position: "absolute", bottom: 12, right: 12 }} /> : null}</View>}
+    </View>
+    <View className="flex-1 justify-center pl-5 py-2">
+      <View>
         <Text
-          className={`text-base font-semibold ${
-            unlocked ? "text-slate-900" : "text-slate-500"
-          }`}
+          className="text-2xl font-black"
+          style={{ color: unlocked ? FIELD_COLORS.ink : FIELD_COLORS.muted }}
           numberOfLines={1}
         >
           {unlocked ? (fish.name_ko ?? fish.name) : "미확인 어종"}
         </Text>
-        <View
-          className={`rounded-md px-2 py-0.5 ${
-            unlocked ? "bg-teal-50" : "bg-slate-100"
-          }`}
-        >
-          <Text
-            className={`text-[11px] font-semibold ${
-              unlocked ? "text-teal-800" : "text-slate-500"
-            }`}
-          >
-            {unlocked ? "해금" : "미해금"}
-          </Text>
-        </View>
       </View>
-      <Text className="mt-0.5 text-sm text-slate-400" numberOfLines={1}>
-        {unlocked ? fish.name : "현장에서 잡아 등록해 보세요"}
+      <Text className="mt-2 text-[11px] tracking-[1px]" style={{ color: FIELD_COLORS.teal, fontFamily: monoFont }} numberOfLines={1}>
+        {unlocked ? fish.name.toUpperCase() : "LOCKED SPECIMEN"}
       </Text>
-      {unlocked && fish.min_size_cm != null && (
-        <Text className="mt-1.5 text-xs text-slate-400">
-          최소 {fish.min_size_cm}cm · {CATEGORY_LABELS[fish.category]}
-        </Text>
-      )}
-      {!unlocked && (
-        <Text className="mt-1.5 text-xs text-slate-400">
-          {CATEGORY_LABELS[fish.category]}
-        </Text>
-      )}
+      <View className="mt-3 h-px w-20" style={{ backgroundColor: FIELD_COLORS.rule }} />
+      <Text className="mt-3 text-xs leading-5" style={{ color: FIELD_COLORS.muted }}>{unlocked ? `${CATEGORY_LABELS[fish.category]} · ${fish.min_size_cm ? `최소 ${fish.min_size_cm}cm` : "현장 발견"}` : "현장에서 발견하면\n정보가 열립니다"}</Text>
     </View>
   </TouchableOpacity>
 );
@@ -199,8 +178,7 @@ export const EncyclopediaPanel = ({
 
   const progressLabel = useMemo(() => {
     if (totalFishCount <= 0) return "도감을 불러오는 중";
-    const pct = Math.round((unlockedCount / totalFishCount) * 100);
-    return `${unlockedCount} / ${totalFishCount} · ${pct}%`;
+    return `${unlockedCount} / ${totalFishCount}`;
   }, [unlockedCount, totalFishCount]);
 
   const progressRatio =
@@ -213,30 +191,27 @@ export const EncyclopediaPanel = ({
 
   return (
     <>
-      <View className="border-b border-slate-200 bg-white px-4 pb-3 pt-3">
+      <View className="px-5 pb-3 pt-5" style={{ backgroundColor: FIELD_COLORS.foam }}>
         <View className="flex-row items-end justify-between">
           <View>
-            <Text className="text-xs font-medium text-teal-800">완성도</Text>
-            <Text className="mt-0.5 text-base font-semibold text-slate-900">
+            <Text className="text-[36px] font-black" style={{ color: FIELD_COLORS.ink }}>
               {progressLabel}
             </Text>
           </View>
-          <Text className="text-xs text-slate-400">
-            {fishes.length}종 표시
-          </Text>
+          <Text className="text-[10px] tracking-[1px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>{fishes.length} SPECIMENS</Text>
         </View>
-        <View className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-slate-100">
+        <View className="mt-3 h-[2px] bg-slate-200">
           <View
-            className="h-full rounded-full bg-teal-700"
-            style={{ width: `${progressRatio * 100}%` }}
+            className="h-full"
+            style={{ width: `${progressRatio * 100}%`, backgroundColor: FIELD_COLORS.teal }}
           />
         </View>
 
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          className="mt-3 -mx-4"
-          contentContainerStyle={{ paddingHorizontal: 16 }}
+          className="mt-5 -mx-5"
+          contentContainerStyle={{ paddingHorizontal: 20 }}
         >
           {CATEGORIES.map((item) => {
             const label = item ? CATEGORY_LABELS[item] : "전체";
@@ -245,14 +220,12 @@ export const EncyclopediaPanel = ({
               <TouchableOpacity
                 key={item ?? "all"}
                 onPress={() => setSelectedCategory(item)}
-                className={`mr-2 rounded-lg px-3 py-2 ${
-                  isSelected ? "bg-slate-900" : "bg-slate-100"
-                }`}
+                className="mr-6 border-b-2 pb-2"
+                style={{ borderColor: isSelected ? FIELD_COLORS.teal : "transparent" }}
               >
                 <Text
-                  className={`text-sm font-medium ${
-                    isSelected ? "text-white" : "text-slate-600"
-                  }`}
+                  className="text-sm font-semibold"
+                  style={{ color: isSelected ? FIELD_COLORS.teal : FIELD_COLORS.muted }}
                 >
                   {label}
                 </Text>
@@ -262,7 +235,7 @@ export const EncyclopediaPanel = ({
         </ScrollView>
       </View>
 
-      <View className="flex-1 px-4 pt-3">
+      <View className="flex-1 px-5">
         {isLoading ? (
           <View className="flex-1 items-center justify-center">
             <ActivityIndicator size="large" color="#0f766e" />
@@ -296,6 +269,7 @@ export const EncyclopediaPanel = ({
                 />
               );
             }}
+            ListHeaderComponent={<View className="border-b py-5" style={{ borderColor: FIELD_COLORS.rule }}><Text className="text-[12px] tracking-[1.5px]" style={{ color: FIELD_COLORS.ink, fontFamily: monoFont }}>01  {selectedCategory ? CATEGORY_LABELS[selectedCategory].toUpperCase() : "ALL SPECIMENS"}</Text></View>}
             contentContainerStyle={{ paddingBottom: insetsBottom + 28 }}
             ListEmptyComponent={
               <View className="items-center py-16">

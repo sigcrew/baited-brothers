@@ -48,45 +48,66 @@ export type Database = {
       user_catches: {
         Row: {
           caught_at: string
+          candidate_fish_ids: string[]
+          capture_method: Database["public"]["Enums"]["capture_method"] | null
           created_at: string | null
           fish_id: string
           id: string
           image_url: string | null
+          id_method: Database["public"]["Enums"]["catch_id_method"] | null
           location_lat: number | null
           location_lng: number | null
+          location_captured_at: string | null
           location_name: string | null
           memo: string | null
           size_cm: number | null
+          trip_id: string | null
           updated_at: string | null
           user_id: string
+          verification_reason: string | null
+          verification_status: Database["public"]["Enums"]["catch_verification_status"]
         }
         Insert: {
           caught_at?: string
+          candidate_fish_ids?: string[]
+          capture_method?: Database["public"]["Enums"]["capture_method"] | null
           created_at?: string | null
           fish_id: string
           id?: string
           image_url?: string | null
+          id_method?: Database["public"]["Enums"]["catch_id_method"] | null
           location_lat?: number | null
           location_lng?: number | null
+          location_captured_at?: string | null
           location_name?: string | null
           memo?: string | null
           size_cm?: number | null
+          trip_id?: string | null
           updated_at?: string | null
           user_id: string
+          verification_reason?: string | null
+          verification_status?: Database["public"]["Enums"]["catch_verification_status"]
         }
         Update: {
           caught_at?: string
+          candidate_fish_ids?: string[]
+          capture_method?: Database["public"]["Enums"]["capture_method"] | null
           created_at?: string | null
           fish_id?: string
           id?: string
           image_url?: string | null
+          id_method?: Database["public"]["Enums"]["catch_id_method"] | null
           location_lat?: number | null
           location_lng?: number | null
+          location_captured_at?: string | null
           location_name?: string | null
           memo?: string | null
           size_cm?: number | null
+          trip_id?: string | null
           updated_at?: string | null
           user_id?: string
+          verification_reason?: string | null
+          verification_status?: Database["public"]["Enums"]["catch_verification_status"]
         }
         Relationships: [
           {
@@ -94,6 +115,13 @@ export type Database = {
             columns: ["fish_id"]
             isOneToOne: false
             referencedRelation: "fishes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_catches_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "fishing_trips"
             referencedColumns: ["id"]
           }
         ]
@@ -124,6 +152,8 @@ export type Database = {
       }
       fishing_trips: {
         Row: {
+          cover_image_path: string | null
+          cover_image_url: string | null
           id: string
           user_id: string
           spot_name: string
@@ -135,6 +165,8 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          cover_image_path?: string | null
+          cover_image_url?: string | null
           id?: string
           user_id: string
           spot_name: string
@@ -146,6 +178,8 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          cover_image_path?: string | null
+          cover_image_url?: string | null
           id?: string
           user_id?: string
           spot_name?: string
@@ -164,6 +198,9 @@ export type Database = {
     Enums: {
       fish_category: "flatfish" | "rockfish" | "seabass" | "mackerel" | "bream" | "mullet" | "cutlassfish" | "eel" | "pufferfish" | "other"
       trip_status: "planned" | "done" | "canceled"
+      capture_method: "live_camera"
+      catch_id_method: "closed_set_candidates" | "fallback_catalog"
+      catch_verification_status: "verified" | "unverified"
     }
     CompositeTypes: { [_ in never]: never }
   }

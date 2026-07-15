@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/contexts/AuthContext";
-import type { Tables, TablesInsert } from "@/src/types/database";
+import type { Tables, TablesInsert, TablesUpdate } from "@/src/types/database";
 
 export type FishingTrip = Tables<"fishing_trips">;
 
@@ -9,9 +9,50 @@ export type CreateTripInput = {
   spotName: string;
   scheduledAt: Date;
   memo?: string;
+  coverImage?: TripCoverImage;
 };
 
-export const useFishingTrips = () => {
+export type UpdateTripInput = Omit<CreateTripInput, "coverImage"> & {
+  coverImage?: TripCoverImage;
+};
+
+export type TripCoverImage = {
+  uri: string;
+  fileName?: string | null;
+  mimeType?: string | null;
+};
+
+const uploadTripCover = async (userId: string, image: TripCoverImage) => {
+  const knownExtensions = new Set(["jpg", "jpeg", "png", "webp"]);
+  const fileExtension = image.fileName?.split(".").pop()?.toLowerCase();
+  const extension = fileExtension && knownExtensions.has(fileExtension)
+    ? fileExtension
+    : image.mimeType === "image/png"
+      ? "png"
+      : image.mimeType === "image/webp"
+        ? "webp"
+        : "jpg";
+  const contentType = image.mimeType && ["image/jpeg", "image/png", "image/webp"].includes(image.mimeType)
+    ? image.mimeType
+    : "image/jpeg";
+  const path = `${userId}/trips/${Date.now()}-${Math.random().toString(36).slice(2, 10)}.${extension}`;
+  const response = await fetch(image.uri);
+  const imageBuffer = await response.arrayBuffer();
+  const { error } = await supabase.storage
+    .from("user-uploads")
+    .upload(path, imageBuffer, { contentType, upsert: false });
+
+  if (error) throw error;
+
+  const { data } = supabase.storage.from("user-uploads").getPublicUrl(path);
+  return { path, publicUrl: data.publicUrl };
+};
+
+type UseFishingTripsOptions = {
+  autoFetch?: boolean;
+};
+
+export const useFishingTrips = ({ autoFetch = true }: UseFishingTripsOptions = {}) => {
   const { session } = useAuth();
   const userId = session?.user?.id;
 
@@ -55,8 +96,13 @@ export const useFishingTrips = () => {
   );
 
   useEffect(() => {
-    fetchTrips();
-  }, [fetchTrips]);
+    if (autoFetch) {
+      fetchTrips();
+    } else {
+      setIsLoading(false);
+      setIsRefreshing(false);
+    }
+  }, [autoFetch, fetchTrips]);
 
   const plannedTrips = useMemo(
     () => trips.filter((trip) => trip.status === "planned"),
@@ -88,32 +134,194 @@ export const useFishingTrips = () => {
       }
 
       setIsSaving(true);
-      const payload: TablesInsert<"fishing_trips"> = {
-        user_id: userId,
-        spot_name: spotName,
-        scheduled_at: input.scheduledAt.toISOString(),
-        memo: input.memo?.trim() ? input.memo.trim() : null,
-        status: "planned",
-      };
+      let uploadedPath: string | null = null;
 
-      const { error: insertError } = await supabase
-        .from("fishing_trips")
-        .insert(payload);
+      try {
+        const uploadedCover = input.coverImage
+          ? await uploadTripCover(userId, input.coverImage)
+          : null;
+        uploadedPath = uploadedCover?.path ?? null;
 
-      setIsSaving(false);
+        const payload: TablesInsert<"fishing_trips"> = {
+          user_id: userId,
+          spot_name: spotName,
+          scheduled_at: input.scheduledAt.toISOString(),
+          memo: input.memo?.trim() ? input.memo.trim() : null,
+          status: "planned",
+          cover_image_url: uploadedCover?.publicUrl ?? null,
+          cover_image_path: uploadedCover?.path ?? null,
+        };
 
-      if (insertError) {
-        return { error: insertError as Error };
+        const { error: insertError } = await supabase
+          .from("fishing_trips")
+          .insert(payload);
+
+        if (insertError) throw insertError;
+      } catch (createError) {
+        if (uploadedPath) {
+          await supabase.storage.from("user-uploads").remove([uploadedPath]);
+        }
+        return {
+          error: createError instanceof Error
+            ? createError
+            : new Error("출조 일정을 저장하지 못했습니다."),
+        };
+      } finally {
+        setIsSaving(false);
+      }
+
+      if (autoFetch) await fetchTrips(true);
+      return { error: null };
+    },
+    [autoFetch, userId, fetchTrips]
+  );
+
+  const updateTripCover = useCallback(
+    async (tripId: string, image: TripCoverImage) => {
+      if (!userId) return { error: new Error("로그인이 필요합니다.") };
+
+      const trip = trips.find((item) => item.id === tripId);
+      if (!trip) return { error: new Error("출조 일정을 찾지 못했습니다.") };
+
+      setIsSaving(true);
+      let uploadedPath: string | null = null;
+
+      try {
+        const uploadedCover = await uploadTripCover(userId, image);
+        uploadedPath = uploadedCover.path;
+
+        const { error: updateError } = await supabase
+          .from("fishing_trips")
+          .update({
+            cover_image_url: uploadedCover.publicUrl,
+            cover_image_path: uploadedCover.path,
+          })
+          .eq("id", tripId)
+          .eq("user_id", userId);
+
+        if (updateError) throw updateError;
+
+        if (trip.cover_image_path) {
+          await supabase.storage.from("user-uploads").remove([trip.cover_image_path]);
+        }
+        await fetchTrips(true);
+        return { error: null };
+      } catch (updateError) {
+        if (uploadedPath) {
+          await supabase.storage.from("user-uploads").remove([uploadedPath]);
+        }
+        return {
+          error: updateError instanceof Error
+            ? updateError
+            : new Error("커버 사진을 변경하지 못했습니다."),
+        };
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [fetchTrips, trips, userId]
+  );
+
+  const updateTrip = useCallback(
+    async (tripId: string, input: UpdateTripInput) => {
+      if (!userId) return { error: new Error("로그인이 필요합니다.") };
+
+      const trip = trips.find((item) => item.id === tripId);
+      if (!trip) return { error: new Error("출조 일정을 찾지 못했습니다.") };
+
+      const spotName = input.spotName.trim();
+      if (!spotName) return { error: new Error("낚시터 이름을 입력해 주세요.") };
+
+      setIsSaving(true);
+      let uploadedPath: string | null = null;
+
+      try {
+        const uploadedCover = input.coverImage
+          ? await uploadTripCover(userId, input.coverImage)
+          : null;
+        uploadedPath = uploadedCover?.path ?? null;
+
+        const payload: TablesUpdate<"fishing_trips"> = {
+          spot_name: spotName,
+          scheduled_at: input.scheduledAt.toISOString(),
+          memo: input.memo?.trim() ? input.memo.trim() : null,
+          ...(uploadedCover
+            ? {
+                cover_image_url: uploadedCover.publicUrl,
+                cover_image_path: uploadedCover.path,
+              }
+            : {}),
+        };
+
+        const { error: updateError } = await supabase
+          .from("fishing_trips")
+          .update(payload)
+          .eq("id", tripId)
+          .eq("user_id", userId);
+
+        if (updateError) throw updateError;
+
+        if (uploadedCover && trip.cover_image_path) {
+          await supabase.storage.from("user-uploads").remove([trip.cover_image_path]);
+        }
+      } catch (updateError) {
+        if (uploadedPath) {
+          await supabase.storage.from("user-uploads").remove([uploadedPath]);
+        }
+        return {
+          error: updateError instanceof Error
+            ? updateError
+            : new Error("출조 일정을 수정하지 못했습니다."),
+        };
+      } finally {
+        setIsSaving(false);
       }
 
       await fetchTrips(true);
       return { error: null };
     },
-    [userId, fetchTrips]
+    [fetchTrips, trips, userId]
+  );
+
+  const deleteTrip = useCallback(
+    async (tripId: string) => {
+      if (!userId) return { error: new Error("로그인이 필요합니다.") };
+
+      const trip = trips.find((item) => item.id === tripId);
+      if (!trip) return { error: new Error("출조 일정을 찾지 못했습니다.") };
+
+      setIsSaving(true);
+      try {
+        const { error: deleteError } = await supabase
+          .from("fishing_trips")
+          .delete()
+          .eq("id", tripId)
+          .eq("user_id", userId);
+
+        if (deleteError) throw deleteError;
+
+        if (trip.cover_image_path) {
+          await supabase.storage.from("user-uploads").remove([trip.cover_image_path]);
+        }
+      } catch (deleteError) {
+        return {
+          error: deleteError instanceof Error
+            ? deleteError
+            : new Error("출조 일정을 삭제하지 못했습니다."),
+        };
+      } finally {
+        setIsSaving(false);
+      }
+
+      await fetchTrips(true);
+      return { error: null };
+    },
+    [fetchTrips, trips, userId]
   );
 
   const markDone = useCallback(
     async (tripId: string) => {
+      if (!userId) return { error: new Error("로그인이 필요합니다.") };
       setIsSaving(true);
       const { error: updateError } = await supabase
         .from("fishing_trips")
@@ -121,7 +329,8 @@ export const useFishingTrips = () => {
           status: "done",
           completed_at: new Date().toISOString(),
         })
-        .eq("id", tripId);
+        .eq("id", tripId)
+        .eq("user_id", userId);
 
       setIsSaving(false);
 
@@ -132,11 +341,12 @@ export const useFishingTrips = () => {
       await fetchTrips(true);
       return { error: null };
     },
-    [fetchTrips]
+    [fetchTrips, userId]
   );
 
   const cancelTrip = useCallback(
     async (tripId: string) => {
+      if (!userId) return { error: new Error("로그인이 필요합니다.") };
       setIsSaving(true);
       const { error: updateError } = await supabase
         .from("fishing_trips")
@@ -144,7 +354,8 @@ export const useFishingTrips = () => {
           status: "canceled",
           completed_at: null,
         })
-        .eq("id", tripId);
+        .eq("id", tripId)
+        .eq("user_id", userId);
 
       setIsSaving(false);
 
@@ -155,7 +366,7 @@ export const useFishingTrips = () => {
       await fetchTrips(true);
       return { error: null };
     },
-    [fetchTrips]
+    [fetchTrips, userId]
   );
 
   return {
@@ -169,6 +380,9 @@ export const useFishingTrips = () => {
     isLoggedIn: Boolean(userId),
     refetch: () => fetchTrips(true),
     createTrip,
+    updateTrip,
+    updateTripCover,
+    deleteTrip,
     markDone,
     cancelTrip,
   };

@@ -8,6 +8,9 @@ import { useFishingTrips } from "@/src/hooks/useFishingTrips";
 import { EncyclopediaPanel } from "@/components/collection/EncyclopediaPanel";
 import { BadgesPanel } from "@/components/collection/BadgesPanel";
 import { CardsPanel } from "@/components/collection/CardsPanel";
+import { ArchiveTabHeader } from "@/components/design/ArchiveTabHeader";
+import { FIELD_COLORS } from "@/src/theme/fieldJournal";
+import type { UserCatch } from "@/src/hooks/useUserCatches";
 
 type CollectionSegment = "encyclopedia" | "badges" | "cards";
 
@@ -33,16 +36,43 @@ const CollectionScreen = () => {
   } = useUserCatches();
   const { trips, refetch: refetchTrips } = useFishingTrips();
 
-  const unlockedCount = unlockedFishIds.size;
+  const previewMode = __DEV__ && !isLoggedIn;
+  const displayUnlockedFishIds = useMemo(() => previewMode ? new Set(allFishes.slice(0, 2).map((fish) => fish.id)) : unlockedFishIds, [allFishes, previewMode, unlockedFishIds]);
+  const displayCatches = useMemo<UserCatch[]>(() => {
+    if (!previewMode) return catches;
+    return allFishes.slice(0, 4).map((fish, index) => ({
+      id: `preview-${fish.id}`,
+      user_id: "preview",
+      fish_id: fish.id,
+      trip_id: null,
+      fish,
+      image_url: fish.image_url,
+      size_cm: [42, 58, 31, 46][index],
+      caught_at: new Date(2026, 6 - index, 6 + index).toISOString(),
+      location_name: ["대천항", "원산도", "군산", "태안"][index],
+      location_lat: null,
+      location_lng: null,
+      location_captured_at: null,
+      memo: null,
+      created_at: null,
+      updated_at: null,
+      candidate_fish_ids: [],
+      capture_method: "live_camera",
+      id_method: "fallback_catalog",
+      verification_status: "verified",
+      verification_reason: null,
+    }));
+  }, [allFishes, catches, previewMode]);
+  const unlockedCount = displayUnlockedFishIds.size;
   const totalFishCount = allFishes.length;
 
   const badgeContext = useMemo(
     () => ({
-      catchCount: catches.length,
-      uniqueSpecies: unlockedFishIds.size,
-      completedTrips: trips.filter((trip) => trip.status === "done").length,
+      catchCount: previewMode ? 5 : catches.length,
+      uniqueSpecies: previewMode ? 3 : unlockedFishIds.size,
+      completedTrips: previewMode ? 1 : trips.filter((trip) => trip.status === "done").length,
     }),
-    [catches.length, unlockedFishIds.size, trips]
+    [catches.length, previewMode, trips, unlockedFishIds.size]
   );
 
   const refreshCollection = () => {
@@ -52,41 +82,45 @@ const CollectionScreen = () => {
   };
 
   return (
-    <View className="flex-1 bg-[#F4F7F8]" style={{ paddingTop: insets.top }}>
-      <View className="border-b border-slate-200/80 bg-white px-4 pb-0 pt-2">
-        <Text className="text-sm font-medium text-teal-800">낚시당한 녀석들</Text>
-        <Text className="mt-0.5 text-2xl font-bold text-slate-900">수집</Text>
-        <View className="mt-4 flex-row">
+    <View className="flex-1" style={{ paddingTop: insets.top, backgroundColor: FIELD_COLORS.foam }}>
+      <ArchiveTabHeader
+        title="수집"
+        actionLabel="기록하기"
+        backgroundColor={FIELD_COLORS.foam}
+        onAction={() => router.push("/record")}
+      />
+      <View className="px-7 pb-0" style={{ backgroundColor: FIELD_COLORS.foam }}>
+        <View className="mt-3 flex-row justify-between">
           {SEGMENTS.map(({ key, label }) => {
             const isActive = segment === key;
             return (
               <TouchableOpacity
                 key={key}
                 onPress={() => setSegment(key)}
-                className="mr-6 pb-3"
+                className="min-w-[30%] items-center pb-4"
                 accessibilityRole="tab"
                 accessibilityState={{ selected: isActive }}
               >
                 <Text
-                  className={`text-base font-semibold ${
-                    isActive ? "text-slate-900" : "text-slate-400"
-                  }`}
+                  className="text-base font-semibold"
+                  style={{ color: isActive ? FIELD_COLORS.teal : "#4B4F50" }}
                 >
                   {label}
                 </Text>
                 {isActive ? (
-                  <View className="absolute bottom-0 left-0 right-0 h-0.5 bg-teal-700" />
+                  <View className="absolute bottom-0 left-0 right-0 h-[3px]" style={{ backgroundColor: FIELD_COLORS.teal }} />
                 ) : null}
               </TouchableOpacity>
             );
           })}
         </View>
+        <View className="h-px" style={{ backgroundColor: FIELD_COLORS.rule }} />
       </View>
 
       {segment === "encyclopedia" && (
         <EncyclopediaPanel
           insetsBottom={insets.bottom}
-          unlockedFishIds={unlockedFishIds}
+          unlockedFishIds={displayUnlockedFishIds}
           totalFishCount={totalFishCount}
           unlockedCount={unlockedCount}
           onRefreshAll={refreshCollection}
@@ -103,10 +137,10 @@ const CollectionScreen = () => {
       {segment === "cards" && (
         <CardsPanel
           insetsBottom={insets.bottom}
-          catches={catches}
+          catches={displayCatches}
           isLoading={catchesLoading}
           isRefreshing={catchesRefreshing}
-          isLoggedIn={isLoggedIn}
+          isLoggedIn={isLoggedIn || previewMode}
           onRefresh={refetchCatches}
           onLoginPress={() => router.push("/(auth)/login")}
         />

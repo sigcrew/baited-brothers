@@ -10,6 +10,14 @@ import 'react-native-reanimated';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import { AuthProvider } from '@/src/contexts/AuthContext';
+import { BlackHanSans_400Regular } from '@expo-google-fonts/black-han-sans';
+import { Anton_400Regular } from '@expo-google-fonts/anton';
+import { DoHyeon_400Regular } from '@expo-google-fonts/do-hyeon';
+import {
+  NotoSansKR_400Regular,
+  NotoSansKR_600SemiBold,
+  NotoSansKR_800ExtraBold,
+} from '@expo-google-fonts/noto-sans-kr';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -26,6 +34,12 @@ SplashScreen.preventAutoHideAsync();
 const RootLayout = () => {
   const [loaded, error] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    BlackHanSans: BlackHanSans_400Regular,
+    Anton: Anton_400Regular,
+    DoHyeon: DoHyeon_400Regular,
+    NotoSansKR: NotoSansKR_400Regular,
+    NotoSansKR_600SemiBold,
+    NotoSansKR_800ExtraBold,
     ...FontAwesome.font,
   });
 
@@ -57,6 +71,8 @@ const RootLayoutNav = () => {
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="record" options={{ presentation: 'fullScreenModal' }} />
+          <Stack.Screen name="trips/[id]" options={{ headerShown: false }} />
           <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
         </Stack>
       </ThemeProvider>

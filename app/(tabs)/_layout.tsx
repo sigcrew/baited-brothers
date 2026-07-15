@@ -1,20 +1,11 @@
-import React from "react";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Redirect } from "expo-router";
 import { Tabs } from "expo-router";
 
-import Colors from "@/constants/Colors";
-import { useColorScheme } from "@/components/useColorScheme";
-import { useClientOnlyValue } from "@/components/useClientOnlyValue";
+import { ArchiveTabIcon } from "@/components/navigation/ArchiveTabIcon";
 import { useAuth } from "@/src/contexts/AuthContext";
-
-const TabBarIcon = (props: {
-  name: React.ComponentProps<typeof FontAwesome>["name"];
-  color: string;
-}) => <FontAwesome size={24} style={{ marginBottom: -3 }} {...props} />;
+import { FIELD_COLORS, bodySemiBoldFont } from "@/src/theme/fieldJournal";
 
 const TabLayout = () => {
-  const colorScheme = useColorScheme();
   const { session } = useAuth();
 
   if (!__DEV__ && !session) {
@@ -24,29 +15,51 @@ const TabLayout = () => {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
-        headerShown: useClientOnlyValue(false, true),
+        tabBarActiveTintColor: FIELD_COLORS.teal,
+        tabBarInactiveTintColor: "#4B5D61",
+        headerShown: false,
+        tabBarStyle: {
+          backgroundColor: FIELD_COLORS.paper,
+          borderTopColor: FIELD_COLORS.rule,
+          borderTopWidth: 1,
+          height: 84,
+          paddingTop: 8,
+          paddingBottom: 8,
+        },
+        tabBarIconStyle: { marginTop: 1, marginBottom: 6 },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          lineHeight: 16,
+          fontFamily: bodySemiBoldFont,
+        },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
           title: "홈",
-          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+          tabBarIcon: ({ color, focused }) => <ArchiveTabIcon name="home" color={color} focused={focused} />,
+        }}
+      />
+      <Tabs.Screen
+        name="journal"
+        options={{
+          title: "일지",
+          tabBarIcon: ({ color, focused }) => <ArchiveTabIcon name="journal" color={color} focused={focused} />,
         }}
       />
       <Tabs.Screen
         name="encyclopedia"
         options={{
           title: "수집",
-          tabBarIcon: ({ color }) => <TabBarIcon name="book" color={color} />,
+          tabBarIcon: ({ color, focused }) => <ArchiveTabIcon name="collection" color={color} focused={focused} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: "프로필",
-          tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
+          tabBarIcon: ({ color, focused }) => <ArchiveTabIcon name="profile" color={color} focused={focused} />,
         }}
       />
     </Tabs>
