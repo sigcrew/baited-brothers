@@ -73,6 +73,7 @@ const RootLayoutNav = () => {
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="record" options={{ presentation: 'fullScreenModal' }} />
           <Stack.Screen name="trips/[id]" options={{ headerShown: false }} />
+          <Stack.Screen name="fishes/[id]" options={{ headerShown: false }} />
           <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
         </Stack>
       </ThemeProvider>

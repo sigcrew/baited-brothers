@@ -39,7 +39,7 @@ const RecordScreen = () => {
   const [size, setSize] = useState("");
   const [memo, setMemo] = useState("");
   const [isCapturing, setIsCapturing] = useState(false);
-  const { fishes, isLoading: fishesLoading } = useFishes(null);
+  const { fishes, isLoading: fishesLoading } = useFishes(null, "all");
   const { createCatch, isSaving } = useCreateCatch();
 
   const filteredFishes = useMemo(() => {

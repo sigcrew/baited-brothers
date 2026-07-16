@@ -9,7 +9,18 @@
     "web": "expo start --web",
     "seed:marine": "ts-node scripts/seed-from-marine-api.ts",
     "fill:descriptions": "ts-node scripts/fill-fish-descriptions.ts",
-    "fill:names-ko": "ts-node scripts/fill-fish-names-ko.ts"
+    "fill:names-ko": "ts-node scripts/fill-fish-names-ko.ts",
+    "enrich:core-images": "ts-node scripts/enrich-core-images.ts",
+    "publish:core-image-assets": "ts-node scripts/publish-core-image-assets.ts",
+    "finalize:core-guides": "ts-node scripts/finalize-core-guides.ts",
+    "mirror:core-images": "ts-node scripts/mirror-core-images.ts",
+    "prepare:core-illustration-references": "ts-node scripts/prepare-core-illustration-references.ts",
+    "audit:core-guides": "ts-node scripts/audit-core-guides.ts",
+    "fetch:core-evidence": "ts-node scripts/fetch-core-species-evidence.ts",
+    "review:core-taxonomy": "ts-node scripts/review-core-taxonomy.ts",
+    "review:core-regulations": "ts-node scripts/review-core-regulations.ts",
+    "review:core-rarity": "ts-node scripts/review-core-rarity.ts",
+    "review:core-cephalopods": "ts-node scripts/review-core-cephalopods.ts"
   },
   "dependencies": {
     "@expo-google-fonts/anton": "0.4.2",

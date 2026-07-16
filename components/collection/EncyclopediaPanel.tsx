@@ -6,36 +6,376 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
-  Modal,
-  Pressable,
   Image,
   ScrollView,
 } from "react-native";
-import { useFishes, type Fish, CATEGORY_LABELS } from "@/src/hooks/useFishes";
-import { FishThumb } from "@/components/collection/FishThumb";
+import {
+  CATALOG_GROUPS,
+  CATEGORY_LABELS,
+  type CatalogGroup,
+  type Fish,
+} from "@/src/hooks/useFishes";
+import { getField60Illustration } from "@/src/data/field60Illustrations";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import Svg, { Circle, Path } from "react-native-svg";
 import { FIELD_COLORS, monoFont } from "@/src/theme/fieldJournal";
 
-const CATEGORIES: (Fish["category"] | null)[] = [
-  null,
-  "flatfish",
-  "rockfish",
-  "seabass",
-  "bream",
-  "mackerel",
-  "mullet",
-  "cutlassfish",
-  "eel",
-  "pufferfish",
-  "other",
-];
+const CATEGORIES: (CatalogGroup | null)[] = [null, ...CATALOG_GROUPS];
+
+const GROUP_CARD_GUIDES: Record<
+  CatalogGroup,
+  { seasons: number[]; bait: string }
+> = {
+  flatfish: { seasons: [3, 4, 5, 9, 10, 11], bait: "웜" },
+  rockfish: { seasons: [3, 4, 5, 10, 11, 12], bait: "웜" },
+  bream: { seasons: [4, 5, 6, 9, 10, 11], bait: "크릴" },
+  seabass_croaker: { seasons: [5, 6, 7, 8, 9, 10], bait: "미노우" },
+  pelagic: { seasons: [6, 7, 8, 9, 10, 11], bait: "메탈지그" },
+  filefish: { seasons: [6, 7, 8, 9, 10], bait: "조개살" },
+  pufferfish: { seasons: [5, 6, 7, 8, 9], bait: "오징어살" },
+  eel: { seasons: [5, 6, 7, 8, 9, 10], bait: "오징어살" },
+  coastal: { seasons: [4, 5, 6, 7, 8, 9, 10], bait: "갯지렁이" },
+  squid: { seasons: [4, 5, 6, 9, 10, 11, 12], bait: "에기" },
+  octopus: { seasons: [3, 4, 5, 9, 10, 11], bait: "왕눈이에기" },
+};
+
+const formatSeasonRanges = (months: number[]) => {
+  const sorted = [...new Set(months)].sort((a, b) => a - b);
+  if (sorted.length === 0) return null;
+
+  const ranges: Array<[number, number]> = [];
+  let start = sorted[0];
+  let end = sorted[0];
+
+  for (const month of sorted.slice(1)) {
+    if (month === end + 1) {
+      end = month;
+    } else {
+      ranges.push([start, end]);
+      start = month;
+      end = month;
+    }
+  }
+  ranges.push([start, end]);
+
+  return `${ranges
+    .map(([rangeStart, rangeEnd]) =>
+      rangeStart === rangeEnd ? `${rangeStart}` : `${rangeStart}–${rangeEnd}`,
+    )
+    .join("·")}월`;
+};
+
+const getFishCardGuide = (fish: Fish) => {
+  const fallback =
+    GROUP_CARD_GUIDES[fish.collection_group as CatalogGroup] ??
+    GROUP_CARD_GUIDES.coastal;
+  const bait = fish.recommended_baits[0] ?? fallback.bait;
+
+  if (fish.min_size_cm) {
+    return `금지체장 ${fish.min_size_cm}cm · 미끼 ${bait}`;
+  }
+
+  const season =
+    formatSeasonRanges(
+      fish.peak_seasons.length > 0 ? fish.peak_seasons : fallback.seasons,
+    ) ?? "시즌 확인 중";
+  return `제철 ${season} · 미끼 ${bait}`;
+};
+
+const LockedFishOutline = () => (
+  <View className="flex-1 items-center justify-center">
+    <Svg width="72%" height="62%" viewBox="0 0 180 92" fill="none">
+      <Path
+        d="M13 46c16-24 43-36 76-34 24 1 45 9 61 22l22-14-6 26 6 26-22-14C134 71 113 79 89 80 56 82 29 70 13 46Z"
+        stroke={FIELD_COLORS.muted}
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Path
+        d="M76 13C86 2 99-2 114 1c-5 8-6 15-3 22M76 79c10 11 23 15 38 12-5-8-6-15-3-22"
+        stroke={FIELD_COLORS.muted}
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Circle cx="44" cy="40" r="4" fill={FIELD_COLORS.muted} />
+    </Svg>
+    <FontAwesome
+      name="lock"
+      size={14}
+      color={FIELD_COLORS.muted}
+      style={{ position: "absolute", bottom: 12, right: 12 }}
+    />
+  </View>
+);
+
+const ErasedTextLine = ({
+  text,
+  width,
+  color,
+  size,
+  tracking = 0,
+  bold = false,
+  intensity = "normal",
+}: {
+  text: string;
+  width: number;
+  color: string;
+  size: number;
+  tracking?: number;
+  bold?: boolean;
+  intensity?: "normal" | "strong";
+}) => {
+  const textWidth = Math.min(
+    width,
+    Math.max(size, Array.from(text).length * size * 0.96),
+  );
+
+  return (
+    <View style={{ width, height: size + 5, overflow: "hidden" }}>
+      <Text
+        numberOfLines={1}
+        style={{
+          color,
+          fontFamily: bold ? undefined : monoFont,
+          fontSize: size,
+          fontWeight: bold ? "900" : "400",
+          letterSpacing: tracking,
+          opacity: 1,
+        }}
+      >
+        {text}
+      </Text>
+      {intensity === "strong" ? (
+        <>
+          <View
+            className="absolute"
+            style={{
+              left: 3.5,
+              top: 0,
+              width: Math.max(0, textWidth - 7),
+              height: size + 5,
+              backgroundColor: FIELD_COLORS.foam,
+              opacity: 0.995,
+            }}
+          />
+          <View
+            className="absolute overflow-hidden"
+            style={{
+              left: textWidth - 6,
+              top: 0,
+              width: 6,
+              height: size + 5,
+            }}
+          >
+            <Text
+              style={{
+                position: "absolute",
+                left: 0,
+                top: 0,
+                width: size + 4,
+                color,
+                fontSize: size,
+                fontWeight: bold ? "900" : "400",
+                transform: [{ translateX: -(size - 7) }],
+              }}
+            >
+              {Array.from(text).at(-1)}
+            </Text>
+          </View>
+          {[
+            {
+              left: textWidth * 0.34,
+              top: size * 0.24,
+              width: 6,
+              height: 3,
+            },
+            {
+              left: textWidth * 0.55,
+              top: size * 0.52,
+              width: 4,
+              height: 4,
+            },
+            {
+              left: textWidth * 0.7,
+              top: size * 0.72,
+              width: 7,
+              height: 3,
+            },
+          ].map((fragment, index) => (
+            <View
+              key={`erased-fragment-${index}`}
+              className="absolute overflow-hidden"
+              style={fragment}
+            >
+              <Text
+                numberOfLines={1}
+                style={{
+                  position: "absolute",
+                  left: 0,
+                  top: -fragment.top,
+                  width: textWidth,
+                  color,
+                  fontFamily: bold ? undefined : monoFont,
+                  fontSize: size,
+                  fontWeight: bold ? "900" : "400",
+                  letterSpacing: tracking,
+                  transform: [{ translateX: -fragment.left }],
+                }}
+              >
+                {text}
+              </Text>
+            </View>
+          ))}
+          {[
+            {
+              left: textWidth * 0.32,
+              top: size * 0.32,
+              width: 6,
+              height: 2,
+              rotate: "-8deg",
+            },
+            {
+              left: textWidth * 0.53,
+              top: size * 0.58,
+              width: 3,
+              height: 3,
+              rotate: "4deg",
+            },
+            {
+              left: textWidth * 0.69,
+              top: size * 0.75,
+              width: 7,
+              height: 2,
+              rotate: "-3deg",
+            },
+          ].map((mark, index) => (
+            <View
+              key={`erased-ink-${index}`}
+              className="absolute"
+              style={{
+                left: mark.left,
+                top: mark.top,
+                width: mark.width,
+                height: mark.height,
+                backgroundColor: color,
+                opacity: 0.72,
+                transform: [{ rotate: mark.rotate }],
+              }}
+            />
+          ))}
+        </>
+      ) : (
+        <>
+          <View
+            className="absolute h-[7px]"
+            style={{
+              left: width * 0.08,
+              top: size * 0.24,
+              width: width * 0.38,
+              backgroundColor: FIELD_COLORS.foam,
+              opacity: 0.98,
+              transform: [{ rotate: "-3deg" }],
+            }}
+          />
+          <View
+            className="absolute h-[8px]"
+            style={{
+              right: width * 0.02,
+              top: size * 0.54,
+              width: width * 0.46,
+              backgroundColor: FIELD_COLORS.foam,
+              opacity: 0.96,
+              transform: [{ rotate: "2deg" }],
+            }}
+          />
+          <View
+            className="absolute h-[5px]"
+            style={{
+              left: width * 0.25,
+              top: size * 0.78,
+              width: width * 0.5,
+              backgroundColor: FIELD_COLORS.foam,
+              opacity: 0.92,
+              transform: [{ rotate: "-1deg" }],
+            }}
+          />
+          <View
+            className="absolute h-[3px]"
+            style={{
+              left: 0,
+              top: size * 0.66,
+              width: width * 0.17,
+              backgroundColor: FIELD_COLORS.foam,
+              opacity: 0.88,
+            }}
+          />
+          <View
+            className="absolute h-[4px]"
+            style={{
+              right: width * 0.18,
+              top: size * 0.08,
+              width: width * 0.22,
+              backgroundColor: FIELD_COLORS.foam,
+              opacity: 0.94,
+            }}
+          />
+        </>
+      )}
+    </View>
+  );
+};
+
+const RedactedFishMetadata = ({ fish }: { fish: Fish }) => (
+  <View
+    className="min-w-0 flex-1 justify-center py-2 pl-4"
+    accessibilityLabel="미발견 어종 정보 잠김"
+  >
+    <ErasedTextLine
+      text={fish.name_ko ?? fish.name}
+      width={132}
+      color={FIELD_COLORS.ink}
+      size={22}
+      bold
+      intensity="strong"
+    />
+    <View className="mt-3">
+      <ErasedTextLine
+        text={fish.name.toUpperCase()}
+        width={156}
+        color={FIELD_COLORS.teal}
+        size={10}
+        tracking={0.8}
+      />
+    </View>
+    <View
+      className="mt-4 h-px w-20"
+      style={{ backgroundColor: FIELD_COLORS.rule }}
+    />
+    <View className="mt-4">
+      <ErasedTextLine
+        text={getFishCardGuide(fish)}
+        width={156}
+        color={FIELD_COLORS.muted}
+        size={11}
+      />
+    </View>
+  </View>
+);
 
 type EncyclopediaPanelProps = {
   insetsBottom: number;
+  allFishes: Fish[];
+  isLoading: boolean;
+  isRefreshing: boolean;
+  error: Error | null;
   unlockedFishIds: Set<string>;
   totalFishCount: number;
   unlockedCount: number;
   onRefreshAll?: () => void;
+  onRetry: () => void;
+  onOpenFish: (fishId: string) => void;
 };
 
 const FishRow = ({
@@ -46,135 +386,127 @@ const FishRow = ({
   fish: Fish;
   unlocked: boolean;
   onPress: () => void;
-}) => (
-  <TouchableOpacity
-    onPress={onPress}
-    activeOpacity={0.75}
-    className="flex-row border-b py-4"
-    style={{ borderColor: FIELD_COLORS.rule }}
-  >
-    <View className="h-36 w-[52%] overflow-hidden rounded-lg" style={{ backgroundColor: FIELD_COLORS.locked }}>
-      {unlocked && fish.image_url ? <Image source={{ uri: fish.image_url }} className="h-full w-full" resizeMode="cover" /> : <View className="flex-1 items-center justify-center"><View className="h-14 w-28 rounded-[50%]" style={{ backgroundColor: "#A9B8B9" }} />{!unlocked ? <FontAwesome name="lock" size={16} color={FIELD_COLORS.muted} style={{ position: "absolute", bottom: 12, right: 12 }} /> : null}</View>}
-    </View>
-    <View className="flex-1 justify-center pl-5 py-2">
-      <View>
-        <Text
-          className="text-2xl font-black"
-          style={{ color: unlocked ? FIELD_COLORS.ink : FIELD_COLORS.muted }}
-          numberOfLines={1}
-        >
-          {unlocked ? (fish.name_ko ?? fish.name) : "미확인 어종"}
-        </Text>
-      </View>
-      <Text className="mt-2 text-[11px] tracking-[1px]" style={{ color: FIELD_COLORS.teal, fontFamily: monoFont }} numberOfLines={1}>
-        {unlocked ? fish.name.toUpperCase() : "LOCKED SPECIMEN"}
-      </Text>
-      <View className="mt-3 h-px w-20" style={{ backgroundColor: FIELD_COLORS.rule }} />
-      <Text className="mt-3 text-xs leading-5" style={{ color: FIELD_COLORS.muted }}>{unlocked ? `${CATEGORY_LABELS[fish.category]} · ${fish.min_size_cm ? `최소 ${fish.min_size_cm}cm` : "현장 발견"}` : "현장에서 발견하면\n정보가 열립니다"}</Text>
-    </View>
-  </TouchableOpacity>
-);
-
-const FishDetailModal = ({
-  fish,
-  unlocked,
-  visible,
-  onClose,
-}: {
-  fish: Fish | null;
-  unlocked: boolean;
-  visible: boolean;
-  onClose: () => void;
 }) => {
-  if (!fish) return null;
+  const localIllustration = getField60Illustration(
+    fish.catalog_sort_order,
+    unlocked ? "color" : "outline",
+  );
+  const imageSource =
+    localIllustration ??
+    (unlocked && fish.image_url ? { uri: fish.image_url } : null);
 
   return (
-    <Modal visible={visible} transparent animationType="fade">
-      <Pressable
-        onPress={onClose}
-        className="flex-1 items-center justify-center bg-slate-950/50 px-4"
-      >
-        <Pressable
-          onPress={(e) => e.stopPropagation()}
-          className="w-full max-w-sm overflow-hidden rounded-2xl bg-white"
-        >
-          <View className="items-center bg-slate-100 py-8">
-            {unlocked && fish.image_url ? (
-              <Image
-                source={{ uri: fish.image_url }}
-                className="h-36 w-36 rounded-xl bg-slate-200"
-                resizeMode="cover"
-              />
-            ) : (
-              <FishThumb
-                imageUrl={fish.image_url}
-                unlocked={unlocked}
-                size={120}
-              />
-            )}
-            <Text className="mt-4 text-xl font-bold text-slate-900">
-              {unlocked ? (fish.name_ko ?? fish.name) : "미확인 어종"}
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.75}
+      className="flex-row border-b py-4"
+      style={{ borderColor: FIELD_COLORS.rule }}
+      accessibilityRole="button"
+      accessibilityLabel={
+        unlocked
+          ? `${fish.name_ko ?? fish.name} 도감 상세 보기`
+          : "미발견 어종 잠금 화면 보기"
+      }
+      accessibilityHint={
+        unlocked
+          ? "발견 기록이 있는 어종입니다"
+          : "아직 발견 기록이 없는 어종입니다"
+      }
+    >
+      <View className="h-36 w-[48%] overflow-hidden rounded-lg" style={{ backgroundColor: FIELD_COLORS.locked }}>
+        {imageSource ? (
+          <Image
+            source={imageSource}
+            style={{ width: "100%", height: "100%" }}
+            resizeMode="contain"
+            accessibilityLabel={
+              unlocked
+                ? `${fish.name_ko ?? fish.name} 컬러 일러스트`
+                : "미발견 어종 점선 실루엣"
+            }
+          />
+        ) : unlocked ? (
+          <View className="flex-1 items-center justify-center">
+            <FontAwesome name="image" size={28} color={FIELD_COLORS.muted} />
+            <Text
+              className="mt-2 text-[9px] tracking-[1px]"
+              style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}
+            >
+              IMAGE PENDING
             </Text>
-            {unlocked && (
-              <Text className="mt-1 text-sm text-slate-500">{fish.name}</Text>
-            )}
-            <View className="mt-2 rounded-md bg-slate-200/80 px-2.5 py-1">
-              <Text className="text-xs font-medium text-slate-600">
-                {CATEGORY_LABELS[fish.category]}
-              </Text>
-            </View>
           </View>
-          <View className="p-5">
-            {!unlocked ? (
-              <Text className="text-center text-sm leading-5 text-slate-500">
-                현장에서 카메라로 기록하면 이 칸이 해금됩니다.
-              </Text>
-            ) : (
-              <>
-                {fish.min_size_cm != null && (
-                  <View className="mb-4">
-                    <Text className="text-xs font-medium text-slate-400">
-                      최소 크기
-                    </Text>
-                    <Text className="mt-0.5 text-lg font-semibold text-slate-900">
-                      {fish.min_size_cm}cm
-                    </Text>
-                  </View>
-                )}
-                <Text className="text-xs font-medium text-slate-400">설명</Text>
-                <Text className="mt-1 text-[15px] leading-6 text-slate-700">
-                  {fish.description?.trim() || "정보가 아직 없어요."}
-                </Text>
-              </>
-            )}
+        ) : (
+          <LockedFishOutline />
+        )}
+        <View
+          className="absolute bottom-2 left-2 flex-row items-center px-2 py-1"
+          style={{ backgroundColor: unlocked ? FIELD_COLORS.teal : "rgba(5, 31, 40, 0.78)" }}
+        >
+          <FontAwesome
+            name={unlocked ? "check" : "circle-o"}
+            size={10}
+            color="white"
+          />
+          <Text className="ml-1 text-[9px] text-white" style={{ fontFamily: monoFont }}>
+            {unlocked ? "발견 완료" : "미발견"}
+          </Text>
+        </View>
+      </View>
+      {unlocked ? (
+        <View className="min-w-0 flex-1 justify-center py-2 pl-4">
+          <View>
+            <Text
+              className="text-2xl font-black"
+              style={{ color: FIELD_COLORS.ink }}
+              numberOfLines={1}
+            >
+              {fish.name_ko ?? fish.name}
+            </Text>
           </View>
-          <TouchableOpacity
-            onPress={onClose}
-            className="mx-4 mb-4 rounded-xl bg-slate-900 py-3.5 active:bg-slate-800"
+          <Text
+            className="mt-2 text-[10px] leading-[15px] tracking-[0.7px]"
+            style={{ color: FIELD_COLORS.teal, fontFamily: monoFont }}
+            numberOfLines={2}
           >
-            <Text className="text-center font-medium text-white">닫기</Text>
-          </TouchableOpacity>
-        </Pressable>
-      </Pressable>
-    </Modal>
+            {fish.name.toUpperCase()}
+          </Text>
+          <View className="mt-3 h-px w-20" style={{ backgroundColor: FIELD_COLORS.rule }} />
+          <Text
+            className="mt-3 text-xs leading-5"
+            style={{ color: FIELD_COLORS.muted }}
+            numberOfLines={2}
+          >
+            {getFishCardGuide(fish)}
+          </Text>
+        </View>
+      ) : (
+        <RedactedFishMetadata fish={fish} />
+      )}
+    </TouchableOpacity>
   );
 };
 
 export const EncyclopediaPanel = ({
   insetsBottom,
+  allFishes,
+  isLoading,
+  isRefreshing,
+  error,
   unlockedFishIds,
   totalFishCount,
   unlockedCount,
   onRefreshAll,
+  onRetry,
+  onOpenFish,
 }: EncyclopediaPanelProps) => {
-  const [selectedCategory, setSelectedCategory] = useState<
-    Fish["category"] | null
-  >(null);
-  const [selectedFish, setSelectedFish] = useState<Fish | null>(null);
-  const [detailVisible, setDetailVisible] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<CatalogGroup | null>(null);
 
-  const { fishes, isLoading, isRefreshing, error, refetch, retry } =
-    useFishes(selectedCategory);
+  const fishes = useMemo(
+    () => selectedCategory
+      ? allFishes.filter((fish) => fish.collection_group === selectedCategory)
+      : allFishes,
+    [allFishes, selectedCategory]
+  );
 
   const progressLabel = useMemo(() => {
     if (totalFishCount <= 0) return "도감을 불러오는 중";
@@ -185,7 +517,6 @@ export const EncyclopediaPanel = ({
     totalFishCount > 0 ? Math.min(unlockedCount / totalFishCount, 1) : 0;
 
   const handleRefresh = () => {
-    refetch();
     onRefreshAll?.();
   };
 
@@ -198,7 +529,7 @@ export const EncyclopediaPanel = ({
               {progressLabel}
             </Text>
           </View>
-          <Text className="text-[10px] tracking-[1px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>{fishes.length} SPECIMENS</Text>
+          <Text className="text-[10px] tracking-[1px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>FIELD 60 · V1</Text>
         </View>
         <View className="mt-3 h-[2px] bg-slate-200">
           <View
@@ -240,13 +571,13 @@ export const EncyclopediaPanel = ({
           <View className="flex-1 items-center justify-center">
             <ActivityIndicator size="large" color="#0f766e" />
           </View>
-        ) : error ? (
+        ) : error && fishes.length === 0 ? (
           <View className="flex-1 items-center justify-center px-4">
             <Text className="text-center text-slate-600">
               도감을 불러오지 못했습니다.
             </Text>
             <TouchableOpacity
-              onPress={retry}
+              onPress={onRetry}
               className="mt-4 rounded-lg bg-slate-200 px-4 py-2"
             >
               <Text className="font-medium text-slate-700">다시 시도</Text>
@@ -262,10 +593,7 @@ export const EncyclopediaPanel = ({
                 <FishRow
                   fish={item}
                   unlocked={unlocked}
-                  onPress={() => {
-                    setSelectedFish(item);
-                    setDetailVisible(true);
-                  }}
+                  onPress={() => onOpenFish(item.id)}
                 />
               );
             }}
@@ -287,17 +615,6 @@ export const EncyclopediaPanel = ({
         )}
       </View>
 
-      <FishDetailModal
-        fish={selectedFish}
-        unlocked={
-          selectedFish ? unlockedFishIds.has(selectedFish.id) : false
-        }
-        visible={detailVisible}
-        onClose={() => {
-          setDetailVisible(false);
-          setSelectedFish(null);
-        }}
-      />
     </>
   );
 };

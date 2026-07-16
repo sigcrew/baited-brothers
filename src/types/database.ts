@@ -11,39 +11,191 @@ export type Database = {
     Tables: {
       fishes: {
         Row: {
+          aliases: string[]
+          average_size_cm: number | null
+          catalog_sort_order: number | null
+          catalog_status: string
+          catalog_version: string | null
           category: Database["public"]["Enums"]["fish_category"]
+          collection_group: string
           created_at: string | null
           description: string | null
+          depth_zone: string | null
+          discovery_difficulty: number | null
+          fishing_methods: string[]
+          guide_reviewed_at: string | null
+          guide_source_urls: string[]
+          guide_status: string
+          habitat_environment: string | null
+          habitat_regions: string[]
+          handling_cautions: string | null
           id: string
+          identification_features: string | null
+          image_attribution: string | null
+          image_license: string | null
+          image_source_url: string | null
           image_url: string | null
+          inclusion_reason: string | null
           min_size_cm: number | null
+          max_size_cm: number | null
           name: string
           name_ko: string | null
+          peak_seasons: number[]
+          rarity: number | null
+          recommended_baits: string[]
+          scientific_synonyms: string[]
+          similar_species_notes: string | null
+          source_name: string | null
+          source_species_id: string | null
+          toxicity: string | null
           updated_at: string | null
         }
         Insert: {
+          aliases?: string[]
+          average_size_cm?: number | null
+          catalog_sort_order?: number | null
+          catalog_status?: string
+          catalog_version?: string | null
           category?: Database["public"]["Enums"]["fish_category"]
+          collection_group?: string
           created_at?: string | null
           description?: string | null
+          depth_zone?: string | null
+          discovery_difficulty?: number | null
+          fishing_methods?: string[]
+          guide_reviewed_at?: string | null
+          guide_source_urls?: string[]
+          guide_status?: string
+          habitat_environment?: string | null
+          habitat_regions?: string[]
+          handling_cautions?: string | null
           id?: string
+          identification_features?: string | null
+          image_attribution?: string | null
+          image_license?: string | null
+          image_source_url?: string | null
           image_url?: string | null
+          inclusion_reason?: string | null
           min_size_cm?: number | null
+          max_size_cm?: number | null
           name: string
           name_ko?: string | null
+          peak_seasons?: number[]
+          rarity?: number | null
+          recommended_baits?: string[]
+          scientific_synonyms?: string[]
+          similar_species_notes?: string | null
+          source_name?: string | null
+          source_species_id?: string | null
+          toxicity?: string | null
           updated_at?: string | null
         }
         Update: {
+          aliases?: string[]
+          average_size_cm?: number | null
+          catalog_sort_order?: number | null
+          catalog_status?: string
+          catalog_version?: string | null
           category?: Database["public"]["Enums"]["fish_category"]
+          collection_group?: string
           created_at?: string | null
           description?: string | null
+          depth_zone?: string | null
+          discovery_difficulty?: number | null
+          fishing_methods?: string[]
+          guide_reviewed_at?: string | null
+          guide_source_urls?: string[]
+          guide_status?: string
+          habitat_environment?: string | null
+          habitat_regions?: string[]
+          handling_cautions?: string | null
           id?: string
+          identification_features?: string | null
+          image_attribution?: string | null
+          image_license?: string | null
+          image_source_url?: string | null
           image_url?: string | null
+          inclusion_reason?: string | null
           min_size_cm?: number | null
+          max_size_cm?: number | null
           name?: string
           name_ko?: string | null
+          peak_seasons?: number[]
+          rarity?: number | null
+          recommended_baits?: string[]
+          scientific_synonyms?: string[]
+          similar_species_notes?: string | null
+          source_name?: string | null
+          source_species_id?: string | null
+          toxicity?: string | null
           updated_at?: string | null
         }
         Relationships: []
+      }
+      fish_regulations: {
+        Row: {
+          created_at: string
+          effective_from: string
+          effective_to: string | null
+          fish_id: string
+          id: string
+          jurisdiction: string
+          measurement_method: string | null
+          min_size_cm: number | null
+          min_weight_g: number | null
+          prohibited_from: string | null
+          prohibited_to: string | null
+          regulation_type: string
+          rule_text: string
+          source_name: string
+          source_url: string
+          verified_at: string
+        }
+        Insert: {
+          created_at?: string
+          effective_from: string
+          effective_to?: string | null
+          fish_id: string
+          id?: string
+          jurisdiction?: string
+          measurement_method?: string | null
+          min_size_cm?: number | null
+          min_weight_g?: number | null
+          prohibited_from?: string | null
+          prohibited_to?: string | null
+          regulation_type: string
+          rule_text: string
+          source_name: string
+          source_url: string
+          verified_at?: string
+        }
+        Update: {
+          created_at?: string
+          effective_from?: string
+          effective_to?: string | null
+          fish_id?: string
+          id?: string
+          jurisdiction?: string
+          measurement_method?: string | null
+          min_size_cm?: number | null
+          min_weight_g?: number | null
+          prohibited_from?: string | null
+          prohibited_to?: string | null
+          regulation_type?: string
+          rule_text?: string
+          source_name?: string
+          source_url?: string
+          verified_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fish_regulations_fish_id_fkey"
+            columns: ["fish_id"]
+            isOneToOne: false
+            referencedRelation: "fishes"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       user_catches: {
         Row: {

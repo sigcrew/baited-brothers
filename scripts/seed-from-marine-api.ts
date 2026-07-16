@@ -97,6 +97,29 @@ const mapCategoryFromFamily = (familyName: string, koreanName: string): FishCate
   return "other";
 };
 
+const mapCollectionGroup = (category: FishCategory) => {
+  switch (category) {
+    case "flatfish":
+      return "flatfish";
+    case "rockfish":
+      return "rockfish";
+    case "bream":
+      return "bream";
+    case "seabass":
+      return "seabass_croaker";
+    case "mackerel":
+    case "mullet":
+    case "cutlassfish":
+      return "pelagic";
+    case "eel":
+      return "eel";
+    case "pufferfish":
+      return "pufferfish";
+    default:
+      return "other";
+  }
+};
+
 const parseApiResponse = (xml: string): Array<Record<string, unknown>> => {
   const parser = new XMLParser({
     ignoreAttributes: false,
@@ -149,6 +172,15 @@ const mapToFishItem = (item: Record<string, unknown>): FishInsert | null => {
 
   const nameKo = commKorNm?.trim() || null;
   const familyName = [family, familyKR].filter(Boolean).join(" ") || "";
+  const category = mapCategoryFromFamily(familyName, nameKo || name);
+  const sourceSpeciesId = [
+    item.Ktsn,
+    item.ktsn,
+    item.TaxonId,
+    item.taxonId,
+    item.SpcNo,
+    item.spcNo,
+  ].find((value) => typeof value === "string" || typeof value === "number");
 
   const abst = (item.ABST ?? item.abst) as string | undefined;
   const form = (item.FORM ?? item.form) as string | undefined;
@@ -173,8 +205,13 @@ const mapToFishItem = (item: Record<string, unknown>): FishInsert | null => {
     name: name.slice(0, 200),
     name_ko: nameKo?.slice(0, 100) || null,
     description,
-    category: mapCategoryFromFamily(familyName, nameKo || name),
+    category,
     min_size_cm: null,
+    catalog_status: "reference",
+    collection_group: mapCollectionGroup(category),
+    inclusion_reason: "공공데이터 신규 수집: 국내 생활낚시 대상 여부 검토 전",
+    source_name: "해양생물종정보 API taxonlist2",
+    source_species_id: sourceSpeciesId == null ? null : String(sourceSpeciesId),
   };
 };
 

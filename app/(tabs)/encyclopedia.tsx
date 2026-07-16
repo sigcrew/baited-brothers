@@ -35,7 +35,14 @@ const CollectionScreen = () => {
   const router = useRouter();
   const [segment, setSegment] = useState<CollectionSegment>("encyclopedia");
 
-  const { fishes: allFishes, refetch: refetchFishes } = useFishes(null);
+  const {
+    fishes: allFishes,
+    isLoading: fishesLoading,
+    isRefreshing: fishesRefreshing,
+    error: fishesError,
+    refetch: refetchFishes,
+    retry: retryFishes,
+  } = useFishes(null);
   const {
     catches,
     unlockedFishIds,
@@ -47,7 +54,11 @@ const CollectionScreen = () => {
   const { trips, refetch: refetchTrips } = useFishingTrips();
 
   const previewMode = __DEV__ && !isLoggedIn;
-  const displayUnlockedFishIds = useMemo(() => previewMode ? new Set(allFishes.slice(0, 2).map((fish) => fish.id)) : unlockedFishIds, [allFishes, previewMode, unlockedFishIds]);
+  const displayUnlockedFishIds = useMemo(() => {
+    if (previewMode) return new Set(allFishes.slice(0, 2).map((fish) => fish.id));
+    const coreIds = new Set(allFishes.map((fish) => fish.id));
+    return new Set([...unlockedFishIds].filter((id) => coreIds.has(id)));
+  }, [allFishes, previewMode, unlockedFishIds]);
   const displayCatches = useMemo<UserCatch[]>(() => {
     if (!previewMode) return catches;
     return allFishes.slice(0, 4).map((fish, index) => ({
@@ -174,10 +185,16 @@ const CollectionScreen = () => {
       {segment === "encyclopedia" && (
         <EncyclopediaPanel
           insetsBottom={insets.bottom}
+          allFishes={allFishes}
+          isLoading={fishesLoading}
+          isRefreshing={fishesRefreshing}
+          error={fishesError}
           unlockedFishIds={displayUnlockedFishIds}
           totalFishCount={totalFishCount}
           unlockedCount={unlockedCount}
           onRefreshAll={refreshCollection}
+          onRetry={retryFishes}
+          onOpenFish={(fishId) => router.push(`/fishes/${fishId}`)}
         />
       )}
       {segment === "badges" && (
