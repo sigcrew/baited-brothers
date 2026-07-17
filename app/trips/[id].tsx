@@ -37,13 +37,16 @@ import {
 const DEFAULT_COVER = require("@/assets/images/design/first-trip-cover-v1.png");
 
 const STATUS_LABEL: Record<FishingTrip["status"], string> = {
-  planned: "예정",
-  done: "완료",
-  canceled: "취소",
+  planned: "출조 예정",
+  done: "출조 완료",
+  canceled: "출조 취소",
 };
 
-const actionColor = (status: FishingTrip["status"]) =>
-  status === "canceled" ? FIELD_COLORS.orange : FIELD_COLORS.teal;
+const actionColor = (status: FishingTrip["status"]) => {
+  if (status === "planned") return FIELD_COLORS.orange;
+  if (status === "canceled") return FIELD_COLORS.red;
+  return FIELD_COLORS.teal;
+};
 
 const TripDetailScreen = () => {
   const router = useRouter();
@@ -176,10 +179,34 @@ const TripDetailScreen = () => {
             >
               <FontAwesome name="long-arrow-left" size={22} color="#fff" />
             </TouchableOpacity>
-            <View className="bg-black/55 px-4 py-2">
-              <Text className="text-sm text-white" style={{ fontFamily: bodyExtraBoldFont }}>
-                {STATUS_LABEL[trip.status]}
+            <View
+              accessible
+              accessibilityRole="text"
+              accessibilityLabel={`상태: ${STATUS_LABEL[trip.status]}`}
+              className="items-end"
+            >
+              <Text
+                className="text-[9px] tracking-[1.6px] text-white"
+                style={{
+                  fontFamily: monoFont,
+                  textShadowColor: "rgba(0,0,0,0.75)",
+                  textShadowOffset: { width: 0, height: 1 },
+                  textShadowRadius: 3,
+                }}
+              >
+                STATUS
               </Text>
+              <View className="mt-1 flex-row items-center">
+                <Text
+                  className="text-xs"
+                  style={{
+                    color: accent,
+                    fontFamily: bodyExtraBoldFont,
+                  }}
+                >
+                  {STATUS_LABEL[trip.status]}
+                </Text>
+              </View>
             </View>
           </View>
           <View className="absolute bottom-0 left-0 right-0 flex-row items-end justify-between bg-black/50 px-5 py-4">
@@ -245,8 +272,8 @@ const TripDetailScreen = () => {
                   className="flex-1 items-center border-r py-4"
                   style={{ borderColor: FIELD_COLORS.rule }}
                 >
-                  <FontAwesome name="ban" size={18} color={FIELD_COLORS.orange} />
-                  <Text className="mt-2 text-sm" style={{ color: FIELD_COLORS.orange, fontFamily: bodySemiBoldFont }}>취소</Text>
+                  <FontAwesome name="ban" size={18} color={FIELD_COLORS.red} />
+                  <Text className="mt-2 text-sm" style={{ color: FIELD_COLORS.red, fontFamily: bodySemiBoldFont }}>취소</Text>
                 </TouchableOpacity>
               </>
             ) : null}
@@ -285,26 +312,94 @@ const TripDetailScreen = () => {
               catches.map((item, index) => {
                 const caughtDate = new Date(item.caught_at);
                 return (
-                  <View key={item.id} className="flex-row border-b py-4" style={{ borderColor: FIELD_COLORS.rule }}>
-                    {item.image_url ? (
-                      <Image source={{ uri: item.image_url }} resizeMode="cover" style={{ width: 112, height: 112 }} />
-                    ) : (
-                      <View className="h-28 w-28 items-center justify-center" style={{ backgroundColor: FIELD_COLORS.locked }}>
-                        <FontAwesome name="image" size={24} color={FIELD_COLORS.muted} />
+                  <View
+                    key={item.id}
+                    className="border-b py-4"
+                    style={{ borderColor: FIELD_COLORS.rule }}
+                  >
+                    <View className="flex-row">
+                      {item.image_url ? (
+                        <Image
+                          source={{ uri: item.image_url }}
+                          resizeMode="cover"
+                          style={{ width: 112, height: 112 }}
+                        />
+                      ) : (
+                        <View
+                          className="h-28 w-28 items-center justify-center"
+                          style={{ backgroundColor: FIELD_COLORS.locked }}
+                        >
+                          <FontAwesome
+                            name="image"
+                            size={24}
+                            color={FIELD_COLORS.muted}
+                          />
+                        </View>
+                      )}
+                      <View className="min-w-0 flex-1 justify-center pl-4">
+                        <Text
+                          className="text-[11px] tracking-[1px]"
+                          style={{
+                            color: FIELD_COLORS.muted,
+                            fontFamily: monoFont,
+                          }}
+                        >
+                          #{String(index + 1).padStart(2, "0")} ·{" "}
+                          {caughtDate.toLocaleTimeString("ko-KR", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </Text>
+                        <Text
+                          className="mt-2 text-xl"
+                          style={{
+                            color: FIELD_COLORS.ink,
+                            fontFamily: bodyExtraBoldFont,
+                          }}
+                        >
+                          {item.fish?.name_ko ??
+                            item.fish?.name ??
+                            "어종 미확인"}
+                        </Text>
+                        <Text
+                          className="mt-2 text-sm"
+                          style={{
+                            color: FIELD_COLORS.ink,
+                            fontFamily: bodyFont,
+                          }}
+                        >
+                          {item.size_cm
+                            ? `${item.size_cm} cm`
+                            : "크기 미기록"}
+                        </Text>
                       </View>
-                    )}
-                    <View className="min-w-0 flex-1 pl-4">
-                      <Text className="text-[11px] tracking-[1px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>
-                        #{String(index + 1).padStart(2, "0")} · {caughtDate.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })}
-                      </Text>
-                      <Text className="mt-2 text-xl" style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>
-                        {item.fish?.name_ko ?? item.fish?.name ?? "어종 미확인"}
-                      </Text>
-                      <Text className="mt-2 text-sm" style={{ color: FIELD_COLORS.ink, fontFamily: bodyFont }}>
-                        {item.size_cm ? `${item.size_cm} cm` : "크기 미기록"}
-                      </Text>
-                      {item.memo ? <Text className="mt-2 text-sm" numberOfLines={2} style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}>{item.memo}</Text> : null}
                     </View>
+
+                    {item.memo ? (
+                      <View
+                        className="mt-4 border-t pt-3"
+                        style={{ borderColor: FIELD_COLORS.rule }}
+                      >
+                        <Text
+                          className="text-[10px] tracking-[1.2px]"
+                          style={{
+                            color: FIELD_COLORS.teal,
+                            fontFamily: monoFont,
+                          }}
+                        >
+                          FIELD NOTE
+                        </Text>
+                        <Text
+                          className="mt-2 text-sm leading-5"
+                          style={{
+                            color: FIELD_COLORS.muted,
+                            fontFamily: bodyFont,
+                          }}
+                        >
+                          {item.memo}
+                        </Text>
+                      </View>
+                    ) : null}
                   </View>
                 );
               })

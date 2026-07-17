@@ -48,8 +48,11 @@ const STATUS_LABEL: Record<FishingTrip["status"], string> = {
   canceled: "취소",
 };
 
-const statusColor = (status: FishingTrip["status"]) =>
-  status === "done" ? FIELD_COLORS.teal : FIELD_COLORS.orange;
+const statusColor = (status: FishingTrip["status"]) => {
+  if (status === "done") return FIELD_COLORS.teal;
+  if (status === "canceled") return FIELD_COLORS.red;
+  return FIELD_COLORS.orange;
+};
 
 const TripTimelineRow = ({
   trip,
@@ -85,6 +88,10 @@ const TripTimelineRow = ({
         <View className="absolute left-[21px] top-[39px] h-[19px] w-[19px] items-center justify-center rounded-full" style={{ backgroundColor: FIELD_COLORS.teal }}>
           <FontAwesome name="check" size={11} color="#fff" />
         </View>
+      ) : trip.status === "canceled" ? (
+        <View className="absolute left-[21px] top-[39px] h-[19px] w-[19px] items-center justify-center bg-white">
+          <FontAwesome name="ban" size={19} color={FIELD_COLORS.red} />
+        </View>
       ) : (
         <View
           className="absolute left-[23px] top-[41px] h-[15px] w-[15px] rounded-full border-2 bg-white"
@@ -95,7 +102,7 @@ const TripTimelineRow = ({
       <View className="w-[142px] items-center pl-8 pr-1">
         <Text
           className="text-[18px] leading-[22px]"
-          style={{ color: FIELD_COLORS.ink, fontFamily: dateKoreanFont }}
+          style={{ color: accent, fontFamily: dateKoreanFont }}
         >
           {month}월
         </Text>

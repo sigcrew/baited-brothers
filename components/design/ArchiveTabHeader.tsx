@@ -16,6 +16,7 @@ type ArchiveTabHeaderProps = {
   actionLabel?: string;
   actionAccessibilityLabel?: string;
   onAction?: () => void;
+  leadingSlot?: ReactNode;
   rightSlot?: ReactNode;
 };
 
@@ -27,6 +28,7 @@ export const ArchiveTabHeader = ({
   actionLabel,
   actionAccessibilityLabel,
   onAction,
+  leadingSlot,
   rightSlot,
 }: ArchiveTabHeaderProps) => (
   <View
@@ -40,14 +42,22 @@ export const ArchiveTabHeader = ({
       className="flex-row items-center justify-between"
       style={{ height: 56 }}
     >
-      <Text
-        className="text-[42px] leading-[48px] tracking-[-2px]"
-        style={{ color: foregroundColor, fontFamily: displayFont }}
-      >
-        {title}
-      </Text>
+      <View className="min-w-0 flex-1 flex-row items-center">
+        {leadingSlot ? <View className="mr-2">{leadingSlot}</View> : null}
+        <Text
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.78}
+          className="min-w-0 flex-1 text-[42px] leading-[48px] tracking-[-2px]"
+          style={{ color: foregroundColor, fontFamily: displayFont }}
+        >
+          {title}
+        </Text>
+      </View>
       {rightSlot ? (
-        <View style={{ transform: [{ translateY: -2 }] }}>{rightSlot}</View>
+        <View className="ml-2" style={{ transform: [{ translateY: -2 }] }}>
+          {rightSlot}
+        </View>
       ) : actionLabel ? (
         onAction ? (
           <TouchableOpacity

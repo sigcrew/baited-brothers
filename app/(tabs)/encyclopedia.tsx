@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useFishes } from "@/src/hooks/useFishes";
 import { useUserCatches } from "@/src/hooks/useUserCatches";
 import { useFishingTrips } from "@/src/hooks/useFishingTrips";
@@ -33,6 +33,7 @@ const SEGMENTS: { key: CollectionSegment; label: string }[] = [
 const CollectionScreen = () => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const params = useLocalSearchParams<{ cardPreview?: string }>();
   const [segment, setSegment] = useState<CollectionSegment>("encyclopedia");
 
   const {
@@ -53,7 +54,8 @@ const CollectionScreen = () => {
   } = useUserCatches();
   const { trips, refetch: refetchTrips } = useFishingTrips();
 
-  const previewMode = __DEV__ && !isLoggedIn;
+  const previewMode =
+    __DEV__ && (!isLoggedIn || params.cardPreview === "1");
   const displayUnlockedFishIds = useMemo(() => {
     if (previewMode) return new Set(allFishes.slice(0, 2).map((fish) => fish.id));
     const coreIds = new Set(allFishes.map((fish) => fish.id));
@@ -74,7 +76,12 @@ const CollectionScreen = () => {
       location_lat: null,
       location_lng: null,
       location_captured_at: null,
-      memo: null,
+      memo: [
+        "수심 18m, 외수질 채비. 입질은 예민했지만 챔질 후 묵직한 손맛이 좋았다.",
+        "오전 들물에 갯바위 가장자리에서 입질. 작은 웜에 반응했다.",
+        "해 뜨기 전 방파제에서 기록. 바닥층을 천천히 탐색했다.",
+        "잔잔한 물때에 연속 입질. 다음 출조에도 같은 채비를 준비할 것.",
+      ][index],
       created_at: null,
       updated_at: null,
       candidate_fish_ids: [],

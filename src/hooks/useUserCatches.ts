@@ -4,7 +4,15 @@ import { useAuth } from "@/src/contexts/AuthContext";
 import type { Tables } from "@/src/types/database";
 
 export type UserCatch = Tables<"user_catches"> & {
-  fish?: Pick<Tables<"fishes">, "id" | "name" | "name_ko" | "image_url" | "category"> | null;
+  fish?: Pick<
+    Tables<"fishes">,
+    | "id"
+    | "name"
+    | "name_ko"
+    | "image_url"
+    | "category"
+    | "catalog_sort_order"
+  > | null;
 };
 
 export const useUserCatches = (tripId?: string) => {
@@ -33,7 +41,7 @@ export const useUserCatches = (tripId?: string) => {
       let query = supabase
         .from("user_catches")
         .select(
-          "*, fish:fishes(id, name, name_ko, image_url, category)"
+          "*, fish:fishes(id, name, name_ko, image_url, category, catalog_sort_order)"
         )
         .eq("user_id", userId);
 

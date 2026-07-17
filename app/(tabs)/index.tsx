@@ -315,6 +315,7 @@ const HomeScreen = () => {
   const router = useRouter();
   const [addVisible, setAddVisible] = useState(false);
   const {
+    trips,
     plannedTrips,
     recentDoneTrips,
     isLoading,
@@ -368,9 +369,13 @@ const HomeScreen = () => {
   };
 
   const nextTrip = plannedTrips[0];
+  const latestDoneTrip = recentDoneTrips[0];
+  const hasTripHistory = Boolean(latestDoneTrip);
   const heroSource = nextTrip?.cover_image_url
     ? { uri: nextTrip.cover_image_url }
-    : DEFAULT_HERO_IMAGE;
+    : latestDoneTrip?.cover_image_url
+      ? { uri: latestDoneTrip.cover_image_url }
+      : DEFAULT_HERO_IMAGE;
   const isDarkHero = useImageContrast(heroSource);
   const heroTextColor = isDarkHero ? FIELD_COLORS.paper : FIELD_COLORS.ink;
   const heroRuleColor = isDarkHero ? "rgba(255,255,255,0.72)" : FIELD_COLORS.rule;
@@ -407,8 +412,33 @@ const HomeScreen = () => {
             backgroundColor="transparent"
             foregroundColor={heroTextColor}
             ruleColor={heroRuleColor}
+            leadingSlot={(
+              <View
+                accessibilityRole="image"
+                accessibilityLabel="낚시당한 녀석들 앱 아이콘"
+                style={{ width: 34, height: 44, overflow: "hidden" }}
+              >
+                <Image
+                  source={require("@/assets/images/card-app-icon-transparent.png")}
+                  resizeMode="contain"
+                  style={{
+                    position: "absolute",
+                    width: 72,
+                    height: 72,
+                    left: -19,
+                    top: -20,
+                  }}
+                />
+              </View>
+            )}
             rightSlot={(
-              <Text className="text-[10px] tracking-[1.5px]" style={{ color: heroTextColor, fontFamily: monoFont }}>FIELD LOG 019</Text>
+              <Text
+                accessibilityLabel={`누적 일지 ${trips.length}개`}
+                className="text-[10px] tracking-[1.5px]"
+                style={{ color: heroTextColor, fontFamily: monoFont }}
+              >
+                FIELD LOG {String(trips.length).padStart(3, "0")}
+              </Text>
             )}
           />
           <View className="px-7 pt-10">
@@ -428,6 +458,38 @@ const HomeScreen = () => {
                 <Text className="mt-1 text-[25px] leading-[34px]" style={{ color: heroTextColor, fontFamily: displayFont }}>다음 출조는 {nextTrip.spot_name}입니다.</Text>
                 <Text className="mt-4 text-[15px] tracking-[1.6px]" style={{ color: heroTextColor, fontFamily: bodySemiBoldFont }}>새벽 5:30 · 우럭 목표</Text>
               </>
+            ) : hasTripHistory ? (
+              <View className="pt-3">
+                <Text
+                  className="max-w-[580px] text-[44px] leading-[54px] tracking-[-1.5px]"
+                  style={{ color: heroTextColor, fontFamily: displayFont }}
+                >
+                  다음 출조를 계획해볼까요
+                </Text>
+                <Text
+                  className="mt-4 text-lg tracking-[-0.3px]"
+                  style={{ color: heroTextColor, fontFamily: bodySemiBoldFont }}
+                >
+                  지난 기록을 이어 새로운 일지를 시작해보세요
+                </Text>
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  accessibilityLabel="새 출조 추가하기"
+                  accessibilityHint="낚시터와 출조 날짜를 입력하는 화면을 엽니다"
+                  onPress={handleAddTrip}
+                  className="mt-6 w-full max-w-[280px] flex-row items-center px-5 py-4"
+                  style={{ backgroundColor: FIELD_COLORS.teal }}
+                >
+                  <FontAwesome name="calendar-plus-o" size={21} color="#fff" />
+                  <Text
+                    className="ml-3 flex-1 text-[17px] text-white"
+                    style={{ fontFamily: bodyExtraBoldFont }}
+                  >
+                    새 출조 추가하기
+                  </Text>
+                  <FontAwesome name="long-arrow-right" size={22} color="#fff" />
+                </TouchableOpacity>
+              </View>
             ) : (
               <View className="pt-3">
                 <Text className="max-w-[580px] text-[44px] leading-[54px] tracking-[-1.5px]" style={{ color: heroTextColor, fontFamily: displayFont }}>첫 출조를 기다리는 중</Text>
@@ -474,8 +536,8 @@ const HomeScreen = () => {
             <FontAwesome name="long-arrow-right" size={28} color="white" />
           </TouchableOpacity>
         </View>
-        <View className="px-4">
-          <View className="mt-7 flex-row items-center justify-between">
+        <View className="mt-3 bg-white px-4 py-6">
+          <View className="flex-row items-center justify-between">
             <Text className="text-xl" style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>다가오는 출조</Text>
             {nextTrip ? (
               <TouchableOpacity accessibilityRole="button" accessibilityLabel="출조 일지 전체 보기" onPress={() => router.push("/(tabs)/journal")}>
@@ -492,21 +554,106 @@ const HomeScreen = () => {
           ) : (
             <TouchableOpacity
               accessibilityRole="button"
-              accessibilityLabel="첫 출조 추가"
+              accessibilityLabel={hasTripHistory ? "새 출조 추가" : "첫 출조 추가"}
               accessibilityHint="낚시터와 출조 날짜를 입력하는 화면을 엽니다"
               onPress={handleAddTrip}
               className="mt-3 flex-row items-center px-5 py-6"
               style={{ backgroundColor: FIELD_COLORS.teal }}
             >
               <FontAwesome name="calendar-plus-o" size={24} color="#fff" />
-              <Text className="ml-4 flex-1 text-[22px] text-white" style={{ fontFamily: bodyExtraBoldFont }}>첫 출조 추가하기</Text>
+              <Text className="ml-4 flex-1 text-[22px] text-white" style={{ fontFamily: bodyExtraBoldFont }}>
+                {hasTripHistory ? "새 출조 추가하기" : "첫 출조 추가하기"}
+              </Text>
               <FontAwesome name="long-arrow-right" size={25} color="#fff" />
             </TouchableOpacity>
           )}
-          <View className="mt-7 flex-row items-center justify-between"><Text className="text-xl" style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>최근 발견</Text><Text className="text-[11px] tracking-[1.2px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>SPECIMEN</Text></View>
-          <View className="mt-3 flex-row border-t pt-3" style={{ borderColor: FIELD_COLORS.rule }}>
-            {catches.slice(0, 3).map((item) => <View key={item.id} className="mr-2 w-[29%] overflow-hidden border" style={{ borderColor: FIELD_COLORS.rule }}>{item.image_url ? <Image source={{ uri: item.image_url }} resizeMode="cover" style={{ width: "100%", height: 96 }} /> : <View className="h-24 items-center justify-center" style={{ backgroundColor: FIELD_COLORS.locked }}><FontAwesome name="image" size={24} color={FIELD_COLORS.muted} /></View>}<View className="bg-white p-2"><Text className="font-bold" style={{ color: FIELD_COLORS.ink }}>{item.fish?.name_ko ?? "어종"}</Text></View></View>)}
-            <View className="flex-1 items-center justify-center border" style={{ minHeight: 126, borderColor: FIELD_COLORS.rule, backgroundColor: FIELD_COLORS.locked }}><FontAwesome name="lock" size={22} color={FIELD_COLORS.muted} /><Text className="mt-2 text-xs font-semibold" style={{ color: FIELD_COLORS.muted }}>{catches.length ? "미확인" : "첫 발견을 기록하세요"}</Text></View>
+        </View>
+
+        <View className="mt-3 bg-white px-4 py-6">
+          <View className="flex-row items-center justify-between">
+            <Text
+              className="text-xl"
+              style={{
+                color: FIELD_COLORS.ink,
+                fontFamily: bodyExtraBoldFont,
+              }}
+            >
+              최근 조과
+            </Text>
+            <Text
+              className="text-[11px] tracking-[1.2px]"
+              style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}
+            >
+              LATEST CATCH
+            </Text>
+          </View>
+          <View
+            className="mt-3 flex-row border-t pt-3"
+            style={{ borderColor: FIELD_COLORS.rule }}
+          >
+            {catches.length ? (
+              catches.slice(0, 3).map((item, index) => (
+                <View
+                  key={item.id}
+                  className="flex-1 overflow-hidden border"
+                  style={{
+                    marginRight: index < Math.min(catches.length, 3) - 1 ? 8 : 0,
+                    borderColor: FIELD_COLORS.rule,
+                  }}
+                >
+                  {item.image_url ? (
+                    <Image
+                      source={{ uri: item.image_url }}
+                      resizeMode="cover"
+                      style={{ width: "100%", height: 96 }}
+                    />
+                  ) : (
+                    <View
+                      className="h-24 items-center justify-center"
+                      style={{ backgroundColor: FIELD_COLORS.locked }}
+                    >
+                      <FontAwesome
+                        name="image"
+                        size={24}
+                        color={FIELD_COLORS.muted}
+                      />
+                    </View>
+                  )}
+                  <View className="bg-white p-2">
+                    <Text
+                      numberOfLines={1}
+                      style={{
+                        color: FIELD_COLORS.ink,
+                        fontFamily: bodyExtraBoldFont,
+                      }}
+                    >
+                      {item.fish?.name_ko ?? "어종"}
+                    </Text>
+                  </View>
+                </View>
+              ))
+            ) : (
+              <View
+                className="flex-1 items-center justify-center border"
+                style={{
+                  minHeight: 126,
+                  borderColor: FIELD_COLORS.rule,
+                  backgroundColor: FIELD_COLORS.locked,
+                }}
+              >
+                <FontAwesome
+                  name="camera"
+                  size={22}
+                  color={FIELD_COLORS.muted}
+                />
+                <Text
+                  className="mt-2 text-xs font-semibold"
+                  style={{ color: FIELD_COLORS.muted }}
+                >
+                  첫 조과를 기록하세요
+                </Text>
+              </View>
+            )}
           </View>
           {error ? <Text className="mt-4 text-xs" style={{ color: FIELD_COLORS.orange }}>{error.message}</Text> : null}
         </View>

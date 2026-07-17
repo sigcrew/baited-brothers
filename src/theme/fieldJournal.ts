@@ -5,6 +5,7 @@ export const FIELD_COLORS = {
   teal: "#17766D",
   rule: "#CBD8D8",
   orange: "#E95A28",
+  red: "#D32F2F",
   muted: "#70878C",
   locked: "#DDE5E5",
 } as const;
