@@ -8,12 +8,12 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  Image,
   ScrollView,
   StyleSheet,
 } from "react-native";
 import { Link, router } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import Svg, { Circle, Line, Path, Rect } from "react-native-svg";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/src/contexts/AuthContext";
 import AppleSignInButton from "@/components/auth/AppleSignInButton";
@@ -29,28 +29,24 @@ import {
 
 type FieldName = "email" | "password" | null;
 
-const FloatMark = () => (
-  <Svg width={64} height={66} viewBox="0 0 64 66" accessibilityLabel="낚시 찌">
-    <Line x1="32" y1="2" x2="32" y2="14" stroke={FIELD_COLORS.orange} strokeWidth="3.4" strokeLinecap="round" />
-    <Path d="M23 30C23 20.5 27 14 32 14s9 6.5 9 16H23Z" fill={FIELD_COLORS.orange} />
-    <Rect x="23" y="30" width="18" height="5" fill={FIELD_COLORS.paper} />
-    <Path d="M23 35h18c0 10.5-4 17-9 17s-9-6.5-9-17Z" fill={FIELD_COLORS.ink} />
-    <Line x1="32" y1="52" x2="32" y2="64" stroke={FIELD_COLORS.ink} strokeWidth="3" strokeLinecap="round" />
-    <Path
-      d="M7 47c7-4 13-4 20 0s13 4 20 0 13-4 20 0"
-      fill="none"
-      stroke={FIELD_COLORS.teal}
-      strokeWidth="2.8"
-      strokeLinecap="round"
+const AppIconMark = () => (
+  <View
+    className="h-[66px] w-[64px] overflow-hidden"
+    accessibilityRole="image"
+    accessibilityLabel="낚시당한 녀석들 앱 아이콘"
+  >
+    <Image
+      source={require("@/assets/images/adaptive-icon-baited.png")}
+      resizeMode="cover"
+      style={{
+        position: "absolute",
+        left: -22,
+        top: -21,
+        width: 108,
+        height: 108,
+      }}
     />
-    <Path
-      d="M10 55c6-3.5 12-3.5 18 0s12 3.5 18 0 12-3.5 18 0"
-      fill="none"
-      stroke={FIELD_COLORS.teal}
-      strokeWidth="2.8"
-      strokeLinecap="round"
-    />
-  </Svg>
+  </View>
 );
 
 const JournalRule = () => (
@@ -124,7 +120,7 @@ const LoginScreen = () => {
       >
         <View className="w-full max-w-[540px]">
           <View className="flex-row items-center justify-center">
-            <FloatMark />
+            <AppIconMark />
             <Text
               className="ml-1 text-[27px] leading-[36px] tracking-[-0.9px]"
               style={{ color: FIELD_COLORS.ink, fontFamily: displayFont }}

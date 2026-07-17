@@ -12,8 +12,9 @@ import {
   View,
 } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
+import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFishes, type Fish } from "@/src/hooks/useFishes";
 import { useCreateCatch } from "@/src/hooks/useCreateCatch";
@@ -21,32 +22,60 @@ import {
   useFishRecognition,
   type FishRecognitionCandidate,
 } from "@/src/hooks/useFishRecognition";
+import { CatchCompletionView } from "@/components/record/CatchCompletionView";
 import { getField60Illustration } from "@/src/data/field60Illustrations";
 import { FIELD_COLORS, bodyExtraBoldFont, bodyFont, monoFont } from "@/src/theme/fieldJournal";
 
 type Capture = {
   uri: string;
   base64: string;
-  mimeType: "image/jpeg";
-  latitude: number;
-  longitude: number;
-  locationCapturedAt: string;
+  mimeType: "image/jpeg" | "image/png";
+  latitude: number | null;
+  longitude: number | null;
+  locationCapturedAt: string | null;
+  source: "camera" | "dev_upload";
 };
+
+type CompletionResult = {
+  fish: Fish;
+  catchId: string | null;
+  isFirstDiscovery: boolean;
+  isDevelopmentTest: boolean;
+  isFileUpload: boolean;
+  discoveredCount: number;
+  sizeCm?: number;
+};
+
+const DEV_FILE_TEST_ENABLED = __DEV__;
+const MAX_RECOGNITION_BASE64_LENGTH = 13_500_000;
 
 const RecordScreen = () => {
   const router = useRouter();
-  const params = useLocalSearchParams<{ tripId?: string; tripName?: string }>();
+  const params = useLocalSearchParams<{
+    tripId?: string;
+    tripName?: string;
+    completionPreview?: string;
+  }>();
   const tripId = typeof params.tripId === "string" ? params.tripId : undefined;
   const tripName = typeof params.tripName === "string" ? params.tripName : undefined;
   const insets = useSafeAreaInsets();
   const cameraRef = useRef<CameraView>(null);
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
+  const lastCameraPermission = useRef(cameraPermission);
+  if (cameraPermission) {
+    lastCameraPermission.current = cameraPermission;
+  }
+  const effectiveCameraPermission =
+    cameraPermission ?? lastCameraPermission.current;
   const [capture, setCapture] = useState<Capture | null>(null);
   const [selectedFish, setSelectedFish] = useState<Fish | null>(null);
+  const [completion, setCompletion] = useState<CompletionResult | null>(null);
   const [query, setQuery] = useState("");
   const [size, setSize] = useState("");
   const [memo, setMemo] = useState("");
   const [isCapturing, setIsCapturing] = useState(false);
+  const [isRequestingCameraPermission, setIsRequestingCameraPermission] =
+    useState(false);
   const [recognitionCandidates, setRecognitionCandidates] = useState<
     FishRecognitionCandidate[]
   >([]);
@@ -60,6 +89,27 @@ const RecordScreen = () => {
     isRecognizing,
     error: recognitionError,
   } = useFishRecognition();
+  const completionPreviewMode =
+    DEV_FILE_TEST_ENABLED &&
+    (params.completionPreview === "first" ||
+      params.completionPreview === "existing")
+      ? params.completionPreview
+      : null;
+  const previewFish =
+    fishes.find((fish) => fish.catalog_sort_order === 2) ?? fishes[0] ?? null;
+  const visibleCompletion =
+    completion ??
+    (completionPreviewMode && previewFish
+      ? {
+          fish: previewFish,
+          catchId: null,
+          isFirstDiscovery: completionPreviewMode === "first",
+          isDevelopmentTest: true,
+          isFileUpload: false,
+          discoveredCount: completionPreviewMode === "first" ? 3 : 2,
+          sizeCm: completionPreviewMode === "existing" ? 32.5 : undefined,
+        }
+      : null);
 
   const candidateRows = useMemo(
     () =>
@@ -84,6 +134,85 @@ const RecordScreen = () => {
       `${fish.name_ko ?? ""} ${fish.name}`.toLowerCase().includes(keyword)
     );
   }, [fishes, query]);
+
+  const analyzeCapture = async (nextCapture: Capture) => {
+    setCapture(nextCapture);
+    setSelectedFish(null);
+    setCompletion(null);
+    setRecognitionCandidates([]);
+    setRecognitionNote(null);
+    setNeedsRetake(false);
+    setShowCatalogSearch(false);
+
+    const result = await recognize({
+      imageBase64: nextCapture.base64,
+      mimeType: nextCapture.mimeType,
+      fishes,
+    });
+    setRecognitionCandidates(result.candidates);
+    setRecognitionNote(result.note);
+    setNeedsRetake(result.needsRetake);
+    if (result.error || result.candidates.length === 0) {
+      setShowCatalogSearch(true);
+    }
+  };
+
+  const pickDevPhoto = async () => {
+    if (!DEV_FILE_TEST_ENABLED || isRecognizing) return;
+    if (fishesLoading) {
+      Alert.alert("도감 준비 중", "도감 60종을 불러온 뒤 다시 시도해 주세요.");
+      return;
+    }
+
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsMultipleSelection: false,
+        base64: true,
+        quality: 0.75,
+      });
+      if (result.canceled) return;
+
+      const asset = result.assets[0];
+      if (!asset?.uri || !asset.base64) {
+        throw new Error("판별에 필요한 이미지 데이터를 읽지 못했습니다.");
+      }
+      if (asset.base64.length > MAX_RECOGNITION_BASE64_LENGTH) {
+        throw new Error("사진이 너무 큽니다. 10MB 이하의 JPG 또는 PNG를 선택해 주세요.");
+      }
+
+      await analyzeCapture({
+        uri: asset.uri,
+        base64: asset.base64,
+        mimeType: asset.mimeType === "image/png" ? "image/png" : "image/jpeg",
+        latitude: null,
+        longitude: null,
+        locationCapturedAt: null,
+        source: "dev_upload",
+      });
+    } catch (error) {
+      Alert.alert(
+        "파일 판별 실패",
+        error instanceof Error ? error.message : "다른 사진으로 다시 시도해 주세요.",
+      );
+    }
+  };
+
+  const handleRequestCameraPermission = async () => {
+    if (isRequestingCameraPermission) return;
+
+    setIsRequestingCameraPermission(true);
+    try {
+      const nextPermission = await requestCameraPermission();
+      lastCameraPermission.current = nextPermission;
+      if (!nextPermission.granted) {
+        setIsRequestingCameraPermission(false);
+      }
+    } catch {
+      setIsRequestingCameraPermission(false);
+      Alert.alert("권한 요청 실패", "카메라 권한을 다시 요청해 주세요.");
+    }
+  };
 
   const takePhoto = async () => {
     if (!cameraRef.current || isCapturing) return;
@@ -110,25 +239,9 @@ const RecordScreen = () => {
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
         locationCapturedAt: new Date(position.timestamp).toISOString(),
+        source: "camera",
       };
-      setCapture(nextCapture);
-      setSelectedFish(null);
-      setRecognitionCandidates([]);
-      setRecognitionNote(null);
-      setNeedsRetake(false);
-      setShowCatalogSearch(false);
-
-      const result = await recognize({
-        imageBase64: nextCapture.base64,
-        mimeType: nextCapture.mimeType,
-        fishes,
-      });
-      setRecognitionCandidates(result.candidates);
-      setRecognitionNote(result.note);
-      setNeedsRetake(result.needsRetake);
-      if (result.error || result.candidates.length === 0) {
-        setShowCatalogSearch(true);
-      }
+      await analyzeCapture(nextCapture);
     } catch (error) {
       Alert.alert("촬영 실패", error instanceof Error ? error.message : "다시 시도해 주세요.");
     } finally {
@@ -136,25 +249,37 @@ const RecordScreen = () => {
     }
   };
 
+  const parseOptionalSize = () => {
+    if (!size.trim()) return { isValid: true, sizeCm: undefined };
+    const parsedSize = Number(size);
+    if (!Number.isFinite(parsedSize) || parsedSize <= 0) {
+      Alert.alert("크기 확인", "크기는 0보다 큰 숫자로 입력해 주세요.");
+      return { isValid: false, sizeCm: undefined };
+    }
+    return { isValid: true, sizeCm: parsedSize };
+  };
+
   const save = async () => {
     if (!capture || !selectedFish) return;
-    const parsedSize = size.trim() ? Number(size) : undefined;
-    if (parsedSize !== undefined && (!Number.isFinite(parsedSize) || parsedSize <= 0)) {
-      Alert.alert("크기 확인", "크기는 0보다 큰 숫자로 입력해 주세요.");
-      return;
-    }
+    const sizeResult = parseOptionalSize();
+    if (!sizeResult.isValid) return;
 
     const selectedCandidate = recognitionCandidates.find(
       (candidate) => candidate.fishId === selectedFish.id,
     );
-    const { error } = await createCatch({
+    const result = await createCatch({
       tripId,
       fishId: selectedFish.id,
       imageUri: capture.uri,
-      latitude: capture.latitude,
-      longitude: capture.longitude,
-      locationCapturedAt: capture.locationCapturedAt,
-      sizeCm: parsedSize,
+      mimeType: capture.mimeType,
+      latitude: capture.latitude ?? undefined,
+      longitude: capture.longitude ?? undefined,
+      locationCapturedAt: capture.locationCapturedAt ?? undefined,
+      captureMethod:
+        capture.source === "dev_upload"
+          ? "development_upload"
+          : "live_camera",
+      sizeCm: sizeResult.sizeCm,
       memo,
       candidateFishIds: recognitionCandidates.map(
         (candidate) => candidate.fishId,
@@ -163,37 +288,84 @@ const RecordScreen = () => {
         ? "closed_set_candidates"
         : "fallback_catalog",
       verificationReason: selectedCandidate
-        ? `AI 후보 추천 후 사용자 확정 · 신뢰도 ${Math.round(selectedCandidate.confidence * 100)}%`
-        : "사용자가 도감에서 직접 어종을 확정함",
+        ? `${capture.source === "dev_upload" ? "개발용 파일 업로드 · " : ""}AI 후보 추천 후 사용자 확정 · 신뢰도 ${Math.round(selectedCandidate.confidence * 100)}%`
+        : `${capture.source === "dev_upload" ? "개발용 파일 업로드 · " : ""}사용자가 도감에서 직접 어종을 확정함`,
     });
-    if (error) {
-      Alert.alert("저장 실패", error.message);
+    if (result.error) {
+      Alert.alert("저장 실패", result.error.message);
       return;
     }
-    const goAfterSave = () => tripId
-      ? router.replace({ pathname: "/trips/[id]", params: { id: tripId } })
-      : router.replace("/(tabs)/encyclopedia");
-
-    if (Platform.OS === "web") {
-      globalThis.alert(`${selectedFish.name_ko ?? selectedFish.name}을(를) 수집했습니다.`);
-      goAfterSave();
-    } else {
-      Alert.alert("도감 해금", `${selectedFish.name_ko ?? selectedFish.name}을(를) 수집했습니다.`, [
-        { text: "확인", onPress: goAfterSave },
-      ]);
-    }
+    setCompletion({
+      fish: selectedFish,
+      catchId: result.catchId,
+      isFirstDiscovery: result.isFirstDiscovery,
+      isDevelopmentTest: false,
+      isFileUpload: capture.source === "dev_upload",
+      discoveredCount: result.discoveredCount,
+      sizeCm: sizeResult.sizeCm,
+    });
   };
 
-  if (!cameraPermission) return <View className="flex-1 bg-black" />;
-  if (!cameraPermission.granted) {
+  const viewCompletionRecord = () => {
+    if (tripId && !visibleCompletion?.isDevelopmentTest) {
+      router.replace({ pathname: "/trips/[id]", params: { id: tripId } });
+      return;
+    }
+    router.replace("/(tabs)/journal");
+  };
+
+  const viewCompletionEncyclopedia = () => {
+    if (!visibleCompletion) return;
+    router.replace({
+      pathname: "/fishes/[id]",
+      params: { id: visibleCompletion.fish.id },
+    });
+  };
+
+  if (visibleCompletion) {
+    return (
+      <CatchCompletionView
+        fish={visibleCompletion.fish}
+        isFirstDiscovery={visibleCompletion.isFirstDiscovery}
+        isDevelopmentTest={visibleCompletion.isDevelopmentTest}
+        isFileUpload={visibleCompletion.isFileUpload}
+        discoveredCount={visibleCompletion.discoveredCount}
+        sizeCm={visibleCompletion.sizeCm}
+        onViewRecord={viewCompletionRecord}
+        onViewEncyclopedia={viewCompletionEncyclopedia}
+        onGoHome={() => router.replace("/(tabs)")}
+      />
+    );
+  }
+
+  if (!effectiveCameraPermission?.granted) {
+    const isPermissionLoading = effectiveCameraPermission == null;
+    const isPermissionBusy =
+      isPermissionLoading || isRequestingCameraPermission;
+
     return (
       <View className="flex-1 items-center justify-center bg-slate-950 px-8">
-        <Stack.Screen options={{ headerShown: false }} />
-        <Text className="text-xl font-bold text-white">카메라 권한이 필요해요</Text>
-        <Text className="mt-3 text-center text-slate-300">현장에서 직접 촬영한 사진만 도감에 등록할 수 있습니다.</Text>
-        <TouchableOpacity onPress={requestCameraPermission} className="mt-6 rounded-xl bg-white px-6 py-3">
-          <Text className="font-semibold text-slate-900">권한 허용</Text>
-        </TouchableOpacity>
+        <Text className="text-xl font-bold text-white">
+          카메라 권한이 필요해요
+        </Text>
+        <Text className="mt-3 text-center text-slate-300">
+          현장에서 직접 촬영한 사진만 도감에 등록할 수 있습니다.
+        </Text>
+        {isPermissionBusy ? (
+          <View className="mt-6 flex-row items-center rounded-xl bg-white px-6 py-3">
+            <ActivityIndicator color="#0f172a" />
+            <Text className="ml-3 font-semibold text-slate-900">
+              {isPermissionLoading ? "권한 상태 확인 중" : "권한 요청 중"}
+            </Text>
+          </View>
+        ) : (
+          <TouchableOpacity
+            onPress={handleRequestCameraPermission}
+            className="mt-6 rounded-xl bg-white px-6 py-3"
+          >
+            <Text className="font-semibold text-slate-900">권한 허용</Text>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity onPress={() => router.back()} className="mt-4 py-2">
           <Text className="text-slate-400">돌아가기</Text>
         </TouchableOpacity>
@@ -204,7 +376,6 @@ const RecordScreen = () => {
   if (!capture) {
     return (
       <View className="flex-1 bg-black">
-        <Stack.Screen options={{ headerShown: false }} />
         <CameraView ref={cameraRef} style={{ flex: 1 }} facing="back" mode="picture" />
         <View className="absolute left-0 right-0 top-0 flex-row justify-between px-5" style={{ paddingTop: insets.top + 12 }}>
           <TouchableOpacity onPress={() => router.back()} className="rounded-lg bg-black/50 px-4 py-2">
@@ -214,6 +385,14 @@ const RecordScreen = () => {
         </View>
         <View className="absolute bottom-0 left-0 right-0 items-center bg-black/40 pb-8 pt-5" style={{ paddingBottom: insets.bottom + 24 }}>
           <Text className="mb-4 text-sm text-white">물고기 전체가 잘 보이게 촬영해 주세요</Text>
+          {DEV_FILE_TEST_ENABLED ? (
+            <TouchableOpacity
+              onPress={pickDevPhoto}
+              className="mb-4 border border-white/60 bg-black/40 px-5 py-3"
+            >
+              <Text className="font-semibold text-white">개발용 사진 파일 판별</Text>
+            </TouchableOpacity>
+          ) : null}
           <TouchableOpacity
             accessibilityLabel="사진 촬영"
             disabled={isCapturing}
@@ -229,7 +408,23 @@ const RecordScreen = () => {
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} className="flex-1 bg-[#F4F7F8]">
-      <Stack.Screen options={{ title: "조과 확인", headerBackTitle: "취소" }} />
+      <View
+        className="flex-row items-center justify-between border-b bg-white px-4 pb-3"
+        style={{ paddingTop: insets.top + 10, borderBottomColor: FIELD_COLORS.rule }}
+      >
+        <TouchableOpacity onPress={() => router.back()} className="w-14 py-2">
+          <Text style={{ color: FIELD_COLORS.teal, fontFamily: bodyExtraBoldFont }}>
+            취소
+          </Text>
+        </TouchableOpacity>
+        <Text
+          className="text-lg"
+          style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}
+        >
+          조과 확인
+        </Text>
+        <View className="w-14" />
+      </View>
       <FlatList
         data={selectedFish || !showCatalogSearch ? [] : filteredFishes}
         keyExtractor={(item) => item.id}
@@ -239,8 +434,26 @@ const RecordScreen = () => {
           <>
             <Image source={{ uri: capture.uri }} className="h-56 w-full rounded-xl bg-slate-200" resizeMode="cover" />
             <View className="mt-3 flex-row justify-between">
-              <Text className="text-xs text-teal-800">GPS 확보 완료 · 현장 촬영</Text>
-              <TouchableOpacity onPress={() => { setCapture(null); setSelectedFish(null); }}><Text className="text-sm font-medium text-slate-600">다시 찍기</Text></TouchableOpacity>
+              <Text className="text-xs text-teal-800">
+                {capture.source === "dev_upload"
+                  ? "DEV ONLY · 파일 업로드 · 실제 저장"
+                  : "GPS 확보 완료 · 현장 촬영"}
+              </Text>
+              <TouchableOpacity
+                onPress={
+                  capture.source === "dev_upload"
+                    ? pickDevPhoto
+                    : () => {
+                        setCapture(null);
+                        setSelectedFish(null);
+                        setCompletion(null);
+                      }
+                }
+              >
+                <Text className="text-sm font-medium text-slate-600">
+                  {capture.source === "dev_upload" ? "다른 파일" : "다시 찍기"}
+                </Text>
+              </TouchableOpacity>
             </View>
             <Text
               className="mt-6 text-[24px]"
@@ -283,7 +496,10 @@ const RecordScreen = () => {
                   </Text>
                 </View>
                 <TouchableOpacity
-                  onPress={() => setSelectedFish(null)}
+                  onPress={() => {
+                    setSelectedFish(null);
+                    setCompletion(null);
+                  }}
                   className="mt-4 self-start border-b pb-1"
                   style={{ borderBottomColor: FIELD_COLORS.teal }}
                 >
@@ -342,7 +558,10 @@ const RecordScreen = () => {
                           key={fish.id}
                           accessibilityRole="button"
                           accessibilityLabel={`${fish.name_ko ?? fish.name}, AI 신뢰도 ${Math.round(candidate.confidence * 100)}퍼센트`}
-                          onPress={() => setSelectedFish(fish)}
+                          onPress={() => {
+                            setSelectedFish(fish);
+                            setCompletion(null);
+                          }}
                           className="mt-3 flex-row border bg-white p-3"
                           style={{ borderColor: index === 0 ? FIELD_COLORS.teal : FIELD_COLORS.rule }}
                         >
@@ -448,19 +667,73 @@ const RecordScreen = () => {
             )}
             {selectedFish ? (
               <View className="mt-5">
-                <Text className="text-sm font-medium text-slate-700">크기(cm, 선택)</Text>
-                <TextInput value={size} onChangeText={setSize} keyboardType="decimal-pad" placeholder="예: 32.5" className="mt-2 rounded-xl border border-slate-200 bg-white px-4 py-3" />
-                <Text className="mt-4 text-sm font-medium text-slate-700">메모(선택)</Text>
-                <TextInput value={memo} onChangeText={setMemo} multiline placeholder="채비, 물때, 기억할 점" className="mt-2 min-h-[88px] rounded-xl border border-slate-200 bg-white px-4 py-3" />
-                <TouchableOpacity disabled={isSaving} onPress={save} className="mt-6 rounded-xl bg-slate-900 py-4">
-                  {isSaving ? <ActivityIndicator color="#fff" /> : <Text className="text-center font-semibold text-white">이 어종으로 저장</Text>}
+                {capture.source === "dev_upload" ? (
+                  <View
+                    className="mb-5 border-l-4 bg-white px-4 py-4"
+                    style={{ borderLeftColor: FIELD_COLORS.orange }}
+                  >
+                    <Text
+                      style={{
+                        color: FIELD_COLORS.ink,
+                        fontFamily: bodyExtraBoldFont,
+                      }}
+                    >
+                      개발용 파일 기록
+                    </Text>
+                    <Text
+                      className="mt-1 text-xs leading-5"
+                      style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
+                    >
+                      선택한 사진은 실제 조과로 저장되고 도감 발견 상태에
+                      반영됩니다. 위치 정보는 저장되지 않습니다.
+                    </Text>
+                  </View>
+                ) : null}
+                <Text className="text-sm font-medium text-slate-700">
+                  크기(cm, 선택)
+                </Text>
+                <TextInput
+                  value={size}
+                  onChangeText={setSize}
+                  keyboardType="decimal-pad"
+                  placeholder="예: 32.5"
+                  className="mt-2 rounded-xl border border-slate-200 bg-white px-4 py-3"
+                />
+                <Text className="mt-4 text-sm font-medium text-slate-700">
+                  메모(선택)
+                </Text>
+                <TextInput
+                  value={memo}
+                  onChangeText={setMemo}
+                  multiline
+                  placeholder="채비, 물때, 기억할 점"
+                  className="mt-2 min-h-[88px] rounded-xl border border-slate-200 bg-white px-4 py-3"
+                />
+                <TouchableOpacity
+                  disabled={isSaving}
+                  onPress={save}
+                  className="mt-6 rounded-xl bg-slate-900 py-4"
+                >
+                  {isSaving ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text className="text-center font-semibold text-white">
+                      이 어종으로 기록
+                    </Text>
+                  )}
                 </TouchableOpacity>
               </View>
             ) : null}
           </>
         }
         renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => setSelectedFish(item)} className="mt-2 rounded-xl border border-slate-200 bg-white px-4 py-3">
+          <TouchableOpacity
+            onPress={() => {
+              setSelectedFish(item);
+              setCompletion(null);
+            }}
+            className="mt-2 rounded-xl border border-slate-200 bg-white px-4 py-3"
+          >
             <Text className="font-semibold text-slate-900">{item.name_ko ?? item.name}</Text>
             {item.name_ko ? <Text className="mt-0.5 text-xs text-slate-400">{item.name}</Text> : null}
           </TouchableOpacity>

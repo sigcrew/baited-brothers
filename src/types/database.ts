@@ -350,7 +350,7 @@ export type Database = {
     Enums: {
       fish_category: "flatfish" | "rockfish" | "seabass" | "mackerel" | "bream" | "mullet" | "cutlassfish" | "eel" | "pufferfish" | "other"
       trip_status: "planned" | "done" | "canceled"
-      capture_method: "live_camera"
+      capture_method: "live_camera" | "development_upload"
       catch_id_method: "closed_set_candidates" | "fallback_catalog"
       catch_verification_status: "verified" | "unverified"
     }
