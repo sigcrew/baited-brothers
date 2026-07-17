@@ -5,9 +5,10 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import 'react-native-reanimated';
 
+import { SplashView } from '@/components/SplashView';
 import { useColorScheme } from '@/components/useColorScheme';
 import { AuthProvider } from '@/src/contexts/AuthContext';
 import { BlackHanSans_400Regular } from '@expo-google-fonts/black-han-sans';
@@ -32,6 +33,7 @@ export const unstable_settings = {
 SplashScreen.preventAutoHideAsync();
 
 const RootLayout = () => {
+  const [showSplash, setShowSplash] = useState(true);
   const [loaded, error] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     BlackHanSans: BlackHanSans_400Regular,
@@ -48,14 +50,25 @@ const RootLayout = () => {
     if (error) throw error;
   }, [error]);
 
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
+  const handleSplashLayout = useCallback(() => {
+    SplashScreen.hideAsync();
+  }, []);
+
+  const handleSplashFinish = useCallback(() => {
+    setShowSplash(false);
+  }, []);
 
   if (!loaded) {
     return null;
+  }
+
+  if (showSplash) {
+    return (
+      <SplashView
+        onLayout={handleSplashLayout}
+        onFinish={handleSplashFinish}
+      />
+    );
   }
 
   return <RootLayoutNav />;

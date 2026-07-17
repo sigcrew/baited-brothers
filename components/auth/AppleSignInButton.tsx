@@ -3,7 +3,11 @@ import { router } from "expo-router";
 import { Alert, Platform } from "react-native";
 import { supabase } from "@/src/lib/supabase";
 
-const AppleSignInButton = () => {
+type AppleSignInButtonProps = {
+  fieldJournal?: boolean;
+};
+
+const AppleSignInButton = ({ fieldJournal = false }: AppleSignInButtonProps) => {
   if (Platform.OS !== "ios") return null;
 
   const handlePress = async () => {
@@ -62,9 +66,13 @@ const AppleSignInButton = () => {
   return (
     <AppleAuthentication.AppleAuthenticationButton
       buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
-      buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
-      cornerRadius={12}
-      style={{ width: "100%", height: 50 }}
+      buttonStyle={
+        fieldJournal
+          ? AppleAuthentication.AppleAuthenticationButtonStyle.WHITE_OUTLINE
+          : AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
+      }
+      cornerRadius={fieldJournal ? 4 : 12}
+      style={{ width: "100%", height: fieldJournal ? 54 : 50 }}
       onPress={handlePress}
     />
   );

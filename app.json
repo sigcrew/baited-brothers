@@ -4,14 +4,14 @@
     "slug": "baited-brothers",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/app-icon-baited.png",
+    "icon": "./assets/images/adaptive-icon-baited.png",
     "scheme": "baited-brothers",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/splash-icon-baited.png",
+      "image": "./assets/images/splash-icon-baited-v2.png",
       "resizeMode": "contain",
-      "backgroundColor": "#F4F7F6"
+      "backgroundColor": "#F5F5F5"
     },
     "ios": {
       "supportsTablet": true,
@@ -32,6 +32,15 @@
     },
     "plugins": [
       "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon-baited-v2.png",
+          "imageWidth": 390,
+          "resizeMode": "contain",
+          "backgroundColor": "#F5F5F5"
+        }
+      ],
       "expo-secure-store",
       "expo-apple-authentication",
       ["expo-web-browser", { "experimentalLauncherActivity": true }],

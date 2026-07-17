@@ -8,9 +8,18 @@ import {
   Alert,
 } from "react-native";
 import { router } from "expo-router";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useAuth } from "@/src/contexts/AuthContext";
+import {
+  FIELD_COLORS,
+  bodySemiBoldFont,
+} from "@/src/theme/fieldJournal";
 
-const GoogleSignInButton = () => {
+type GoogleSignInButtonProps = {
+  fieldJournal?: boolean;
+};
+
+const GoogleSignInButton = ({ fieldJournal = false }: GoogleSignInButtonProps) => {
   const { signInWithGoogle } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -40,16 +49,46 @@ const GoogleSignInButton = () => {
     <TouchableOpacity
       onPress={handlePress}
       disabled={isLoading}
-      className="flex-row items-center justify-center rounded-xl border border-gray-300 bg-white py-3 active:bg-gray-50"
+      activeOpacity={0.72}
+      className={`flex-row items-center justify-center border bg-white ${
+        fieldJournal ? "h-[54px] rounded-[4px]" : "rounded-xl py-3"
+      }`}
+      style={{
+        borderColor: fieldJournal ? FIELD_COLORS.rule : "#D1D5DB",
+        opacity: isLoading ? 0.65 : 1,
+      }}
+      accessibilityRole="button"
+      accessibilityLabel="Google로 계속하기"
     >
       {isLoading ? (
         <ActivityIndicator size="small" color="#4285F4" />
       ) : (
         <>
-          <View className="mr-3 h-5 w-5 items-center justify-center rounded-full bg-[#4285F4]">
-            <Text className="text-xs font-bold text-white">G</Text>
-          </View>
-          <Text className="font-medium text-gray-700">Google로 계속하기</Text>
+          {fieldJournal ? (
+            <FontAwesome
+              name="google"
+              size={19}
+              color="#4285F4"
+              style={{ marginRight: 12 }}
+            />
+          ) : (
+            <View className="mr-3 h-5 w-5 items-center justify-center rounded-full bg-[#4285F4]">
+              <Text className="text-xs font-bold text-white">G</Text>
+            </View>
+          )}
+          <Text
+            className={fieldJournal ? "text-[15px]" : "font-medium text-gray-700"}
+            style={
+              fieldJournal
+                ? {
+                    color: FIELD_COLORS.ink,
+                    fontFamily: bodySemiBoldFont,
+                  }
+                : undefined
+            }
+          >
+            Google로 계속하기
+          </Text>
         </>
       )}
     </TouchableOpacity>
