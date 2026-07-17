@@ -499,7 +499,7 @@ const HomeScreen = () => {
               style={{ backgroundColor: FIELD_COLORS.teal }}
             >
               <FontAwesome name="calendar-plus-o" size={24} color="#fff" />
-              <Text className="ml-4 flex-1 text-[22px] text-white" style={{ fontFamily: bodyExtraBoldFont }}>첫 출조 추가 +</Text>
+              <Text className="ml-4 flex-1 text-[22px] text-white" style={{ fontFamily: bodyExtraBoldFont }}>첫 출조 추가하기</Text>
               <FontAwesome name="long-arrow-right" size={25} color="#fff" />
             </TouchableOpacity>
           )}

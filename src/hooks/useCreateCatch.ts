@@ -12,6 +12,9 @@ type CreateCatchInput = {
   locationCapturedAt: string;
   sizeCm?: number;
   memo?: string;
+  candidateFishIds?: string[];
+  idMethod?: "closed_set_candidates" | "fallback_catalog";
+  verificationReason?: string;
 };
 
 export const useCreateCatch = () => {
@@ -49,10 +52,10 @@ export const useCreateCatch = () => {
         size_cm: input.sizeCm ?? null,
         memo: input.memo?.trim() || null,
         capture_method: "live_camera",
-        id_method: "fallback_catalog",
-        candidate_fish_ids: [],
+        id_method: input.idMethod ?? "fallback_catalog",
+        candidate_fish_ids: input.candidateFishIds ?? [],
         verification_status: "verified",
-        verification_reason: null,
+        verification_reason: input.verificationReason?.trim() || null,
       };
 
       const { error: insertError } = await supabase.from("user_catches").insert(payload);

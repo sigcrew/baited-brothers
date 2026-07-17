@@ -84,3 +84,24 @@ SUPABASE_SERVICE_ROLE_KEY=service_role_키  # 시드 스크립트용, Project Se
 - [x] Home 화면 + 탭 네비게이션
 - [x] Phase 1: 회원가입/로그인 (이메일, Apple, Google)
 - [x] Phase 2: 물고기 도감
+
+## 9. AI 어종 후보 추천 (Claude)
+
+`identify-fish` Edge Function은 현장 사진을 Claude 비전 모델로 분석하고,
+도감 60종 안에서 최대 3개의 후보를 반환합니다. API 키는 앱의 `.env`에
+넣지 않고 Supabase Function secret으로 설정합니다.
+
+```bash
+npx supabase secrets set ANTHROPIC_API_KEY=YOUR_KEY \
+  --project-ref zfezkimynicyvhmwgzoi
+
+npx supabase secrets set ANTHROPIC_VISION_MODEL=claude-sonnet-5 \
+  --project-ref zfezkimynicyvhmwgzoi
+
+npx supabase functions deploy identify-fish \
+  --project-ref zfezkimynicyvhmwgzoi \
+  --use-api
+```
+
+`ANTHROPIC_VISION_MODEL`은 선택 사항이며 생략하면
+`claude-sonnet-5`를 사용합니다.
