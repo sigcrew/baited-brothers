@@ -95,13 +95,9 @@ SUPABASE_SERVICE_ROLE_KEY=service_role_키  # 시드 스크립트용, Project Se
 npx supabase secrets set ANTHROPIC_API_KEY=YOUR_KEY \
   --project-ref zfezkimynicyvhmwgzoi
 
-npx supabase secrets set ANTHROPIC_VISION_MODEL=claude-sonnet-5 \
-  --project-ref zfezkimynicyvhmwgzoi
-
 npx supabase functions deploy identify-fish \
   --project-ref zfezkimynicyvhmwgzoi \
   --use-api
 ```
 
-`ANTHROPIC_VISION_MODEL`은 선택 사항이며 생략하면
-`claude-sonnet-5`를 사용합니다.
+모델은 `claude-sonnet-5`를 사용합니다.

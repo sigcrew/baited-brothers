@@ -65,8 +65,7 @@ Deno.serve(async (req) => {
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY");
   const anthropicApiKey = Deno.env.get("ANTHROPIC_API_KEY");
-  const model =
-    Deno.env.get("ANTHROPIC_VISION_MODEL") || "claude-sonnet-5";
+  const model = "claude-sonnet-5";
   const authorization = req.headers.get("Authorization");
 
   if (!supabaseUrl || !supabaseAnonKey || !anthropicApiKey) {
