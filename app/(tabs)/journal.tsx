@@ -6,6 +6,7 @@ import {
   RefreshControl,
   Text,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from "react-native";
 import { useRouter } from "expo-router";
@@ -55,9 +56,11 @@ const statusColor = (status: FishingTrip["status"]) => {
 };
 
 const TripTimelineRow = ({
+  compact,
   trip,
   onPress,
 }: {
+  compact: boolean;
   trip: FishingTrip;
   onPress: () => void;
 }) => {
@@ -81,8 +84,12 @@ const TripTimelineRow = ({
       style={{ borderColor: FIELD_COLORS.rule }}
     >
       <View
-        className="absolute left-[30px] top-0 h-full w-px"
-        style={{ backgroundColor: FIELD_COLORS.rule }}
+        className="absolute left-[30px] w-px"
+        style={{
+          backgroundColor: FIELD_COLORS.rule,
+          bottom: -1,
+          top: -1,
+        }}
       />
       {trip.status === "done" ? (
         <View className="absolute left-[21px] top-[39px] h-[19px] w-[19px] items-center justify-center rounded-full" style={{ backgroundColor: FIELD_COLORS.teal }}>
@@ -99,16 +106,34 @@ const TripTimelineRow = ({
         />
       )}
 
-      <View className="w-[142px] items-center pl-8 pr-1">
+      <View
+        className="items-center"
+        style={{
+          width: compact ? 108 : 142,
+          paddingLeft: compact ? 24 : 32,
+          paddingRight: 4,
+        }}
+      >
         <Text
-          className="text-[18px] leading-[22px]"
-          style={{ color: accent, fontFamily: dateKoreanFont }}
+          style={{
+            color: accent,
+            fontFamily: dateKoreanFont,
+            fontSize: compact ? 16 : 18,
+            lineHeight: compact ? 24 : 26,
+            paddingTop: 2,
+          }}
         >
           {month}월
         </Text>
         <Text
-          className="text-[64px] leading-[68px]"
-          style={{ color: accent, fontFamily: dateNumberFont }}
+          style={{
+            color: accent,
+            fontFamily: dateNumberFont,
+            fontSize: compact ? 54 : 64,
+            lineHeight: compact ? 66 : 76,
+            overflow: "visible",
+            paddingTop: 2,
+          }}
         >
           {day}
         </Text>
@@ -122,12 +147,22 @@ const TripTimelineRow = ({
       </View>
 
       <View className="min-w-0 flex-1 flex-row border-l" style={{ borderColor: FIELD_COLORS.rule }}>
-        <View className="min-w-0 flex-1 pl-5 pr-4">
+        <View
+          className="min-w-0 flex-1"
+          style={{
+            paddingLeft: compact ? 14 : 20,
+            paddingRight: compact ? 10 : 16,
+          }}
+        >
           <View className="min-w-0 flex-1">
             <Text
-              className="text-[22px] leading-[29px]"
               numberOfLines={2}
-              style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}
+              style={{
+                color: FIELD_COLORS.ink,
+                fontFamily: bodyExtraBoldFont,
+                fontSize: compact ? 20 : 22,
+                lineHeight: compact ? 27 : 29,
+              }}
             >
               {trip.spot_name}
             </Text>
@@ -162,7 +197,10 @@ const TripTimelineRow = ({
             {STATUS_LABEL[trip.status]}
           </Text>
         </View>
-        <View className="w-[70px] items-center justify-center border-l" style={{ borderColor: FIELD_COLORS.rule }}>
+        <View
+          className="items-center justify-center border-l"
+          style={{ borderColor: FIELD_COLORS.rule, width: compact ? 48 : 70 }}
+        >
           <Text className="text-xs" style={{ color: FIELD_COLORS.ink, fontFamily: bodySemiBoldFont }}>상세</Text>
           <FontAwesome name="long-arrow-right" size={21} color={FIELD_COLORS.ink} style={{ marginTop: 12 }} />
         </View>
@@ -173,7 +211,9 @@ const TripTimelineRow = ({
 
 const JournalScreen = () => {
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
   const router = useRouter();
+  const compactTimeline = width <= 390;
   const [filter, setFilter] = useState<TripFilter>("all");
   const [formVisible, setFormVisible] = useState(false);
   const {
@@ -214,8 +254,12 @@ const JournalScreen = () => {
         data={trips}
         keyExtractor={(trip) => trip.id}
         renderItem={({ item: trip }) => (
-          <View className="bg-white px-7">
+          <View
+            className="bg-white"
+            style={{ paddingHorizontal: compactTimeline ? 20 : 28 }}
+          >
             <TripTimelineRow
+              compact={compactTimeline}
               trip={trip}
               onPress={() => router.push({ pathname: "/trips/[id]", params: { id: trip.id } })}
             />
