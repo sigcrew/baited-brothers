@@ -6,27 +6,22 @@ import {
   Image,
   ImageBackground,
   TouchableOpacity,
-  TextInput,
-  Modal,
-  Pressable,
   ActivityIndicator,
   RefreshControl,
   Alert,
-  KeyboardAvoidingView,
-  Platform,
 } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import * as ImagePicker from "expo-image-picker";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import {
   useFishingTrips,
-  type FishingTrip,
-  type TripCoverImage,
+  type UpdateTripInput,
 } from "@/src/hooks/useFishingTrips";
 import { useUserCatches } from "@/src/hooks/useUserCatches";
 import { useImageContrast } from "@/src/hooks/useImageContrast";
 import { ArchiveTabHeader } from "@/components/design/ArchiveTabHeader";
+import { TripCoverActionSheet } from "@/components/trips/TripCoverActionSheet";
+import { TripFormModal } from "@/components/trips/TripFormModal";
 import {
   FIELD_COLORS,
   bodyExtraBoldFont,
@@ -50,270 +45,11 @@ const formatTripDate = (iso: string) => {
   });
 };
 
-const toLocalInputValue = (date: Date) => {
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
-};
-
-const parseLocalInputValue = (value: string): Date | null => {
-  const match = value
-    .trim()
-    .match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}))?$/);
-  if (!match) return null;
-
-  const year = Number(match[1]);
-  const month = Number(match[2]);
-  const day = Number(match[3]);
-  const hour = Number(match[4] ?? "9");
-  const minute = Number(match[5] ?? "0");
-  const date = new Date(year, month - 1, day, hour, minute);
-  return Number.isNaN(date.getTime()) ? null : date;
-};
-
-const defaultScheduledInput = () => {
-  const date = new Date();
-  date.setDate(date.getDate() + 1);
-  date.setHours(6, 0, 0, 0);
-  return toLocalInputValue(date);
-};
-
-const pickTripCover = async (): Promise<TripCoverImage | null> => {
-  const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-  if (!permission.granted) {
-    Alert.alert("사진 권한 필요", "출조 커버를 선택하려면 사진 보관함 접근을 허용해 주세요.");
-    return null;
-  }
-
-  const result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ["images"],
-    allowsEditing: true,
-    aspect: [4, 3],
-    quality: 0.85,
-  });
-
-  if (result.canceled || !result.assets[0]) return null;
-  const asset = result.assets[0];
-  return {
-    uri: asset.uri,
-    fileName: asset.fileName,
-    mimeType: asset.mimeType,
-  };
-};
-
-const TripRow = ({
-  trip,
-  showActions,
-  onDone,
-  onCancel,
-  disabled,
-}: {
-  trip: FishingTrip;
-  showActions?: boolean;
-  onDone?: () => void;
-  onCancel?: () => void;
-  disabled?: boolean;
-}) => (
-  <View className="mb-3 rounded-xl border border-gray-200 bg-white px-4 py-3">
-    <Text className="text-base font-semibold text-gray-900">
-      {trip.spot_name}
-    </Text>
-    <Text className="mt-1 text-sm text-gray-500">
-      {formatTripDate(trip.scheduled_at)}
-    </Text>
-    {trip.memo ? (
-      <Text className="mt-2 text-sm text-gray-600">{trip.memo}</Text>
-    ) : null}
-    {showActions ? (
-      <View className="mt-3 flex-row gap-2">
-        <TouchableOpacity
-          onPress={onDone}
-          disabled={disabled}
-          className="flex-1 rounded-lg bg-teal-800 py-2.5 active:bg-teal-900"
-        >
-          <Text className="text-center text-sm font-medium text-white">
-            완료
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={onCancel}
-          disabled={disabled}
-          className="flex-1 rounded-lg bg-gray-100 py-2.5 active:bg-gray-200"
-        >
-          <Text className="text-center text-sm font-medium text-gray-700">
-            취소
-          </Text>
-        </TouchableOpacity>
-      </View>
-    ) : null}
-  </View>
-);
-
-const AddTripModal = ({
-  visible,
-  onClose,
-  onSubmit,
-  isSaving,
-}: {
-  visible: boolean;
-  onClose: () => void;
-  onSubmit: (input: {
-    spotName: string;
-    scheduledAt: Date;
-    memo?: string;
-    coverImage?: TripCoverImage;
-  }) => Promise<Error | null>;
-  isSaving: boolean;
-}) => {
-  const [spotName, setSpotName] = useState("");
-  const [scheduledInput, setScheduledInput] = useState(defaultScheduledInput);
-  const [memo, setMemo] = useState("");
-  const [coverImage, setCoverImage] = useState<TripCoverImage | null>(null);
-  const [formError, setFormError] = useState<string | null>(null);
-
-  const reset = () => {
-    setSpotName("");
-    setScheduledInput(defaultScheduledInput());
-    setMemo("");
-    setCoverImage(null);
-    setFormError(null);
-  };
-
-  const handleClose = () => {
-    reset();
-    onClose();
-  };
-
-  const handleSubmit = async () => {
-    const scheduledAt = parseLocalInputValue(scheduledInput);
-    if (!spotName.trim()) {
-      setFormError("낚시터 이름을 입력해 주세요.");
-      return;
-    }
-    if (!scheduledAt) {
-      setFormError("날짜는 YYYY-MM-DD 또는 YYYY-MM-DD HH:mm 형식으로 입력해 주세요.");
-      return;
-    }
-
-    const error = await onSubmit({
-      spotName,
-      scheduledAt,
-      memo,
-      coverImage: coverImage ?? undefined,
-    });
-
-    if (error) {
-      setFormError(error.message);
-      return;
-    }
-
-    handleClose();
-  };
-
-  return (
-    <Modal visible={visible} transparent animationType="slide">
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        className="flex-1"
-      >
-        <Pressable
-          onPress={handleClose}
-          className="flex-1 justify-end bg-black/40"
-        >
-          <Pressable
-            onPress={(e) => e.stopPropagation()}
-            className="rounded-t-2xl bg-white px-4 pb-8 pt-5"
-          >
-            <Text className="text-xl font-bold text-gray-900">일정 추가</Text>
-            <Text className="mt-1 text-sm text-gray-500">
-              출조 전에 낚시터와 날짜를 남겨 두세요.
-            </Text>
-
-            <Text className="mt-5 text-xs font-medium text-gray-400">
-              낚시터
-            </Text>
-            <TextInput
-              value={spotName}
-              onChangeText={setSpotName}
-              placeholder="예: 대천항 방파제"
-              placeholderTextColor="#9ca3af"
-              className="mt-1 rounded-lg border border-gray-200 px-3 py-3 text-base text-gray-900"
-            />
-
-            <Text className="mt-4 text-xs font-medium text-gray-400">
-              일시 (YYYY-MM-DD HH:mm)
-            </Text>
-            <TextInput
-              value={scheduledInput}
-              onChangeText={setScheduledInput}
-              placeholder="2026-07-16 06:00"
-              placeholderTextColor="#9ca3af"
-              autoCapitalize="none"
-              className="mt-1 rounded-lg border border-gray-200 px-3 py-3 text-base text-gray-900"
-            />
-
-            <Text className="mt-4 text-xs font-medium text-gray-400">
-              메모 (선택)
-            </Text>
-            <TextInput
-              value={memo}
-              onChangeText={setMemo}
-              placeholder="물때, 동행, 목표 어종 등"
-              placeholderTextColor="#9ca3af"
-              multiline
-              className="mt-1 min-h-[72px] rounded-lg border border-gray-200 px-3 py-3 text-base text-gray-900"
-            />
-
-            <Text className="mt-4 text-xs font-medium text-gray-400">
-              홈 커버 사진 (선택)
-            </Text>
-            <TouchableOpacity
-              onPress={async () => {
-                const image = await pickTripCover();
-                if (image) setCoverImage(image);
-              }}
-              className="mt-1 overflow-hidden rounded-lg border border-gray-200 bg-gray-50"
-            >
-              {coverImage ? (
-                <View>
-                  <Image source={{ uri: coverImage.uri }} className="h-36 w-full" resizeMode="cover" />
-                  <View className="absolute bottom-3 right-3 rounded bg-black/60 px-3 py-2">
-                    <Text className="text-xs font-semibold text-white">사진 다시 선택</Text>
-                  </View>
-                </View>
-              ) : (
-                <View className="h-24 flex-row items-center justify-center">
-                  <FontAwesome name="image" size={20} color={FIELD_COLORS.teal} />
-                  <Text className="ml-2 text-sm" style={{ color: FIELD_COLORS.teal }}>사진 선택</Text>
-                </View>
-              )}
-            </TouchableOpacity>
-
-            {formError ? (
-              <Text className="mt-3 text-sm text-red-600">{formError}</Text>
-            ) : null}
-
-            <TouchableOpacity
-              onPress={handleSubmit}
-              disabled={isSaving}
-              className="mt-5 rounded-xl bg-gray-900 py-3.5 active:bg-gray-800"
-            >
-              {isSaving ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text className="text-center font-medium text-white">저장</Text>
-              )}
-            </TouchableOpacity>
-          </Pressable>
-        </Pressable>
-      </KeyboardAvoidingView>
-    </Modal>
-  );
-};
-
 const HomeScreen = () => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const [addVisible, setAddVisible] = useState(false);
+  const [coverActionsVisible, setCoverActionsVisible] = useState(false);
   const {
     trips,
     plannedTrips,
@@ -326,46 +62,13 @@ const HomeScreen = () => {
     refetch,
     createTrip,
     updateTripCover,
-    markDone,
-    cancelTrip,
+    removeTripCover,
   } = useFishingTrips();
   const { catches } = useUserCatches();
 
-  const handleCreate = async (input: {
-    spotName: string;
-    scheduledAt: Date;
-    memo?: string;
-    coverImage?: TripCoverImage;
-  }) => {
+  const handleCreate = async (input: UpdateTripInput) => {
     const { error: createError } = await createTrip(input);
     return createError;
-  };
-
-  const handleDone = (trip: FishingTrip) => {
-    Alert.alert("출조 완료", `${trip.spot_name} 일정을 완료할까요?`, [
-      { text: "아니오", style: "cancel" },
-      {
-        text: "완료",
-        onPress: async () => {
-          const { error: doneError } = await markDone(trip.id);
-          if (doneError) Alert.alert("오류", doneError.message);
-        },
-      },
-    ]);
-  };
-
-  const handleCancel = (trip: FishingTrip) => {
-    Alert.alert("일정 취소", `${trip.spot_name} 일정을 취소할까요?`, [
-      { text: "아니오", style: "cancel" },
-      {
-        text: "취소하기",
-        style: "destructive",
-        onPress: async () => {
-          const { error: cancelError } = await cancelTrip(trip.id);
-          if (cancelError) Alert.alert("오류", cancelError.message);
-        },
-      },
-    ]);
   };
 
   const nextTrip = plannedTrips[0];
@@ -390,18 +93,14 @@ const HomeScreen = () => {
     : 0;
   const handleRecord = () => isLoggedIn ? router.push("/record") : router.push("/(auth)/login");
   const handleAddTrip = () => isLoggedIn ? setAddVisible(true) : router.push("/(auth)/login");
-  const handleChangeCover = async () => {
+  const handleChangeCover = () => {
     if (!nextTrip || isSaving) return;
-    const image = await pickTripCover();
-    if (!image) return;
-
-    const { error: coverError } = await updateTripCover(nextTrip.id, image);
-    if (coverError) Alert.alert("사진 변경 실패", coverError.message);
+    setCoverActionsVisible(true);
   };
 
   return (
     <View className="flex-1" style={{ paddingTop: insets.top, backgroundColor: FIELD_COLORS.foam }}>
-      <ScrollView refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={refetch} tintColor={FIELD_COLORS.teal} />} contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}>
+      <ScrollView refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={refetch} tintColor={FIELD_COLORS.teal} />}>
         <ImageBackground
           source={heroSource}
           resizeMode="cover"
@@ -448,12 +147,12 @@ const HomeScreen = () => {
               </View>
             ) : nextTrip ? (
               <>
-                <View className="h-[84px] flex-row items-end">
-                  <Text style={{ color: heroTextColor, fontFamily: dateNumberFont, fontSize: 82, lineHeight: 84 }}>{dateMonth}</Text>
-                  <Text style={{ color: heroTextColor, fontFamily: dateKoreanFont, fontSize: 39, lineHeight: 57 }}>월 </Text>
-                  <Text style={{ color: heroTextColor, fontFamily: dateNumberFont, fontSize: 82, lineHeight: 84 }}>{dateDay}</Text>
-                  <Text style={{ color: heroTextColor, fontFamily: dateKoreanFont, fontSize: 39, lineHeight: 57 }}>일, </Text>
-                  <Text style={{ color: heroTextColor, fontFamily: dateKoreanFont, fontSize: 47, lineHeight: 61 }}>{dateWeekday}</Text>
+                <View className="min-h-[96px] flex-row items-end">
+                  <Text style={{ color: heroTextColor, fontFamily: dateNumberFont, fontSize: 82, lineHeight: 96, overflow: "visible", paddingTop: 4 }}>{dateMonth}</Text>
+                  <Text style={{ color: heroTextColor, fontFamily: dateKoreanFont, fontSize: 39, lineHeight: 64 }}>월 </Text>
+                  <Text style={{ color: heroTextColor, fontFamily: dateNumberFont, fontSize: 82, lineHeight: 96, overflow: "visible", paddingTop: 4 }}>{dateDay}</Text>
+                  <Text style={{ color: heroTextColor, fontFamily: dateKoreanFont, fontSize: 39, lineHeight: 64 }}>일, </Text>
+                  <Text style={{ color: heroTextColor, fontFamily: dateKoreanFont, fontSize: 47, lineHeight: 68 }}>{dateWeekday}</Text>
                 </View>
                 <Text className="mt-1 text-[25px] leading-[34px]" style={{ color: heroTextColor, fontFamily: displayFont }}>다음 출조는 {nextTrip.spot_name}입니다.</Text>
                 <Text className="mt-4 text-[15px] tracking-[1.6px]" style={{ color: heroTextColor, fontFamily: bodySemiBoldFont }}>새벽 5:30 · 우럭 목표</Text>
@@ -550,7 +249,77 @@ const HomeScreen = () => {
               <ActivityIndicator color={FIELD_COLORS.teal} />
             </View>
           ) : nextTrip ? (
-            <View className="mt-3 flex-row items-center border-y py-4" style={{ borderColor: FIELD_COLORS.rule }}><FontAwesome name="map-signs" size={25} color={FIELD_COLORS.teal} /><View className="ml-4 flex-1"><Text className="text-lg" style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>{nextTrip.spot_name}</Text><Text className="mt-1 text-[11px] tracking-[1px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>{formatTripDate(nextTrip.scheduled_at)} · 우럭 목표</Text></View><View className="flex-row items-center" accessible accessibilityLabel={`D-${daysAway}`}><Text style={{ color: FIELD_COLORS.orange, fontFamily: dateNumberFont, fontSize: 48, lineHeight: 54 }}>D</Text><View style={{ width: 14, height: 4, marginHorizontal: 5, backgroundColor: FIELD_COLORS.orange }} /><Text style={{ color: FIELD_COLORS.orange, fontFamily: dateNumberFont, fontSize: 48, lineHeight: 54 }}>{daysAway}</Text></View></View>
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={`${nextTrip.spot_name} 출조 상세 보기`}
+              accessibilityHint="선택한 출조의 일정과 현장 기록을 엽니다"
+              activeOpacity={0.72}
+              onPress={() =>
+                router.push({
+                  pathname: "/trips/[id]",
+                  params: { id: nextTrip.id },
+                })
+              }
+              className="mt-3 flex-row items-center border-y py-4"
+              style={{ borderColor: FIELD_COLORS.rule }}
+            >
+              <FontAwesome name="map-signs" size={25} color={FIELD_COLORS.teal} />
+              <View className="ml-4 flex-1">
+                <Text
+                  className="text-lg"
+                  style={{
+                    color: FIELD_COLORS.ink,
+                    fontFamily: bodyExtraBoldFont,
+                  }}
+                >
+                  {nextTrip.spot_name}
+                </Text>
+                <Text
+                  className="mt-1 text-[11px] tracking-[1px]"
+                  style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}
+                >
+                  {formatTripDate(nextTrip.scheduled_at)} · 우럭 목표
+                </Text>
+              </View>
+              <View
+                className="flex-row items-center"
+                accessible
+                accessibilityLabel={`D-${daysAway}`}
+              >
+                <Text
+                  style={{
+                    color: FIELD_COLORS.orange,
+                    fontFamily: dateNumberFont,
+                    fontSize: 48,
+                    lineHeight: 62,
+                    overflow: "visible",
+                    paddingTop: 2,
+                  }}
+                >
+                  D
+                </Text>
+                <View
+                  style={{
+                    width: 14,
+                    height: 4,
+                    marginHorizontal: 5,
+                    backgroundColor: FIELD_COLORS.orange,
+                  }}
+                />
+                <Text
+                  style={{
+                    color: FIELD_COLORS.orange,
+                    fontFamily: dateNumberFont,
+                    fontSize: 48,
+                    lineHeight: 62,
+                    overflow: "visible",
+                    paddingTop: 2,
+                  }}
+                >
+                  {daysAway}
+                </Text>
+              </View>
+            </TouchableOpacity>
           ) : (
             <TouchableOpacity
               accessibilityRole="button"
@@ -571,21 +340,40 @@ const HomeScreen = () => {
 
         <View className="mt-3 bg-white px-4 py-6">
           <View className="flex-row items-center justify-between">
-            <Text
-              className="text-xl"
-              style={{
-                color: FIELD_COLORS.ink,
-                fontFamily: bodyExtraBoldFont,
-              }}
+            <View className="flex-row items-baseline">
+              <Text
+                className="text-xl"
+                style={{
+                  color: FIELD_COLORS.ink,
+                  fontFamily: bodyExtraBoldFont,
+                }}
+              >
+                최근 조과
+              </Text>
+              <Text
+                className="ml-2 text-[10px] tracking-[1px]"
+                style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}
+              >
+                최대 3개
+              </Text>
+            </View>
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel="전체 조과 카드 보기"
+              onPress={() =>
+                router.push({
+                  pathname: "/(tabs)/encyclopedia",
+                  params: { segment: "cards" },
+                })
+              }
             >
-              최근 조과
-            </Text>
-            <Text
-              className="text-[11px] tracking-[1.2px]"
-              style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}
-            >
-              LATEST CATCH
-            </Text>
+              <Text
+                className="text-[11px] tracking-[1px]"
+                style={{ color: FIELD_COLORS.teal, fontFamily: monoFont }}
+              >
+                ALL CARDS →
+              </Text>
+            </TouchableOpacity>
           </View>
           <View
             className="mt-3 flex-row border-t pt-3"
@@ -593,8 +381,17 @@ const HomeScreen = () => {
           >
             {catches.length ? (
               catches.slice(0, 3).map((item, index) => (
-                <View
+                <TouchableOpacity
                   key={item.id}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${item.fish?.name_ko ?? "어종"} 조과 카드 열기`}
+                  activeOpacity={0.84}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/(tabs)/encyclopedia",
+                      params: { segment: "cards", catchId: item.id },
+                    })
+                  }
                   className="flex-1 overflow-hidden border"
                   style={{
                     marginRight: index < Math.min(catches.length, 3) - 1 ? 8 : 0,
@@ -630,7 +427,7 @@ const HomeScreen = () => {
                       {item.fish?.name_ko ?? "어종"}
                     </Text>
                   </View>
-                </View>
+                </TouchableOpacity>
               ))
             ) : (
               <View
@@ -659,11 +456,28 @@ const HomeScreen = () => {
         </View>
       </ScrollView>
 
-      <AddTripModal
+      <TripFormModal
         visible={addVisible}
+        trip={null}
         onClose={() => setAddVisible(false)}
         onSubmit={handleCreate}
         isSaving={isSaving}
+      />
+      <TripCoverActionSheet
+        hasCover={Boolean(nextTrip?.cover_image_url)}
+        visible={coverActionsVisible}
+        isBusy={isSaving}
+        onClose={() => setCoverActionsVisible(false)}
+        onSelect={async (image) => {
+          if (!nextTrip) return;
+          const { error: coverError } = await updateTripCover(nextTrip.id, image);
+          if (coverError) Alert.alert("사진 변경 실패", coverError.message);
+        }}
+        onRemove={async () => {
+          if (!nextTrip) return;
+          const { error: coverError } = await removeTripCover(nextTrip.id);
+          if (coverError) Alert.alert("커버 초기화 실패", coverError.message);
+        }}
       />
     </View>
   );

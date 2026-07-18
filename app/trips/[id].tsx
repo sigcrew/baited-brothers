@@ -220,10 +220,10 @@ const TripDetailScreen = () => {
         </ImageBackground>
 
         <View className="bg-white px-5 pb-6 pt-5">
-          <View className="flex-row items-end">
-            <Text style={{ color: FIELD_COLORS.ink, fontFamily: dateNumberFont, fontSize: 66, lineHeight: 70 }}>{month}</Text>
+          <View className="min-h-[80px] flex-row items-end">
+            <Text style={{ color: FIELD_COLORS.ink, fontFamily: dateNumberFont, fontSize: 66, lineHeight: 80, overflow: "visible", paddingTop: 3 }}>{month}</Text>
             <Text style={{ color: FIELD_COLORS.ink, fontFamily: dateKoreanFont, fontSize: 29, lineHeight: 49 }}>월 </Text>
-            <Text style={{ color: FIELD_COLORS.ink, fontFamily: dateNumberFont, fontSize: 66, lineHeight: 70 }}>{day}</Text>
+            <Text style={{ color: FIELD_COLORS.ink, fontFamily: dateNumberFont, fontSize: 66, lineHeight: 80, overflow: "visible", paddingTop: 3 }}>{day}</Text>
             <Text style={{ color: FIELD_COLORS.ink, fontFamily: dateKoreanFont, fontSize: 29, lineHeight: 49 }}>일, </Text>
             <Text style={{ color: FIELD_COLORS.ink, fontFamily: dateKoreanFont, fontSize: 34, lineHeight: 52 }}>{weekday}</Text>
           </View>

@@ -14,6 +14,7 @@ export type CreateTripInput = {
 
 export type UpdateTripInput = Omit<CreateTripInput, "coverImage"> & {
   coverImage?: TripCoverImage;
+  removeCover?: boolean;
 };
 
 export type TripCoverImage = {
@@ -222,6 +223,43 @@ export const useFishingTrips = ({ autoFetch = true }: UseFishingTripsOptions = {
     [fetchTrips, trips, userId]
   );
 
+  const removeTripCover = useCallback(
+    async (tripId: string) => {
+      if (!userId) return { error: new Error("로그인이 필요합니다.") };
+
+      const trip = trips.find((item) => item.id === tripId);
+      if (!trip) return { error: new Error("출조 일정을 찾지 못했습니다.") };
+
+      setIsSaving(true);
+      try {
+        const { error: updateError } = await supabase
+          .from("fishing_trips")
+          .update({
+            cover_image_url: null,
+            cover_image_path: null,
+          })
+          .eq("id", tripId)
+          .eq("user_id", userId);
+
+        if (updateError) throw updateError;
+        if (trip.cover_image_path) {
+          await supabase.storage.from("user-uploads").remove([trip.cover_image_path]);
+        }
+        await fetchTrips(true);
+        return { error: null };
+      } catch (removeError) {
+        return {
+          error: removeError instanceof Error
+            ? removeError
+            : new Error("기본 커버로 되돌리지 못했습니다."),
+        };
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [fetchTrips, trips, userId]
+  );
+
   const updateTrip = useCallback(
     async (tripId: string, input: UpdateTripInput) => {
       if (!userId) return { error: new Error("로그인이 필요합니다.") };
@@ -245,6 +283,12 @@ export const useFishingTrips = ({ autoFetch = true }: UseFishingTripsOptions = {
           spot_name: spotName,
           scheduled_at: input.scheduledAt.toISOString(),
           memo: input.memo?.trim() ? input.memo.trim() : null,
+          ...(input.removeCover
+            ? {
+                cover_image_url: null,
+                cover_image_path: null,
+              }
+            : {}),
           ...(uploadedCover
             ? {
                 cover_image_url: uploadedCover.publicUrl,
@@ -261,7 +305,7 @@ export const useFishingTrips = ({ autoFetch = true }: UseFishingTripsOptions = {
 
         if (updateError) throw updateError;
 
-        if (uploadedCover && trip.cover_image_path) {
+        if ((uploadedCover || input.removeCover) && trip.cover_image_path) {
           await supabase.storage.from("user-uploads").remove([trip.cover_image_path]);
         }
       } catch (updateError) {
@@ -382,6 +426,7 @@ export const useFishingTrips = ({ autoFetch = true }: UseFishingTripsOptions = {
     createTrip,
     updateTrip,
     updateTripCover,
+    removeTripCover,
     deleteTrip,
     markDone,
     cancelTrip,

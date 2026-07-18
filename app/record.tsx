@@ -2,10 +2,10 @@ import { useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  FlatList,
   Image,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
@@ -23,6 +23,7 @@ import {
   type FishRecognitionCandidate,
 } from "@/src/hooks/useFishRecognition";
 import { CatchCompletionView } from "@/components/record/CatchCompletionView";
+import { FishCatalogSheet } from "@/components/record/FishCatalogSheet";
 import { getField60Illustration } from "@/src/data/field60Illustrations";
 import { FIELD_COLORS, bodyExtraBoldFont, bodyFont, monoFont } from "@/src/theme/fieldJournal";
 
@@ -70,7 +71,6 @@ const RecordScreen = () => {
   const [capture, setCapture] = useState<Capture | null>(null);
   const [selectedFish, setSelectedFish] = useState<Fish | null>(null);
   const [completion, setCompletion] = useState<CompletionResult | null>(null);
-  const [query, setQuery] = useState("");
   const [size, setSize] = useState("");
   const [memo, setMemo] = useState("");
   const [isCapturing, setIsCapturing] = useState(false);
@@ -81,7 +81,7 @@ const RecordScreen = () => {
   >([]);
   const [recognitionNote, setRecognitionNote] = useState<string | null>(null);
   const [needsRetake, setNeedsRetake] = useState(false);
-  const [showCatalogSearch, setShowCatalogSearch] = useState(false);
+  const [catalogVisible, setCatalogVisible] = useState(false);
   const { fishes, isLoading: fishesLoading } = useFishes(null, "core");
   const { createCatch, isSaving } = useCreateCatch();
   const {
@@ -127,14 +127,6 @@ const RecordScreen = () => {
     [fishes, recognitionCandidates],
   );
 
-  const filteredFishes = useMemo(() => {
-    const keyword = query.trim().toLowerCase();
-    if (!keyword) return fishes;
-    return fishes.filter((fish) =>
-      `${fish.name_ko ?? ""} ${fish.name}`.toLowerCase().includes(keyword)
-    );
-  }, [fishes, query]);
-
   const analyzeCapture = async (nextCapture: Capture) => {
     setCapture(nextCapture);
     setSelectedFish(null);
@@ -142,7 +134,7 @@ const RecordScreen = () => {
     setRecognitionCandidates([]);
     setRecognitionNote(null);
     setNeedsRetake(false);
-    setShowCatalogSearch(false);
+    setCatalogVisible(false);
 
     const result = await recognize({
       imageBase64: nextCapture.base64,
@@ -153,7 +145,7 @@ const RecordScreen = () => {
     setRecognitionNote(result.note);
     setNeedsRetake(result.needsRetake);
     if (result.error || result.candidates.length === 0) {
-      setShowCatalogSearch(true);
+      setCatalogVisible(true);
     }
   };
 
@@ -425,13 +417,10 @@ const RecordScreen = () => {
         </Text>
         <View className="w-14" />
       </View>
-      <FlatList
-        data={selectedFish || !showCatalogSearch ? [] : filteredFishes}
-        keyExtractor={(item) => item.id}
+      <ScrollView
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + 32 }}
-        ListHeaderComponent={
-          <>
+      >
             <Image source={{ uri: capture.uri }} className="h-56 w-full rounded-xl bg-slate-200" resizeMode="cover" />
             <View className="mt-3 flex-row justify-between">
               <Text className="text-xs text-teal-800">
@@ -644,24 +633,16 @@ const RecordScreen = () => {
 
                 {!isRecognizing ? (
                   <TouchableOpacity
-                    onPress={() => setShowCatalogSearch((visible) => !visible)}
+                    accessibilityRole="button"
+                    accessibilityLabel="도감에서 직접 어종 찾기"
+                    onPress={() => setCatalogVisible(true)}
                     className="mt-5 items-center border py-3"
                     style={{ borderColor: FIELD_COLORS.rule }}
                   >
                     <Text style={{ color: FIELD_COLORS.teal, fontFamily: bodyExtraBoldFont }}>
-                      {showCatalogSearch ? "도감 검색 닫기" : "도감에서 직접 찾기"}
+                      도감에서 직접 찾기
                     </Text>
                   </TouchableOpacity>
-                ) : null}
-
-                {showCatalogSearch ? (
-                  <TextInput
-                    value={query}
-                    onChangeText={setQuery}
-                    placeholder="어종 이름 검색"
-                    className="mt-3 border bg-white px-4 py-3 text-base"
-                    style={{ borderColor: FIELD_COLORS.rule, color: FIELD_COLORS.ink }}
-                  />
                 ) : null}
               </>
             )}
@@ -724,27 +705,16 @@ const RecordScreen = () => {
                 </TouchableOpacity>
               </View>
             ) : null}
-          </>
-        }
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => {
-              setSelectedFish(item);
-              setCompletion(null);
-            }}
-            className="mt-2 rounded-xl border border-slate-200 bg-white px-4 py-3"
-          >
-            <Text className="font-semibold text-slate-900">{item.name_ko ?? item.name}</Text>
-            {item.name_ko ? <Text className="mt-0.5 text-xs text-slate-400">{item.name}</Text> : null}
-          </TouchableOpacity>
-        )}
-        ListEmptyComponent={
-          showCatalogSearch && !fishesLoading && !selectedFish ? (
-            <Text className="py-8 text-center text-slate-500">
-              검색 결과가 없습니다.
-            </Text>
-          ) : null
-        }
+      </ScrollView>
+      <FishCatalogSheet
+        fishes={fishes}
+        isLoading={fishesLoading}
+        visible={catalogVisible}
+        onClose={() => setCatalogVisible(false)}
+        onSelect={(fish) => {
+          setSelectedFish(fish);
+          setCompletion(null);
+        }}
       />
     </KeyboardAvoidingView>
   );

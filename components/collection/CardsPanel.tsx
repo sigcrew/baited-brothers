@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -29,6 +29,8 @@ type CardsPanelProps = {
   isLoggedIn: boolean;
   onRefresh: () => void;
   onLoginPress?: () => void;
+  requestedCatchId?: string;
+  onRequestedCatchOpened?: () => void;
 };
 
 const CatchCardTile = ({
@@ -92,6 +94,7 @@ const CatchDetailModal = ({
             width: "100%",
             maxWidth: 430,
             maxHeight: Math.min(windowHeight - insets.top - insets.bottom - 24, 860),
+            backgroundColor: FIELD_COLORS.foam,
           }}
         >
           <ScrollView
@@ -99,10 +102,9 @@ const CatchDetailModal = ({
             style={{ width: "100%" }}
           >
             <Pressable
-              onPress={onClose}
               accessibilityRole="button"
               accessibilityLabel="조과 카드 닫기"
-              className="w-full"
+              onPress={onClose}
             >
               <CatchArchiveCard item={item} variant="detail" />
             </Pressable>
@@ -121,6 +123,8 @@ export const CardsPanel = ({
   isLoggedIn,
   onRefresh,
   onLoginPress,
+  requestedCatchId,
+  onRequestedCatchOpened,
 }: CardsPanelProps) => {
   const [selected, setSelected] = useState<UserCatch | null>(null);
   const [sortDirection, setSortDirection] = useState<"newest" | "oldest">(
@@ -135,6 +139,16 @@ export const CardsPanel = ({
       ),
     [catches, sortDirection],
   );
+
+  useEffect(() => {
+    if (!requestedCatchId) return;
+
+    const requestedCatch = catches.find((item) => item.id === requestedCatchId);
+    if (!requestedCatch) return;
+
+    setSelected(requestedCatch);
+    onRequestedCatchOpened?.();
+  }, [catches, onRequestedCatchOpened, requestedCatchId]);
 
   if (!isLoggedIn) {
     return (

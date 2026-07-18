@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -33,8 +33,26 @@ const SEGMENTS: { key: CollectionSegment; label: string }[] = [
 const CollectionScreen = () => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const params = useLocalSearchParams<{ cardPreview?: string }>();
-  const [segment, setSegment] = useState<CollectionSegment>("encyclopedia");
+  const params = useLocalSearchParams<{
+    cardPreview?: string;
+    catchId?: string;
+    segment?: CollectionSegment;
+  }>();
+  const [segment, setSegment] = useState<CollectionSegment>(
+    params.segment === "cards" || params.segment === "badges"
+      ? params.segment
+      : "encyclopedia",
+  );
+
+  useEffect(() => {
+    if (params.segment === "cards" || params.segment === "badges") {
+      setSegment(params.segment);
+    }
+  }, [params.segment]);
+
+  const handleRequestedCatchOpened = useCallback(() => {
+    router.setParams({ catchId: "" });
+  }, [router]);
 
   const {
     fishes: allFishes,
@@ -221,6 +239,8 @@ const CollectionScreen = () => {
           isLoggedIn={isLoggedIn || previewMode}
           onRefresh={refetchCatches}
           onLoginPress={() => router.push("/(auth)/login")}
+          requestedCatchId={params.catchId}
+          onRequestedCatchOpened={handleRequestedCatchOpened}
         />
       )}
     </View>

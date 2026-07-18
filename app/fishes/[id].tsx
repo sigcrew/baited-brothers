@@ -33,6 +33,16 @@ const formatDate = (value: string | null) =>
     ? new Intl.DateTimeFormat("ko-KR", { year: "numeric", month: "long", day: "numeric" }).format(new Date(value))
     : "기록 없음";
 
+const formatNumericDate = (value: string) =>
+  new Intl.DateTimeFormat("ko-KR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  })
+    .format(new Date(value))
+    .replace(/\. /g, ".")
+    .replace(/\.$/, "");
+
 const InfoSection = ({
   index,
   title,
@@ -67,12 +77,26 @@ const Value = ({ children }: { children: React.ReactNode }) => (
   </Text>
 );
 
-const Metric = ({ label, value }: { label: string; value: string }) => (
+const Metric = ({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) => (
   <View className="flex-1 border-r px-3 last:border-r-0" style={{ borderColor: FIELD_COLORS.rule }}>
     <Text className="text-center text-[10px]" style={{ color: FIELD_COLORS.muted, fontFamily: bodySemiBoldFont }}>
       {label}
     </Text>
-    <Text className="mt-2 text-center text-[24px]" style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>
+    <Text
+      className="mt-2 text-center text-[18px]"
+      numberOfLines={1}
+      style={{
+        color: FIELD_COLORS.ink,
+        fontFamily: bodyExtraBoldFont,
+        letterSpacing: -0.6,
+      }}
+    >
       {value}
     </Text>
   </View>
@@ -418,7 +442,10 @@ const FishDetailScreen = () => {
           <View className="flex-row border-y py-5" style={{ borderColor: FIELD_COLORS.rule }}>
             <Metric label="발견 횟수" value={`${discovery.count}회`} />
             <Metric label="개인 최고" value={discovery.bestSizeCm ? `${discovery.bestSizeCm}cm` : "-"} />
-            <Metric label="첫 발견" value={discovery.firstCaughtAt ? formatDate(discovery.firstCaughtAt).replace(/\s/g, "") : "-"} />
+            <Metric
+              label="첫 발견"
+              value={discovery.firstCaughtAt ? formatNumericDate(discovery.firstCaughtAt) : "-"}
+            />
           </View>
           <View className="mt-5">
             <Label>발견 장소</Label>
