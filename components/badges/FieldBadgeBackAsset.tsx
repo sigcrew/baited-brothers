@@ -1,17 +1,5 @@
-import { Asset } from "expo-asset";
-import Svg, {
-  Circle,
-  Defs,
-  FeColorMatrix,
-  Filter,
-  G,
-  Image as SvgImage,
-  Line,
-  Mask,
-  Path,
-  Rect,
-  Text as SvgText,
-} from "react-native-svg";
+import { Image } from "expo-image";
+import { Text, View } from "react-native";
 
 import { getBadgeImageSource } from "@/components/badges/FieldBadgeAsset";
 import {
@@ -30,8 +18,6 @@ type FieldBadgeBackAssetProps = {
   requirement: string;
   size?: number;
 };
-
-const SHIELD_BADGE_IDS = new Set(["trip_first", "trips_5"]);
 
 const wrapRequirement = (requirement: string) => {
   const words = requirement.split(" ");
@@ -59,98 +45,145 @@ export const FieldBadgeBackAsset = ({
   size = 276,
 }: FieldBadgeBackAssetProps) => {
   const source = getBadgeImageSource(badgeId);
-  const sourceUri = Asset.fromModule(source as number).uri;
-  const safeId = badgeId.replace(/[^a-zA-Z0-9_-]/g, "");
-  const filterId = `badge-alpha-${safeId}`;
-  const maskId = `badge-silhouette-${safeId}`;
   const requirementLines = wrapRequirement(requirement);
-  const requirementStartY = requirementLines.length > 1 ? 118 : 128;
-  const requirementFontSize = requirementLines.length > 1 ? 15 : 17;
   const progressValue = `${Math.min(progressCurrent, progressTarget)} / ${progressTarget}`;
-  const isShieldBadge = SHIELD_BADGE_IDS.has(badgeId);
+  const contentWidth = size * 0.58;
 
   return (
-    <Svg
-      width={size}
-      height={size}
-      viewBox="0 0 276 276"
+    <View
       accessibilityRole="image"
       accessibilityLabel={`${requirement}, ${progressLabel} ${progressValue}, 획득일 ${acquiredDate}`}
+      style={{ height: size, width: size }}
     >
-      <Defs>
-        <Filter id={filterId} x="0" y="0" width="100%" height="100%">
-          <FeColorMatrix
-            type="matrix"
-            values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1 0"
-          />
-        </Filter>
-        <Mask id={maskId} x="0" y="0" width={size} height={size} maskUnits="userSpaceOnUse">
-          <SvgImage
-            href={sourceUri}
-            x="0"
-            y="0"
-            width={size}
-            height={size}
-            preserveAspectRatio="xMidYMid meet"
-            filter={`url(#${filterId})`}
-          />
-        </Mask>
-      </Defs>
-      <G mask={`url(#${maskId})`}>
-        <Rect x="0" y="0" width={size} height={size} fill={FIELD_COLORS.ink} />
-        <Rect x="0" y="0" width={size} height={size} fill={FIELD_COLORS.teal} opacity={0.12} />
+      <Image
+        source={source}
+        contentFit="contain"
+        tintColor={FIELD_COLORS.ink}
+        style={{
+          height: size,
+          left: 0,
+          position: "absolute",
+          top: 0,
+          width: size,
+        }}
+      />
 
-        <Line x1="54" y1="78" x2="222" y2="78" stroke={FIELD_COLORS.teal} strokeWidth="1" />
-        <SvgText
-          x="138"
-          y="96"
-          fill={FIELD_COLORS.orange}
-          fontFamily={monoFont}
-          fontSize="7"
-          letterSpacing="1.8"
-          textAnchor="middle"
+      <View
+        style={{
+          alignItems: "center",
+          left: (size - contentWidth) / 2,
+          position: "absolute",
+          top: size * 0.28,
+          width: contentWidth,
+        }}
+      >
+        <View
+          style={{
+            backgroundColor: FIELD_COLORS.teal,
+            height: 1,
+            opacity: 0.9,
+            width: "100%",
+          }}
+        />
+        <Text
+          style={{
+            color: FIELD_COLORS.orange,
+            fontFamily: monoFont,
+            fontSize: 7,
+            letterSpacing: 1.5,
+            marginTop: 9,
+          }}
         >
           UNLOCK CONDITION
-        </SvgText>
-        {requirementLines.map((line, index) => (
-          <SvgText
-            key={`${line}-${index}`}
-            x="138"
-            y={requirementStartY + index * 22}
-            fill={FIELD_COLORS.foam}
-            fontFamily={bodyExtraBoldFont}
-            fontSize={requirementFontSize}
-            textAnchor="middle"
-          >
-            {line}
-          </SvgText>
-        ))}
+        </Text>
+        <View style={{ marginTop: 8 }}>
+          {requirementLines.map((line, index) => (
+            <Text
+              key={`${line}-${index}`}
+              style={{
+                color: FIELD_COLORS.foam,
+                fontFamily: bodyExtraBoldFont,
+                fontSize: requirementLines.length > 1 ? 15 : 17,
+                lineHeight: 21,
+                textAlign: "center",
+              }}
+            >
+              {line}
+            </Text>
+          ))}
+        </View>
 
-        <Line x1="72" y1="148" x2="204" y2="148" stroke={FIELD_COLORS.rule} strokeWidth="1" />
-        <SvgText x="62" y="165" fill="#B6C6C7" fontFamily={monoFont} fontSize="7">
-          {progressLabel}
-        </SvgText>
-        <SvgText x="62" y="185" fill={FIELD_COLORS.foam} fontFamily={displayFont} fontSize="21">
-          {progressValue}
-        </SvgText>
-        <SvgText x="214" y="165" fill="#B6C6C7" fontFamily={monoFont} fontSize="7" textAnchor="end">
-          ACQUIRED
-        </SvgText>
-        <SvgText x="214" y="184" fill={FIELD_COLORS.foam} fontFamily={monoFont} fontSize="8" textAnchor="end">
-          {acquiredDate}
-        </SvgText>
-
-        <Circle cx="138" cy="201" r="7" fill={FIELD_COLORS.orange} />
-        <Path d="M134 201 L137 204 L142 198" fill="none" stroke={FIELD_COLORS.ink} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        <Line
-          x1={isShieldBadge ? 90 : 54}
-          y1="214"
-          x2={isShieldBadge ? 186 : 222}
-          y2="214"
-          stroke={FIELD_COLORS.teal}
-          strokeWidth="1"
+        <View
+          style={{
+            backgroundColor: FIELD_COLORS.rule,
+            height: 1,
+            marginTop: 10,
+            width: "82%",
+          }}
         />
-      </G>
-    </Svg>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginTop: 8,
+            width: "100%",
+          }}
+        >
+          <View>
+            <Text style={{ color: "#B6C6C7", fontFamily: monoFont, fontSize: 7 }}>
+              {progressLabel}
+            </Text>
+            <Text
+              style={{
+                color: FIELD_COLORS.foam,
+                fontFamily: displayFont,
+                fontSize: 21,
+                lineHeight: 24,
+              }}
+            >
+              {progressValue}
+            </Text>
+          </View>
+          <View style={{ alignItems: "flex-end" }}>
+            <Text style={{ color: "#B6C6C7", fontFamily: monoFont, fontSize: 7 }}>
+              ACQUIRED
+            </Text>
+            <Text
+              style={{
+                color: FIELD_COLORS.foam,
+                fontFamily: monoFont,
+                fontSize: 8,
+                marginTop: 6,
+              }}
+            >
+              {acquiredDate}
+            </Text>
+          </View>
+        </View>
+
+        <View
+          style={{
+            alignItems: "center",
+            backgroundColor: FIELD_COLORS.orange,
+            borderRadius: 7,
+            height: 14,
+            justifyContent: "center",
+            marginTop: 8,
+            width: 14,
+          }}
+        >
+          <Text
+            style={{
+              color: FIELD_COLORS.ink,
+              fontFamily: bodyExtraBoldFont,
+              fontSize: 9,
+              lineHeight: 11,
+            }}
+          >
+            ✓
+          </Text>
+        </View>
+      </View>
+    </View>
   );
 };

@@ -72,10 +72,12 @@ export const BadgeDetailModal = ({
 
   useEffect(() => {
     if (!visible) {
+      rotation.stopAnimation();
       bottomSheetRef.current?.dismiss();
       return;
     }
 
+    rotation.stopAnimation();
     isFlippedRef.current = false;
     setIsFlipped(false);
     dragStartRotation.current = 0;
@@ -97,8 +99,9 @@ export const BadgeDetailModal = ({
   );
 
   const dismiss = useCallback(() => {
+    rotation.stopAnimation();
     bottomSheetRef.current?.dismiss();
-  }, []);
+  }, [rotation]);
 
   const settleRotation = useCallback((currentRotation: number) => {
     const targetRotation = Math.round(currentRotation / 180) * 180;
@@ -177,13 +180,23 @@ export const BadgeDetailModal = ({
   const frontStyle = {
     transform: [
       { perspective: 1100 },
-      { rotateY: rotation.interpolate({ inputRange: [-720, 0, 720], outputRange: ["-720deg", "0deg", "720deg"] }) },
+      {
+        rotateY: rotation.interpolate({
+          inputRange: [-720, 0, 720],
+          outputRange: ["-720deg", "0deg", "720deg"],
+        }),
+      },
     ],
   };
   const backStyle = {
     transform: [
       { perspective: 1100 },
-      { rotateY: rotation.interpolate({ inputRange: [-720, 0, 720], outputRange: ["-540deg", "180deg", "900deg"] }) },
+      {
+        rotateY: rotation.interpolate({
+          inputRange: [-720, 0, 720],
+          outputRange: ["-540deg", "180deg", "900deg"],
+        }),
+      },
     ],
   };
 
@@ -236,16 +249,39 @@ export const BadgeDetailModal = ({
                   accessibilityElementsHidden={isFlipped}
                   importantForAccessibility={isFlipped ? "no-hide-descendants" : "yes"}
                   className="items-center justify-center"
-                  style={[StyleSheet.absoluteFillObject, { alignItems: "center", justifyContent: "center", backfaceVisibility: "hidden", pointerEvents: "none" }, frontStyle]}
+                  style={[
+                    StyleSheet.absoluteFillObject,
+                    {
+                      alignItems: "center",
+                      backfaceVisibility: "hidden",
+                      justifyContent: "center",
+                      pointerEvents: "none",
+                    },
+                    frontStyle,
+                  ]}
                 >
-                  <FieldBadgeAsset badgeId={badge.id} unlocked={unlocked} label={badge.title} size={276} />
+                  <FieldBadgeAsset
+                    badgeId={badge.id}
+                    unlocked={unlocked}
+                    label={badge.title}
+                    size={276}
+                  />
                 </Animated.View>
 
                 <Animated.View
                   accessibilityElementsHidden={!isFlipped}
                   importantForAccessibility={!isFlipped ? "no-hide-descendants" : "yes"}
                   className="items-center justify-center"
-                  style={[StyleSheet.absoluteFillObject, { alignItems: "center", justifyContent: "center", backfaceVisibility: "hidden", pointerEvents: "none" }, backStyle]}
+                  style={[
+                    StyleSheet.absoluteFillObject,
+                    {
+                      alignItems: "center",
+                      backfaceVisibility: "hidden",
+                      justifyContent: "center",
+                      pointerEvents: "none",
+                    },
+                    backStyle,
+                  ]}
                 >
                   <FieldBadgeBackAsset
                     acquiredDate={compactAcquiredDate}

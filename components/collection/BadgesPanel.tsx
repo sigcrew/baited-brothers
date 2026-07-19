@@ -41,11 +41,11 @@ export const BadgesPanel = ({ insetsBottom, unlockContext, isRefreshing = false,
         </TouchableOpacity>;
       }}
     />
-    {selectedBadge && isBadgeUnlocked(selectedBadge.id, unlockContext) ? <BadgeDetailModal
+    {selectedBadge && selectedBadgeIndex !== null && isBadgeUnlocked(selectedBadge.id, unlockContext) ? <BadgeDetailModal
       badge={selectedBadge}
-      badgeNumber={selectedBadgeIndex! + 1}
+      badgeNumber={selectedBadgeIndex + 1}
       context={unlockContext}
-      unlocked={isBadgeUnlocked(selectedBadge.id, unlockContext)}
+      unlocked
       visible
       onClose={() => setSelectedBadgeIndex(null)}
     /> : null}
