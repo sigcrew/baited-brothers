@@ -7,6 +7,11 @@ import { useUserCatches } from "@/src/hooks/useUserCatches";
 import { useFishingTrips } from "@/src/hooks/useFishingTrips";
 import { ArchiveRule } from "@/components/design/ArchiveRule";
 import { ArchiveTabHeader } from "@/components/design/ArchiveTabHeader";
+import {
+  BADGE_CATALOG,
+  createBadgeUnlockContext,
+  isBadgeUnlocked,
+} from "@/src/data/badges";
 import { FIELD_COLORS, bodySemiBoldFont, monoFont } from "@/src/theme/fieldJournal";
 
 const HARBOR_IMAGE = require("@/assets/images/design/daecheon-harbor.png");
@@ -47,15 +52,21 @@ const ProfileScreen = () => {
     router.push("/(auth)/login");
   };
 
-  const doneTrips = trips.filter((trip) => trip.status === "done").length;
+  const badgeContext = createBadgeUnlockContext(catches, trips);
+  const acquiredBadgeCount = BADGE_CATALOG.filter((badge) =>
+    isBadgeUnlocked(badge.id, badgeContext)
+  ).length;
   const name = displayName ?? email?.split("@")[0] ?? "바다형제";
+  const profileStats = [
+    { label: "수집 어종", value: unlockedFishIds.size, segment: "encyclopedia" },
+    { label: "획득 배지", value: acquiredBadgeCount, segment: "badges" },
+    { label: "조과 카드", value: catches.length, segment: "cards" },
+  ] as const;
 
   return <ScrollView className="flex-1" style={{ paddingTop: insets.top, backgroundColor: FIELD_COLORS.foam }} contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}>
     <ArchiveTabHeader
       title="프로필"
-      actionLabel="설정"
       backgroundColor={FIELD_COLORS.foam}
-      onAction={() => router.push("/settings")}
     />
     <View className="px-7">
       <View className="flex-row items-center py-7">
@@ -67,7 +78,26 @@ const ProfileScreen = () => {
         <View className="ml-5 flex-1"><Text className="text-2xl font-black" style={{ color: FIELD_COLORS.ink }}>{name}</Text><Text className="mt-1 text-sm" style={{ color: FIELD_COLORS.ink, fontFamily: monoFont }}>@{email?.split("@")[0] ?? "baited_brother"}</Text><Text className="mt-3 text-[11px] tracking-[2px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>LOG OWNER 019</Text></View>
       </View>
       <ArchiveRule />
-      <View className="flex-row py-5">{[["수집 어종", unlockedFishIds.size], ["조과 기록", catches.length], ["완료 출조", doneTrips]].map(([label, value], index) => <View key={String(label)} className={`flex-1 items-center ${index ? "border-l" : ""}`} style={{ borderColor: FIELD_COLORS.rule }}><Text className="text-sm font-semibold" style={{ color: FIELD_COLORS.ink }}>{label}</Text><Text className="mt-1 text-[40px] font-black" style={{ color: FIELD_COLORS.ink }}>{value}</Text></View>)}</View>
+      <View className="flex-row py-5">
+        {profileStats.map(({ label, value, segment }, index) => (
+          <TouchableOpacity
+            key={label}
+            accessibilityRole="button"
+            accessibilityLabel={`${label} ${value}, 수집 화면에서 보기`}
+            className={`flex-1 items-center ${index ? "border-l" : ""}`}
+            style={{ borderColor: FIELD_COLORS.rule }}
+            onPress={() =>
+              router.push({
+                pathname: "/(tabs)/encyclopedia",
+                params: { segment },
+              })
+            }
+          >
+            <Text className="text-sm font-semibold" style={{ color: FIELD_COLORS.ink }}>{label}</Text>
+            <Text className="mt-1 text-[40px] font-black" style={{ color: FIELD_COLORS.ink }}>{value}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
       <ArchiveRule />
       <Text className="mb-1 mt-6 text-xl font-black" style={{ color: FIELD_COLORS.ink }}>나의 기록</Text>
       <ProfileRow

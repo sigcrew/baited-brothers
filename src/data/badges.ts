@@ -26,6 +26,22 @@ export const BADGE_CATALOG: BadgeDefinition[] = [
     requirement: "출조 5회 완료",
   },
   {
+    id: "trips_10",
+    title: "노련한 항해",
+    description: "출조를 10회 완료했어요",
+    accent: "#E95A28",
+    category: "VOYAGE",
+    requirement: "출조 10회 완료",
+  },
+  {
+    id: "spots_5",
+    title: "다섯 개의 항로",
+    description: "서로 다른 낚시터 5곳에서 출조를 완료했어요",
+    accent: "#17766D",
+    category: "VOYAGE",
+    requirement: "낚시터 5곳에서 출조 완료",
+  },
+  {
     id: "field_note",
     title: "필드 노트",
     description: "커버·메모·조과가 담긴 일지를 완성했어요",
@@ -40,6 +56,14 @@ export const BADGE_CATALOG: BadgeDefinition[] = [
     accent: "#E95A28",
     category: "FIELD NOTE",
     requirement: "오전 3시부터 6시 사이 출조 1회 완료",
+  },
+  {
+    id: "night_trip",
+    title: "밤바다의 불빛",
+    description: "밤바다에서 출조를 완료했어요",
+    accent: "#E95A28",
+    category: "FIELD NOTE",
+    requirement: "오후 6시부터 오전 3시 사이 출조 1회 완료",
   },
   {
     id: "first_catch",
@@ -58,6 +82,22 @@ export const BADGE_CATALOG: BadgeDefinition[] = [
     requirement: "조과 5건 기록",
   },
   {
+    id: "catches_10",
+    title: "열 번의 손맛",
+    description: "조과를 10건 기록했어요",
+    accent: "#E95A28",
+    category: "CATCH",
+    requirement: "조과 10건 기록",
+  },
+  {
+    id: "record_catch",
+    title: "기록의 주인",
+    description: "50cm 이상의 대어를 기록했어요",
+    accent: "#E95A28",
+    category: "CATCH",
+    requirement: "50cm 이상 조과 1건 기록",
+  },
+  {
     id: "species_3",
     title: "도감의 시작",
     description: "서로 다른 어종 3종을 모았어요",
@@ -73,6 +113,14 @@ export const BADGE_CATALOG: BadgeDefinition[] = [
     category: "SPECIMEN",
     requirement: "서로 다른 어종 10종 수집",
   },
+  {
+    id: "species_20",
+    title: "바다 탐구자",
+    description: "서로 다른 어종 20종을 모았어요",
+    accent: "#17766D",
+    category: "SPECIMEN",
+    requirement: "서로 다른 어종 20종 수집",
+  },
 ];
 
 export type BadgeUnlockContext = {
@@ -81,7 +129,128 @@ export type BadgeUnlockContext = {
   completedTrips: number;
   completeFieldNotes: number;
   dawnTrips: number;
+  nightTrips: number;
+  uniqueSpots: number;
+  maxCatchSize: number;
   acquiredAt: Partial<Record<BadgeDefinition["id"], string>>;
+};
+
+type BadgeCatchInput = {
+  caught_at: string;
+  fish_id: string;
+  size_cm: number | null;
+  trip_id: string | null;
+  verification_status: string | null;
+};
+
+type BadgeTripInput = {
+  completed_at: string | null;
+  cover_image_url: string | null;
+  id: string;
+  memo: string | null;
+  scheduled_at: string;
+  spot_name: string;
+  status: string;
+};
+
+const getSpeciesMilestoneDate = (
+  catches: BadgeCatchInput[],
+  target: number,
+) => {
+  const species = new Set<string>();
+  for (const item of catches) {
+    if (item.verification_status !== "verified") continue;
+    species.add(item.fish_id);
+    if (species.size >= target) return item.caught_at;
+  }
+  return undefined;
+};
+
+const getSpotMilestoneDate = (trips: BadgeTripInput[], target: number) => {
+  const spots = new Set<string>();
+  for (const trip of trips) {
+    const normalizedSpot = trip.spot_name.trim().toLocaleLowerCase();
+    if (!normalizedSpot) continue;
+    spots.add(normalizedSpot);
+    if (spots.size >= target) return trip.completed_at ?? trip.scheduled_at;
+  }
+  return undefined;
+};
+
+export const createBadgeUnlockContext = (
+  catches: BadgeCatchInput[],
+  trips: BadgeTripInput[],
+): BadgeUnlockContext => {
+  const sortedCatches = [...catches].sort((a, b) =>
+    a.caught_at.localeCompare(b.caught_at)
+  );
+  const doneTrips = trips
+    .filter((trip) => trip.status === "done")
+    .sort((a, b) =>
+      (a.completed_at ?? a.scheduled_at).localeCompare(
+        b.completed_at ?? b.scheduled_at
+      )
+    );
+  const verifiedSpecies = new Set(
+    sortedCatches
+      .filter((item) => item.verification_status === "verified")
+      .map((item) => item.fish_id)
+  );
+  const tripsWithCatches = new Set(
+    sortedCatches.flatMap((item) => item.trip_id ? [item.trip_id] : [])
+  );
+  const completeNotes = doneTrips.filter((trip) =>
+    Boolean(
+      trip.cover_image_url &&
+      trip.memo &&
+      tripsWithCatches.has(trip.id)
+    )
+  );
+  const dawnTrips = doneTrips.filter((trip) => {
+    const hour = new Date(trip.scheduled_at).getHours();
+    return hour >= 3 && hour < 6;
+  });
+  const nightTrips = doneTrips.filter((trip) => {
+    const hour = new Date(trip.scheduled_at).getHours();
+    return hour >= 18 || hour < 3;
+  });
+  const uniqueSpots = new Set(
+    doneTrips
+      .map((trip) => trip.spot_name.trim().toLocaleLowerCase())
+      .filter(Boolean)
+  );
+  const maxCatchSize = sortedCatches.reduce(
+    (largest, item) => Math.max(largest, item.size_cm ?? 0),
+    0
+  );
+  const recordCatch = sortedCatches.find((item) => (item.size_cm ?? 0) >= 50);
+
+  return {
+    catchCount: sortedCatches.length,
+    uniqueSpecies: verifiedSpecies.size,
+    completedTrips: doneTrips.length,
+    completeFieldNotes: completeNotes.length,
+    dawnTrips: dawnTrips.length,
+    nightTrips: nightTrips.length,
+    uniqueSpots: uniqueSpots.size,
+    maxCatchSize,
+    acquiredAt: {
+      trip_first: doneTrips[0]?.completed_at ?? doneTrips[0]?.scheduled_at,
+      trips_5: doneTrips[4]?.completed_at ?? doneTrips[4]?.scheduled_at,
+      trips_10: doneTrips[9]?.completed_at ?? doneTrips[9]?.scheduled_at,
+      spots_5: getSpotMilestoneDate(doneTrips, 5),
+      field_note: completeNotes[0]?.completed_at ?? completeNotes[0]?.scheduled_at,
+      dawn_trip: dawnTrips[0]?.completed_at ?? dawnTrips[0]?.scheduled_at,
+      night_trip: nightTrips[0]?.completed_at ?? nightTrips[0]?.scheduled_at,
+      first_catch: sortedCatches[0]?.caught_at,
+      catches_5: sortedCatches[4]?.caught_at,
+      catches_10: sortedCatches[9]?.caught_at,
+      record_catch: recordCatch?.caught_at,
+      species_3: getSpeciesMilestoneDate(sortedCatches, 3),
+      species_10: getSpeciesMilestoneDate(sortedCatches, 10),
+      species_20: getSpeciesMilestoneDate(sortedCatches, 20),
+    },
+  };
 };
 
 export const isBadgeUnlocked = (
@@ -93,18 +262,30 @@ export const isBadgeUnlocked = (
       return ctx.catchCount >= 1;
     case "catches_5":
       return ctx.catchCount >= 5;
+    case "catches_10":
+      return ctx.catchCount >= 10;
+    case "record_catch":
+      return ctx.maxCatchSize >= 50;
     case "species_3":
       return ctx.uniqueSpecies >= 3;
     case "species_10":
       return ctx.uniqueSpecies >= 10;
+    case "species_20":
+      return ctx.uniqueSpecies >= 20;
     case "trip_first":
       return ctx.completedTrips >= 1;
     case "trips_5":
       return ctx.completedTrips >= 5;
+    case "trips_10":
+      return ctx.completedTrips >= 10;
+    case "spots_5":
+      return ctx.uniqueSpots >= 5;
     case "field_note":
       return ctx.completeFieldNotes >= 1;
     case "dawn_trip":
       return ctx.dawnTrips >= 1;
+    case "night_trip":
+      return ctx.nightTrips >= 1;
     default:
       return false;
   }
@@ -119,18 +300,30 @@ export const getBadgeProgress = (
       return { current: ctx.completedTrips, target: 1, label: "완료 출조" };
     case "trips_5":
       return { current: ctx.completedTrips, target: 5, label: "완료 출조" };
+    case "trips_10":
+      return { current: ctx.completedTrips, target: 10, label: "완료 출조" };
+    case "spots_5":
+      return { current: ctx.uniqueSpots, target: 5, label: "완료 장소" };
     case "field_note":
       return { current: ctx.completeFieldNotes, target: 1, label: "완성 일지" };
     case "dawn_trip":
       return { current: ctx.dawnTrips, target: 1, label: "새벽 출조" };
+    case "night_trip":
+      return { current: ctx.nightTrips, target: 1, label: "야간 출조" };
     case "first_catch":
       return { current: ctx.catchCount, target: 1, label: "조과 기록" };
     case "catches_5":
       return { current: ctx.catchCount, target: 5, label: "조과 기록" };
+    case "catches_10":
+      return { current: ctx.catchCount, target: 10, label: "조과 기록" };
+    case "record_catch":
+      return { current: ctx.maxCatchSize, target: 50, label: "최대 크기(cm)" };
     case "species_3":
       return { current: ctx.uniqueSpecies, target: 3, label: "수집 어종" };
     case "species_10":
       return { current: ctx.uniqueSpecies, target: 10, label: "수집 어종" };
+    case "species_20":
+      return { current: ctx.uniqueSpecies, target: 20, label: "수집 어종" };
     default:
       return { current: 0, target: 1, label: "진행도" };
   }
