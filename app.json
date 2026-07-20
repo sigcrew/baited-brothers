@@ -15,15 +15,28 @@
     },
     "ios": {
       "supportsTablet": true,
-      "usesAppleSignIn": true
+      "usesAppleSignIn": true,
+      "bundleIdentifier": "com.sigcrew.baitedbrothers",
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
+      "package": "com.sigcrew.baitedbrothers",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon-baited.png",
         "backgroundColor": "#F4F7F6"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -43,7 +56,12 @@
       ],
       "expo-secure-store",
       "expo-apple-authentication",
-      ["expo-web-browser", { "experimentalLauncherActivity": true }],
+      [
+        "expo-web-browser",
+        {
+          "experimentalLauncherActivity": true
+        }
+      ],
       [
         "expo-camera",
         {
@@ -67,6 +85,14 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "1d1814e2-b3c6-40af-a819-914795ad8e66"
+      },
+      "privacyPolicyUrl": "https://sigcrew.github.io/baited-brothers/privacy/"
+    },
+    "owner": "yyh901"
   }
 }

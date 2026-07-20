@@ -56,6 +56,11 @@ const parseClaudeJson = (text: string) => {
   return JSON.parse(withoutFence.slice(start, end + 1));
 };
 
+const normalizeScore = (value: unknown) => {
+  const score = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(score) ? Math.min(1, Math.max(0, score)) : 0;
+};
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -148,9 +153,11 @@ Deno.serve(async (req) => {
               text:
                 "사진 속 대상의 체형, 입과 머리, 지느러미 배치, 꼬리, 무늬와 색을 관찰하세요. " +
                 "아래 폐쇄형 도감 목록에 있는 어종만 후보로 선택하고, 가장 가능성 높은 순서로 최대 3개를 반환하세요. " +
-                "사진에 물고기·두족류가 없거나 식별 특징이 부족하면 후보를 억지로 만들지 말고 needs_retake를 true로 설정하세요. " +
+                "먼저 사진에 물고기·두족류가 실제로 있는지 판단하세요. 음식, 낚시 장비, 풍경, 사람, 반려동물은 subject_present=false입니다. " +
+                "대상이 프레임에서 너무 작거나 잘렸거나, 심하게 흐리거나 어둡거나 가려져 핵심 특징을 비교할 수 없으면 image_quality를 0.45 미만으로 평가하세요. " +
+                "subject_present=false 또는 image_quality<0.45이면 후보를 비우고 needs_retake=true로 설정하세요. 애매한 사진에 후보를 억지로 만들지 마세요. " +
                 "confidence는 후보 간 상대 점수가 아니라 각 후보의 식별 확신도 0~1입니다. 이유는 사용자가 비교할 수 있게 한국어 한 문장으로 작성하세요. " +
-                '출력 형식은 {"candidates":[{"fish_id":"도감 UUID","confidence":0.0,"reason":"비교 근거"}],"needs_retake":false,"note":"짧은 안내"} 입니다.\n\n' +
+                '출력 형식은 {"subject_present":true,"image_quality":0.0,"candidates":[{"fish_id":"도감 UUID","confidence":0.0,"reason":"비교 근거"}],"needs_retake":false,"note":"짧은 안내"} 입니다.\n\n' +
                 `도감 목록:\n${catalogText}`,
             },
           ],
@@ -171,12 +178,27 @@ Deno.serve(async (req) => {
   try {
     const result = parseClaudeJson(outputText);
     const allowedIds = new Set(catalog.map((fish) => fish.id));
-    result.candidates = (Array.isArray(result.candidates) ? result.candidates : [])
+    const imageQuality = normalizeScore(result.image_quality);
+    const subjectPresent = result.subject_present === true;
+    const mustRetake =
+      !subjectPresent || imageQuality < 0.45 || result.needs_retake === true;
+    result.subject_present = subjectPresent;
+    result.image_quality = imageQuality;
+    result.needs_retake = mustRetake;
+    result.candidates = (mustRetake
+      ? []
+      : Array.isArray(result.candidates)
+        ? result.candidates
+        : [])
       .filter(
         (candidate: { fish_id?: unknown }) =>
           typeof candidate?.fish_id === "string" &&
           allowedIds.has(candidate.fish_id),
       )
+      .map((candidate: { confidence?: unknown }) => ({
+        ...candidate,
+        confidence: normalizeScore(candidate.confidence),
+      }))
       .slice(0, 3);
     return json(result);
   } catch {

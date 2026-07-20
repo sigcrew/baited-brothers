@@ -61,6 +61,7 @@ const RecordScreen = () => {
   const tripName = typeof params.tripName === "string" ? params.tripName : undefined;
   const insets = useSafeAreaInsets();
   const cameraRef = useRef<CameraView>(null);
+  const saveRequestId = useRef<string | null>(null);
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const lastCameraPermission = useRef(cameraPermission);
   if (cameraPermission) {
@@ -128,6 +129,7 @@ const RecordScreen = () => {
   );
 
   const analyzeCapture = async (nextCapture: Capture) => {
+    saveRequestId.current = `${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
     setCapture(nextCapture);
     setSelectedFish(null);
     setCompletion(null);
@@ -252,7 +254,7 @@ const RecordScreen = () => {
   };
 
   const save = async () => {
-    if (!capture || !selectedFish) return;
+    if (!capture || !selectedFish || isSaving) return;
     const sizeResult = parseOptionalSize();
     if (!sizeResult.isValid) return;
 
@@ -282,6 +284,9 @@ const RecordScreen = () => {
       verificationReason: selectedCandidate
         ? `${capture.source === "dev_upload" ? "개발용 파일 업로드 · " : ""}AI 후보 추천 후 사용자 확정 · 신뢰도 ${Math.round(selectedCandidate.confidence * 100)}%`
         : `${capture.source === "dev_upload" ? "개발용 파일 업로드 · " : ""}사용자가 도감에서 직접 어종을 확정함`,
+      clientRequestId:
+        saveRequestId.current ??
+        `${Date.now()}-${Math.random().toString(36).slice(2, 12)}`,
     });
     if (result.error) {
       Alert.alert("저장 실패", result.error.message);

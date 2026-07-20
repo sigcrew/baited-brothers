@@ -1,0 +1,335 @@
+{
+  "notes": "실제 촬영 원본만 추가합니다. 같은 사진의 편집본은 train/test처럼 중복 집계하지 않습니다.",
+  "cases": [
+    {
+      "id": "real-kareius-bicoloratus-01",
+      "path": "../../assets/images/species/field60/kareius-bicoloratus.png",
+      "kind": "fish",
+      "expectedScientificName": "Kareius bicoloratus"
+    },
+    {
+      "id": "real-hyporthodus-septemfasciatus-01",
+      "path": "../../assets/images/species/field60/hyporthodus-septemfasciatus.jpg",
+      "kind": "fish",
+      "expectedScientificName": "Hyporthodus septemfasciatus"
+    },
+    {
+      "id": "real-pseudopleuronectes-herzensteini-01",
+      "path": "../../assets/images/species/field60/pseudopleuronectes-herzensteini.png",
+      "kind": "fish",
+      "expectedScientificName": "Pseudopleuronectes herzensteini"
+    },
+    {
+      "id": "real-lateolabrax-maculatus-01",
+      "path": "../../assets/images/species/field60/lateolabrax-maculatus.png",
+      "kind": "fish",
+      "expectedScientificName": "Lateolabrax maculatus"
+    },
+    {
+      "id": "real-pseudopleuronectes-yokohamae-01",
+      "path": "../../assets/images/species/field60/pseudopleuronectes-yokohamae.png",
+      "kind": "fish",
+      "expectedScientificName": "Pseudopleuronectes yokohamae"
+    },
+    {
+      "id": "non-fish-cat-01",
+      "path": "rejection-data/non-fish/non-fish-cat-01.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-cat-02",
+      "path": "rejection-data/non-fish/non-fish-cat-02.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-cat-03",
+      "path": "rejection-data/non-fish/non-fish-cat-03.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-cat-04",
+      "path": "rejection-data/non-fish/non-fish-cat-04.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-cat-05",
+      "path": "rejection-data/non-fish/non-fish-cat-05.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-dog-01",
+      "path": "rejection-data/non-fish/non-fish-dog-01.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-dog-02",
+      "path": "rejection-data/non-fish/non-fish-dog-02.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-dog-03",
+      "path": "rejection-data/non-fish/non-fish-dog-03.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-dog-04",
+      "path": "rejection-data/non-fish/non-fish-dog-04.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-dog-05",
+      "path": "rejection-data/non-fish/non-fish-dog-05.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-rabbit-01",
+      "path": "rejection-data/non-fish/non-fish-rabbit-01.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-rabbit-02",
+      "path": "rejection-data/non-fish/non-fish-rabbit-02.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-rabbit-03",
+      "path": "rejection-data/non-fish/non-fish-rabbit-03.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-rabbit-04",
+      "path": "rejection-data/non-fish/non-fish-rabbit-04.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-rabbit-05",
+      "path": "rejection-data/non-fish/non-fish-rabbit-05.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-bird-01",
+      "path": "rejection-data/non-fish/non-fish-bird-01.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-bird-02",
+      "path": "rejection-data/non-fish/non-fish-bird-02.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-bird-03",
+      "path": "rejection-data/non-fish/non-fish-bird-03.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-bird-04",
+      "path": "rejection-data/non-fish/non-fish-bird-04.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-bird-05",
+      "path": "rejection-data/non-fish/non-fish-bird-05.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-starfish-01",
+      "path": "rejection-data/non-fish/non-fish-starfish-01.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-starfish-02",
+      "path": "rejection-data/non-fish/non-fish-starfish-02.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-starfish-03",
+      "path": "rejection-data/non-fish/non-fish-starfish-03.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-starfish-04",
+      "path": "rejection-data/non-fish/non-fish-starfish-04.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-starfish-05",
+      "path": "rejection-data/non-fish/non-fish-starfish-05.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-crab-01",
+      "path": "rejection-data/non-fish/non-fish-crab-01.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-crab-02",
+      "path": "rejection-data/non-fish/non-fish-crab-02.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-crab-03",
+      "path": "rejection-data/non-fish/non-fish-crab-03.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-crab-04",
+      "path": "rejection-data/non-fish/non-fish-crab-04.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "non-fish-crab-05",
+      "path": "rejection-data/non-fish/non-fish-crab-05.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "low-quality-blur-01",
+      "path": "rejection-data/low-quality/low-quality-blur-01.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-blur-02",
+      "path": "rejection-data/low-quality/low-quality-blur-02.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-blur-03",
+      "path": "rejection-data/low-quality/low-quality-blur-03.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-blur-04",
+      "path": "rejection-data/low-quality/low-quality-blur-04.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-blur-05",
+      "path": "rejection-data/low-quality/low-quality-blur-05.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-dark-01",
+      "path": "rejection-data/low-quality/low-quality-dark-01.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-dark-02",
+      "path": "rejection-data/low-quality/low-quality-dark-02.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-dark-03",
+      "path": "rejection-data/low-quality/low-quality-dark-03.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-dark-04",
+      "path": "rejection-data/low-quality/low-quality-dark-04.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-dark-05",
+      "path": "rejection-data/low-quality/low-quality-dark-05.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-tiny-subject-01",
+      "path": "rejection-data/low-quality/low-quality-tiny-subject-01.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-tiny-subject-02",
+      "path": "rejection-data/low-quality/low-quality-tiny-subject-02.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-tiny-subject-03",
+      "path": "rejection-data/low-quality/low-quality-tiny-subject-03.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-tiny-subject-04",
+      "path": "rejection-data/low-quality/low-quality-tiny-subject-04.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-tiny-subject-05",
+      "path": "rejection-data/low-quality/low-quality-tiny-subject-05.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-cropped-01",
+      "path": "rejection-data/low-quality/low-quality-cropped-01.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-cropped-02",
+      "path": "rejection-data/low-quality/low-quality-cropped-02.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-cropped-03",
+      "path": "rejection-data/low-quality/low-quality-cropped-03.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-cropped-04",
+      "path": "rejection-data/low-quality/low-quality-cropped-04.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-cropped-05",
+      "path": "rejection-data/low-quality/low-quality-cropped-05.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-overexposed-01",
+      "path": "rejection-data/low-quality/low-quality-overexposed-01.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-overexposed-02",
+      "path": "rejection-data/low-quality/low-quality-overexposed-02.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-overexposed-03",
+      "path": "rejection-data/low-quality/low-quality-overexposed-03.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-overexposed-04",
+      "path": "rejection-data/low-quality/low-quality-overexposed-04.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-overexposed-05",
+      "path": "rejection-data/low-quality/low-quality-overexposed-05.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-pixelated-01",
+      "path": "rejection-data/low-quality/low-quality-pixelated-01.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-pixelated-02",
+      "path": "rejection-data/low-quality/low-quality-pixelated-02.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-pixelated-03",
+      "path": "rejection-data/low-quality/low-quality-pixelated-03.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-pixelated-04",
+      "path": "rejection-data/low-quality/low-quality-pixelated-04.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-pixelated-05",
+      "path": "rejection-data/low-quality/low-quality-pixelated-05.jpg",
+      "kind": "low_quality"
+    }
+  ]
+}

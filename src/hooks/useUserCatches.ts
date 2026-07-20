@@ -76,6 +76,43 @@ export const useUserCatches = (tripId?: string) => {
     return ids;
   }, [catches]);
 
+  const updateCatch = async (
+    catchId: string,
+    input: { sizeCm?: number | null; memo?: string | null },
+  ) => {
+    if (!userId) return { error: new Error("로그인이 필요합니다.") };
+    const { error: updateError } = await supabase
+      .from("user_catches")
+      .update({
+        size_cm: input.sizeCm ?? null,
+        memo: input.memo?.trim() || null,
+      })
+      .eq("id", catchId)
+      .eq("user_id", userId);
+    if (!updateError) await fetchCatches(true);
+    return { error: updateError ? (updateError as Error) : null };
+  };
+
+  const deleteCatch = async (item: UserCatch) => {
+    if (!userId) return { error: new Error("로그인이 필요합니다.") };
+    const { error: deleteError } = await supabase
+      .from("user_catches")
+      .delete()
+      .eq("id", item.id)
+      .eq("user_id", userId);
+    if (deleteError) return { error: deleteError as Error };
+
+    const marker = "/storage/v1/object/public/user-uploads/";
+    const objectPath = item.image_url?.includes(marker)
+      ? decodeURIComponent(item.image_url.split(marker)[1] ?? "")
+      : "";
+    if (objectPath) {
+      await supabase.storage.from("user-uploads").remove([objectPath]);
+    }
+    await fetchCatches(true);
+    return { error: null };
+  };
+
   return {
     catches,
     unlockedFishIds,
@@ -84,5 +121,7 @@ export const useUserCatches = (tripId?: string) => {
     error,
     isLoggedIn: Boolean(userId),
     refetch: () => fetchCatches(true),
+    updateCatch,
+    deleteCatch,
   };
 };

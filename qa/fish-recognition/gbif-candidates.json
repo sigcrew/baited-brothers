@@ -1,0 +1,3846 @@
+{
+  "generatedAt": "2026-07-19T21:57:59.860Z",
+  "notice": "GBIF 발생 기록의 이미지 후보입니다. 종 동정·사진 품질·라이선스를 사람이 확인한 뒤 reviewStatus를 approved로 변경해야 합니다.",
+  "species": [
+    {
+      "sort": 1,
+      "nameKo": "넙치",
+      "scientificName": "Paralichthys olivaceus (Temminck & Schlegel, 1846)",
+      "gbifTaxonKey": 2408877,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6184884742,
+          "acceptedScientificName": "Paralichthys olivaceus (Temminck & Schlegel, 1846)",
+          "country": "China",
+          "eventDate": "2026-03-14T15:35:04",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/625987067/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/625987067",
+          "creator": "fhvc",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6185827305,
+          "acceptedScientificName": "Paralichthys olivaceus (Temminck & Schlegel, 1846)",
+          "country": "China",
+          "eventDate": "2026-03-14T15:34",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/625611640/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/625611640",
+          "creator": "orcinusss",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6188004246,
+          "acceptedScientificName": "Paralichthys olivaceus (Temminck & Schlegel, 1846)",
+          "country": "China",
+          "eventDate": "2026-04-04T13:34:59",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/634230671/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/634230671",
+          "creator": "fhvc",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6188004246,
+          "acceptedScientificName": "Paralichthys olivaceus (Temminck & Schlegel, 1846)",
+          "country": "China",
+          "eventDate": "2026-04-04T13:34:59",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/634230723/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/634230723",
+          "creator": "fhvc",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6273350934,
+          "acceptedScientificName": "Paralichthys olivaceus (Temminck & Schlegel, 1846)",
+          "country": "China",
+          "eventDate": "2026-04-19T15:27:37",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/640730309/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/640730309",
+          "creator": "castle_pendragon",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 2,
+      "nameKo": "도다리",
+      "scientificName": "Pleuronichthys cornutus (Temminck & Schlegel, 1846)",
+      "gbifTaxonKey": 2409242,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6185375318,
+          "acceptedScientificName": "Pleuronichthys cornutus (Temminck & Schlegel, 1846)",
+          "country": "China",
+          "eventDate": "2026-03-12T14:21:14",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/623845497/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/623845497",
+          "creator": "fhvc",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5827537191,
+          "acceptedScientificName": "Pleuronichthys cornutus (Temminck & Schlegel, 1846)",
+          "country": "China",
+          "eventDate": "2025-09-07T09:50:06",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/563493179/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/563493179",
+          "creator": "fhvc",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5827811518,
+          "acceptedScientificName": "Pleuronichthys cornutus (Temminck & Schlegel, 1846)",
+          "country": "China",
+          "eventDate": "2025-09-07T09:50:03",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/564421861/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/564421861",
+          "creator": "orcinusss",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5844243090,
+          "acceptedScientificName": "Pleuronichthys cornutus (Temminck & Schlegel, 1846)",
+          "country": "China",
+          "eventDate": "2025-10-06T11:11:31",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/576780408/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/576780408",
+          "creator": "维生素",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6131469492,
+          "acceptedScientificName": "Pleuronichthys cornutus (Temminck & Schlegel, 1846)",
+          "country": "China",
+          "eventDate": "2025-10-31T13:23",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/601708987/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/601708987",
+          "creator": "阿白",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 3,
+      "nameKo": "문치가자미",
+      "scientificName": "Pseudopleuronectes yokohamae (Günther, 1877)",
+      "gbifTaxonKey": 2409074,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 5935853529,
+          "acceptedScientificName": "Pseudopleuronectes yokohamae (Günther, 1877)",
+          "country": "Japan",
+          "eventDate": "2025-04-11T23:57",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/585517032/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/585517032",
+          "creator": "nittan_lover",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 4987760731,
+          "acceptedScientificName": "Pseudopleuronectes yokohamae (Günther, 1877)",
+          "country": "Japan",
+          "eventDate": "2024-11-10T13:59",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/451450526/original.jpeg",
+          "sourceUrl": "https://www.inaturalist.org/photos/451450526",
+          "creator": "sakai",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 4987760731,
+          "acceptedScientificName": "Pseudopleuronectes yokohamae (Günther, 1877)",
+          "country": "Japan",
+          "eventDate": "2024-11-10T13:59",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/451452239/original.jpeg",
+          "sourceUrl": "https://www.inaturalist.org/photos/451452239",
+          "creator": "sakai",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6431533309,
+          "acceptedScientificName": "Pseudopleuronectes yokohamae (Günther, 1877)",
+          "country": "Korea, Republic of",
+          "eventDate": "2022-05-16T21:23:30",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/671905839/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/671905839",
+          "creator": "Sang-Hyeon Jin",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6431533309,
+          "acceptedScientificName": "Pseudopleuronectes yokohamae (Günther, 1877)",
+          "country": "Korea, Republic of",
+          "eventDate": "2022-05-16T21:23:30",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/671905879/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/671905879",
+          "creator": "Sang-Hyeon Jin",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 4,
+      "nameKo": "참가자미",
+      "scientificName": "Pseudopleuronectes herzensteini (Jordan & Snyder, 1901)",
+      "gbifTaxonKey": 2409056,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6185730655,
+          "acceptedScientificName": "Pseudopleuronectes herzensteini (Jordan & Snyder, 1901)",
+          "country": "Korea, Republic of",
+          "eventDate": "2026-03-27T17:55:32",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/629541943/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/629541943",
+          "creator": "Brad Song",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6185730655,
+          "acceptedScientificName": "Pseudopleuronectes herzensteini (Jordan & Snyder, 1901)",
+          "country": "Korea, Republic of",
+          "eventDate": "2026-03-27T17:55:32",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/629541999/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/629541999",
+          "creator": "Brad Song",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6163301272,
+          "acceptedScientificName": "Pseudopleuronectes herzensteini (Jordan & Snyder, 1901)",
+          "country": "Japan",
+          "eventDate": "2025-04-13T14:34:46",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/612310273/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/612310273",
+          "creator": "kusa-to-uo",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5909140974,
+          "acceptedScientificName": "Pseudopleuronectes herzensteini (Jordan & Snyder, 1901)",
+          "country": "Korea, Republic of",
+          "eventDate": "2025-06-09T12:40",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/523632025/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/523632025",
+          "creator": "nhaass",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5909140974,
+          "acceptedScientificName": "Pseudopleuronectes herzensteini (Jordan & Snyder, 1901)",
+          "country": "Korea, Republic of",
+          "eventDate": "2025-06-09T12:40",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/523631838/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/523631838",
+          "creator": "nhaass",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 5,
+      "nameKo": "돌가자미",
+      "scientificName": "Platichthys bicoloratus (Basilewsky, 1855)",
+      "gbifTaxonKey": 2409231,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6130606598,
+          "acceptedScientificName": "Kareius bicoloratus (Basilewsky, 1855)",
+          "country": "China",
+          "eventDate": "2026-01-09T17:18:42",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/606592539/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/606592539",
+          "creator": "琪琴",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6185436673,
+          "acceptedScientificName": "Kareius bicoloratus (Basilewsky, 1855)",
+          "country": "China",
+          "eventDate": "2026-03-12T14:27:31",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/624120327/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/624120327",
+          "creator": "fhvc",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6185485747,
+          "acceptedScientificName": "Kareius bicoloratus (Basilewsky, 1855)",
+          "country": "China",
+          "eventDate": "2026-03-26T09:44:32",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/629107699/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/629107699",
+          "creator": "zgy",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6273842043,
+          "acceptedScientificName": "Kareius bicoloratus (Basilewsky, 1855)",
+          "country": "China",
+          "eventDate": "2026-04-19T15:14:04",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/640728424/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/640728424",
+          "creator": "castle_pendragon",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6274135339,
+          "acceptedScientificName": "Kareius bicoloratus (Basilewsky, 1855)",
+          "country": "China",
+          "eventDate": "2026-04-19T15:14:02",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/640728230/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/640728230",
+          "creator": "castle_pendragon",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 6,
+      "nameKo": "강도다리",
+      "scientificName": "Platichthys stellatus (Pallas, 1787)",
+      "gbifTaxonKey": 2409327,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 5938054593,
+          "acceptedScientificName": "Platichthys stellatus (Pallas, 1787)",
+          "country": "Canada",
+          "eventDate": "2026-01-04T12:01",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605545333/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/605545333",
+          "creator": "Liam Steele",
+          "license": "http://creativecommons.org/licenses/by/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5938054593,
+          "acceptedScientificName": "Platichthys stellatus (Pallas, 1787)",
+          "country": "Canada",
+          "eventDate": "2026-01-04T12:01",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605545334/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/605545334",
+          "creator": "Liam Steele",
+          "license": "http://creativecommons.org/licenses/by/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5938054593,
+          "acceptedScientificName": "Platichthys stellatus (Pallas, 1787)",
+          "country": "Canada",
+          "eventDate": "2026-01-04T12:01",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605545338/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/605545338",
+          "creator": "Liam Steele",
+          "license": "http://creativecommons.org/licenses/by/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5938054593,
+          "acceptedScientificName": "Platichthys stellatus (Pallas, 1787)",
+          "country": "Canada",
+          "eventDate": "2026-01-04T12:01",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605540534/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/605540534",
+          "creator": "Liam Steele",
+          "license": "http://creativecommons.org/licenses/by/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5938054593,
+          "acceptedScientificName": "Platichthys stellatus (Pallas, 1787)",
+          "country": "Canada",
+          "eventDate": "2026-01-04T12:01",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605540533/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/605540533",
+          "creator": "Liam Steele",
+          "license": "http://creativecommons.org/licenses/by/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 7,
+      "nameKo": "조피볼락",
+      "scientificName": "Sebastes schlegelii Hilgendorf, 1880",
+      "gbifTaxonKey": 2335435,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6130000083,
+          "acceptedScientificName": "Sebastes schlegelii Hilgendorf, 1880",
+          "country": "China",
+          "eventDate": "2026-01-19T17:02:57",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/609335583/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/609335583",
+          "creator": "李博恒",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6187973191,
+          "acceptedScientificName": "Sebastes schlegelii Hilgendorf, 1880",
+          "country": "China",
+          "eventDate": "2026-03-29T16:05:01",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/631282064/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/631282064",
+          "creator": "orcinusss",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6399520878,
+          "acceptedScientificName": "Sebastes schlegelii Hilgendorf, 1880",
+          "country": "China",
+          "eventDate": "2026-03-29T16:04:57",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/631326541/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/631326541",
+          "creator": "fhvc",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6334507344,
+          "acceptedScientificName": "Sebastes schlegelii Hilgendorf, 1880",
+          "country": "Korea, Republic of",
+          "eventDate": "2026-04-21T17:57:08",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/641823155/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/641823155",
+          "creator": "campbellfmh",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6334507344,
+          "acceptedScientificName": "Sebastes schlegelii Hilgendorf, 1880",
+          "country": "Korea, Republic of",
+          "eventDate": "2026-04-21T17:57:08",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/641823158/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/641823158",
+          "creator": "campbellfmh",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 8,
+      "nameKo": "볼락",
+      "scientificName": "Sebastes inermis Cuvier, 1829",
+      "gbifTaxonKey": 2333687,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6352966736,
+          "acceptedScientificName": "Sebastes inermis Cuvier, 1829",
+          "country": "Japan",
+          "eventDate": "2026-05-29T14:18",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/670841161/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/670841161",
+          "creator": "K.Kawasaka",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5167321554,
+          "acceptedScientificName": "Sebastes inermis Cuvier, 1829",
+          "country": "Japan",
+          "eventDate": "2025-03-19T17:57",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/478211679/original.jpeg",
+          "sourceUrl": "https://www.inaturalist.org/photos/478211679",
+          "creator": "Tomioka Masafumi",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5932532547,
+          "acceptedScientificName": "Sebastes inermis Cuvier, 1829",
+          "country": "Korea, Republic of",
+          "eventDate": "2025-12-10T18:16:55",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/598746649/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/598746649",
+          "creator": "beautychick",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 4980370614,
+          "acceptedScientificName": "Sebastes inermis Cuvier, 1829",
+          "country": "Japan",
+          "eventDate": "2024-02-24T12:54",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/353371936/original.jpeg",
+          "sourceUrl": "https://www.inaturalist.org/photos/353371936",
+          "creator": "Keita Watanabe",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 4852888976,
+          "acceptedScientificName": "Sebastes inermis Cuvier, 1829",
+          "country": "Japan",
+          "eventDate": "2024-04-21T19:17:38",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/368824330/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/368824330",
+          "creator": "Dhugal Lindsay",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 9,
+      "nameKo": "개볼락",
+      "scientificName": "Sebastes pachycephalus Temminck & Schlegel, 1843",
+      "gbifTaxonKey": 4286366,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6274247816,
+          "acceptedScientificName": "Sebastes pachycephalus Temminck & Schlegel, 1843",
+          "country": "Japan",
+          "eventDate": "2026-05-07T19:31:50",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/655700543/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/655700543",
+          "creator": "茜島",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6274247816,
+          "acceptedScientificName": "Sebastes pachycephalus Temminck & Schlegel, 1843",
+          "country": "Japan",
+          "eventDate": "2026-05-07T19:31:50",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/655700574/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/655700574",
+          "creator": "茜島",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5920047781,
+          "acceptedScientificName": "Sebastes pachycephalus Temminck & Schlegel, 1843",
+          "country": "Japan",
+          "eventDate": "2025-03-14T15:12:46",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/476481317/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/476481317",
+          "creator": "daichi2023",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5909402695,
+          "acceptedScientificName": "Sebastes pachycephalus Temminck & Schlegel, 1843",
+          "country": "Korea, Republic of",
+          "eventDate": "2025-08-25T20:01",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/595433317/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/595433317",
+          "creator": "taiwan_habu",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5889944334,
+          "acceptedScientificName": "Sebastes pachycephalus Temminck & Schlegel, 1843",
+          "country": "Korea, Republic of",
+          "eventDate": "2024-06-26T19:30",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/585895037/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/585895037",
+          "creator": "taiwan_habu",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 10,
+      "nameKo": "불볼락",
+      "scientificName": "Sebastes thompsoni (Jordan & Hubbs, 1925)",
+      "gbifTaxonKey": 2335575,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6130035459,
+          "acceptedScientificName": "Sebastes thompsoni (Jordan & Hubbs, 1925)",
+          "country": "China",
+          "eventDate": "2026-01-19T16:30:53",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/609622690/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/609622690",
+          "creator": "李博恒",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6195786930,
+          "acceptedScientificName": "Sebastes thompsoni (Jordan & Hubbs, 1925)",
+          "country": "China",
+          "eventDate": "2026-04-12T06:52:12",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/637052060/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/637052060",
+          "creator": "castle_pendragon",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6195786930,
+          "acceptedScientificName": "Sebastes thompsoni (Jordan & Hubbs, 1925)",
+          "country": "China",
+          "eventDate": "2026-04-12T06:52:12",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/637052107/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/637052107",
+          "creator": "castle_pendragon",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6236202694,
+          "acceptedScientificName": "Sebastes thompsoni (Jordan & Hubbs, 1925)",
+          "country": "China",
+          "eventDate": "2026-04-12T06:52:11",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/638000485/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/638000485",
+          "creator": "orcinusss",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6236202694,
+          "acceptedScientificName": "Sebastes thompsoni (Jordan & Hubbs, 1925)",
+          "country": "China",
+          "eventDate": "2026-04-12T06:52:11",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/638000512/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/638000512",
+          "creator": "orcinusss",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 11,
+      "nameKo": "쏨뱅이",
+      "scientificName": "Sebastiscus marmoratus (Cuvier, 1829)",
+      "gbifTaxonKey": 2335355,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6129924584,
+          "acceptedScientificName": "Sebastiscus marmoratus (Cuvier, 1829)",
+          "country": "Hong Kong",
+          "eventDate": "2026-01-13T17:55:52",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/607720394/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/607720394",
+          "creator": "Aiden Chong",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6130887677,
+          "acceptedScientificName": "Sebastiscus marmoratus (Cuvier, 1829)",
+          "country": "Australia",
+          "eventDate": "2026-01-09T10:00",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/606836211/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/606836211",
+          "creator": "terrorstylist",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6130887677,
+          "acceptedScientificName": "Sebastiscus marmoratus (Cuvier, 1829)",
+          "country": "Australia",
+          "eventDate": "2026-01-09T10:00",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/606836228/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/606836228",
+          "creator": "terrorstylist",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6171018418,
+          "acceptedScientificName": "Sebastiscus marmoratus (Cuvier, 1829)",
+          "country": "Japan",
+          "eventDate": "2026-01-06T06:23:12",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/618687545/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/618687545",
+          "creator": "youmu",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6133249245,
+          "acceptedScientificName": "Sebastiscus marmoratus (Cuvier, 1829)",
+          "country": "Hong Kong",
+          "eventDate": "2026-02-01T13:15:09",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/612431036/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/612431036",
+          "creator": "Aiden Chong",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 12,
+      "nameKo": "노래미",
+      "scientificName": "Hexagrammos agrammus (Temminck & Schlegel, 1843)",
+      "gbifTaxonKey": 2336490,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6185461365,
+          "acceptedScientificName": "Hexagrammos agrammus (Temminck & Schlegel, 1843)",
+          "country": "Korea, Republic of",
+          "eventDate": "2026-03-19T16:45:24",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/626363305/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/626363305",
+          "creator": "J Sim",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6185461365,
+          "acceptedScientificName": "Hexagrammos agrammus (Temminck & Schlegel, 1843)",
+          "country": "Korea, Republic of",
+          "eventDate": "2026-03-19T16:45:24",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/626363308/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/626363308",
+          "creator": "J Sim",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6185461365,
+          "acceptedScientificName": "Hexagrammos agrammus (Temminck & Schlegel, 1843)",
+          "country": "Korea, Republic of",
+          "eventDate": "2026-03-19T16:45:24",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/626363311/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/626363311",
+          "creator": "J Sim",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6185461365,
+          "acceptedScientificName": "Hexagrammos agrammus (Temminck & Schlegel, 1843)",
+          "country": "Korea, Republic of",
+          "eventDate": "2026-03-19T16:45:24",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/626363302/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/626363302",
+          "creator": "J Sim",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6185461365,
+          "acceptedScientificName": "Hexagrammos agrammus (Temminck & Schlegel, 1843)",
+          "country": "Korea, Republic of",
+          "eventDate": "2026-03-19T16:45:24",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/626363309/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/626363309",
+          "creator": "J Sim",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 13,
+      "nameKo": "쥐노래미",
+      "scientificName": "Hexagrammos otakii Jordan & Starks, 1895",
+      "gbifTaxonKey": 2336496,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6130236052,
+          "acceptedScientificName": "Hexagrammos otakii Jordan & Starks, 1895",
+          "country": "Korea, Republic of",
+          "eventDate": "2026-01-05T17:00:20",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/606146772/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/606146772",
+          "creator": "beautychick",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6178976366,
+          "acceptedScientificName": "Hexagrammos otakii Jordan & Starks, 1895",
+          "country": "China",
+          "eventDate": "2026-03-12T14:26:49",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/623851556/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/623851556",
+          "creator": "fhvc",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6178976366,
+          "acceptedScientificName": "Hexagrammos otakii Jordan & Starks, 1895",
+          "country": "China",
+          "eventDate": "2026-03-12T14:26:49",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/623851572/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/623851572",
+          "creator": "fhvc",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6353313492,
+          "acceptedScientificName": "Hexagrammos otakii Jordan & Starks, 1895",
+          "country": "China",
+          "eventDate": "2026-05-27T15:44:16",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/667637402/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/667637402",
+          "creator": "Timothy Loh",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6398982724,
+          "acceptedScientificName": "Hexagrammos otakii Jordan & Starks, 1895",
+          "country": "Korea, Republic of",
+          "eventDate": "2026-05-31T09:46",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/675694788/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/675694788",
+          "creator": "crabini_ysk",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 14,
+      "nameKo": "성대",
+      "scientificName": "Chelidonichthys spinosus (McClelland, 1843)",
+      "gbifTaxonKey": 2336783,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6431326305,
+          "acceptedScientificName": "Chelidonichthys spinosus (McClelland, 1844)",
+          "country": "Japan",
+          "eventDate": "2026-06-30T08:44:11",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/689540064/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/689540064",
+          "creator": "akio.suzuki",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6431326305,
+          "acceptedScientificName": "Chelidonichthys spinosus (McClelland, 1844)",
+          "country": "Japan",
+          "eventDate": "2026-06-30T08:44:11",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/689540104/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/689540104",
+          "creator": "akio.suzuki",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6431820354,
+          "acceptedScientificName": "Chelidonichthys spinosus (McClelland, 1844)",
+          "country": "Japan",
+          "eventDate": "2026-07-04T11:29:48",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/691219103/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/691219103",
+          "creator": "ponyomi",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6431820354,
+          "acceptedScientificName": "Chelidonichthys spinosus (McClelland, 1844)",
+          "country": "Japan",
+          "eventDate": "2026-07-04T11:29:48",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/691219109/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/691219109",
+          "creator": "ponyomi",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5063237968,
+          "acceptedScientificName": "Chelidonichthys spinosus (McClelland, 1844)",
+          "country": "China",
+          "eventDate": "2025-01-22T10:33:21",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/465258145/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/465258145",
+          "creator": "JIN Pin-Tsen",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 15,
+      "nameKo": "임연수어",
+      "scientificName": "Pleurogrammus azonus Jordan & Metz, 1913",
+      "gbifTaxonKey": 2336513,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6184911793,
+          "acceptedScientificName": "Pleurogrammus azonus Jordan & Metz, 1913",
+          "country": "Japan",
+          "eventDate": "2026-02-12T11:54",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/615144991/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/615144991",
+          "creator": "stan2013",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5076729164,
+          "acceptedScientificName": "Pleurogrammus azonus Jordan & Metz, 1913",
+          "country": "Japan",
+          "eventDate": "2024-01-08T07:42",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/345517228/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/345517228",
+          "creator": "りなべる",
+          "license": "http://creativecommons.org/licenses/by/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5909203250,
+          "acceptedScientificName": "Pleurogrammus azonus Jordan & Metz, 1913",
+          "country": "Japan",
+          "eventDate": "2024-04-29T13:48",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/591743326/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/591743326",
+          "creator": "akira_jp",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 4950318353,
+          "acceptedScientificName": "Pleurogrammus azonus Jordan & Metz, 1913",
+          "country": "Russian Federation",
+          "eventDate": "2024-09-17T08:44",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/431900528/original.jpeg",
+          "sourceUrl": "https://www.inaturalist.org/photos/431900528",
+          "creator": "Шипилов Виталий",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 4954239989,
+          "acceptedScientificName": "Pleurogrammus azonus Jordan & Metz, 1913",
+          "country": "Russian Federation",
+          "eventDate": "2024-10-09T18:33:06",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/440457181/original.jpeg",
+          "sourceUrl": "https://www.inaturalist.org/photos/440457181",
+          "creator": "Глеб Колесников",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 16,
+      "nameKo": "참돔",
+      "scientificName": "Pagrus major (Temminck & Schlegel, 1843)",
+      "gbifTaxonKey": 5210935,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 5938107575,
+          "acceptedScientificName": "Pagrus major (Temminck & Schlegel, 1843)",
+          "country": "China",
+          "eventDate": "2026-01-01T16:33",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/604693042/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/604693042",
+          "creator": "Baixun Xun",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6159171993,
+          "acceptedScientificName": "Pagrus major (Temminck & Schlegel, 1843)",
+          "country": "Hong Kong",
+          "eventDate": "2026-02-15T14:40:26",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/616031925/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/616031925",
+          "creator": "Aiden Chong",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6159171993,
+          "acceptedScientificName": "Pagrus major (Temminck & Schlegel, 1843)",
+          "country": "Hong Kong",
+          "eventDate": "2026-02-15T14:40:26",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/616031936/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/616031936",
+          "creator": "Aiden Chong",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6159171993,
+          "acceptedScientificName": "Pagrus major (Temminck & Schlegel, 1843)",
+          "country": "Hong Kong",
+          "eventDate": "2026-02-15T14:40:26",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/616031950/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/616031950",
+          "creator": "Aiden Chong",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6185981221,
+          "acceptedScientificName": "Pagrus major (Temminck & Schlegel, 1843)",
+          "country": "Hong Kong",
+          "eventDate": "2026-03-21T15:03",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/627952008/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/627952008",
+          "creator": "dod_od",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 17,
+      "nameKo": "감성돔",
+      "scientificName": "Acanthopagrus schlegelii (Bleeker, 1854)",
+      "gbifTaxonKey": 4284635,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6131261432,
+          "acceptedScientificName": "Acanthopagrus schlegelii (Bleeker, 1854)",
+          "country": "Japan",
+          "eventDate": "2026-01-13T12:48:51",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/607644878/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/607644878",
+          "creator": "Paulo Mascaretti",
+          "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6133184766,
+          "acceptedScientificName": "Acanthopagrus schlegelii (Bleeker, 1854)",
+          "country": "Japan",
+          "eventDate": "2026-01-31T15:12:34",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/612080749/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/612080749",
+          "creator": "Dhugal Lindsay",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6133314638,
+          "acceptedScientificName": "Acanthopagrus schlegelii (Bleeker, 1854)",
+          "country": "Japan",
+          "eventDate": "2026-01-31T15:14:19",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/612080903/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/612080903",
+          "creator": "Dhugal Lindsay",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6334644682,
+          "acceptedScientificName": "Acanthopagrus schlegelii (Bleeker, 1854)",
+          "country": "China",
+          "eventDate": "2026-01-30T10:57",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/612656451/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/612656451",
+          "creator": "Huang H.C.",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6159165247,
+          "acceptedScientificName": "Acanthopagrus schlegelii (Bleeker, 1854)",
+          "country": "Japan",
+          "eventDate": "2026-02-14T13:47:35",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/615649631/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/615649631",
+          "creator": "Dhugal Lindsay",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 18,
+      "nameKo": "돌돔",
+      "scientificName": "Oplegnathus fasciatus (Temminck & Schlegel, 1844)",
+      "gbifTaxonKey": 2392240,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6184992284,
+          "acceptedScientificName": "Oplegnathus fasciatus (Temminck & Schlegel, 1844)",
+          "country": "China",
+          "eventDate": "2026-03-19T16:24:35",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/628429462/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/628429462",
+          "creator": "fhvc",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6185133506,
+          "acceptedScientificName": "Oplegnathus fasciatus (Temminck & Schlegel, 1844)",
+          "country": "China",
+          "eventDate": "2026-03-19T16:24:28",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/626580421/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/626580421",
+          "creator": "orcinusss",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6188127935,
+          "acceptedScientificName": "Oplegnathus fasciatus (Temminck & Schlegel, 1844)",
+          "country": "China",
+          "eventDate": "2026-03-29T16:22:21",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/631315495/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/631315495",
+          "creator": "fhvc",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6188180469,
+          "acceptedScientificName": "Oplegnathus fasciatus (Temminck & Schlegel, 1844)",
+          "country": "China",
+          "eventDate": "2026-03-29T16:20:41",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/631280006/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/631280006",
+          "creator": "orcinusss",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6235741790,
+          "acceptedScientificName": "Oplegnathus fasciatus (Temminck & Schlegel, 1844)",
+          "country": "Japan",
+          "eventDate": "2026-04-23T10:51",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/644552166/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/644552166",
+          "creator": "kawahagi",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 19,
+      "nameKo": "벵에돔",
+      "scientificName": "Girella punctata",
+      "gbifTaxonKey": 2381231,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6163382142,
+          "acceptedScientificName": "Girella punctata Gray, 1835",
+          "country": "Japan",
+          "eventDate": "2026-02-19T15:20",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/617137862/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/617137862",
+          "creator": "holyel",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6252965833,
+          "acceptedScientificName": "Girella punctata Gray, 1835",
+          "country": "Hong Kong",
+          "eventDate": "2026-04-26T15:57",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/652718646/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/652718646",
+          "creator": "Andy",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6273212201,
+          "acceptedScientificName": "Girella punctata Gray, 1835",
+          "country": "Japan",
+          "eventDate": "2026-04-30T10:49:26",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/658316308/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/658316308",
+          "creator": "Lily Yeung",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6274143625,
+          "acceptedScientificName": "Girella punctata Gray, 1835",
+          "country": "Japan",
+          "eventDate": "2026-05-07T14:19",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/655290289/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/655290289",
+          "creator": "sharkdevotee",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6398630989,
+          "acceptedScientificName": "Girella punctata Gray, 1835",
+          "country": "Japan",
+          "eventDate": "2026-06-14T08:47:38",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/678727314/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/678727314",
+          "creator": "岡隆太",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 20,
+      "nameKo": "긴꼬리벵에돔",
+      "scientificName": "Girella leonina",
+      "gbifTaxonKey": 2381214,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6179484940,
+          "acceptedScientificName": "Girella leonina (Richardson, 1846)",
+          "country": "Japan",
+          "eventDate": "2026-03-15T08:32:29",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/624828384/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/624828384",
+          "creator": "youmu",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5909258483,
+          "acceptedScientificName": "Girella leonina (Richardson, 1846)",
+          "country": "Japan",
+          "eventDate": "2025-03-19T19:28:53",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/478013555/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/478013555",
+          "creator": "Tomioka Masafumi",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5909369777,
+          "acceptedScientificName": "Girella leonina (Richardson, 1846)",
+          "country": "Japan",
+          "eventDate": "2025-03-19T19:26:32",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/478013601/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/478013601",
+          "creator": "Tomioka Masafumi",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5932383958,
+          "acceptedScientificName": "Girella leonina (Richardson, 1846)",
+          "country": "Korea, Republic of",
+          "eventDate": "2025-07-12T17:56:51",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/535810974/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/535810974",
+          "creator": "Seokin Yang",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5920054825,
+          "acceptedScientificName": "Girella leonina (Richardson, 1846)",
+          "country": "Japan",
+          "eventDate": "2025-09-18T12:52",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/573353169/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/573353169",
+          "creator": "Nicola Crockford",
+          "license": "http://creativecommons.org/licenses/by/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 21,
+      "nameKo": "황돔",
+      "scientificName": "Dentex hypselosomus Bleeker, 1854",
+      "gbifTaxonKey": 8405707,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6131518816,
+          "acceptedScientificName": "Dentex hypselosomus Bleeker, 1854",
+          "country": "China",
+          "eventDate": "2026-01-07T11:44:52",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/606061204/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/606061204",
+          "creator": "JIN Pin-Tsen",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5154682603,
+          "acceptedScientificName": "Dentex hypselosomus Bleeker, 1854",
+          "country": "China",
+          "eventDate": "2025-05-05T16:46:19",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/500424124/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/500424124",
+          "creator": "虹",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5167883529,
+          "acceptedScientificName": "Dentex hypselosomus Bleeker, 1854",
+          "country": "China",
+          "eventDate": "2025-05-17T15:23:29",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/506281676/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/506281676",
+          "creator": "李博恒",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5217171722,
+          "acceptedScientificName": "Dentex hypselosomus Bleeker, 1854",
+          "country": "China",
+          "eventDate": "2025-05-31T17:00:39",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/513321771/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/513321771",
+          "creator": "李博恒",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5215875337,
+          "acceptedScientificName": "Dentex hypselosomus Bleeker, 1854",
+          "country": "China",
+          "eventDate": "2025-07-02T16:35:09",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/530164669/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/530164669",
+          "creator": "李博恒",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 22,
+      "nameKo": "농어",
+      "scientificName": "Lateolabrax japonicus (Cuvier, 1828)",
+      "gbifTaxonKey": 2392025,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6133022501,
+          "acceptedScientificName": "Lateolabrax japonicus (Cuvier, 1828)",
+          "country": "China",
+          "eventDate": "2026-01-29T16:39:08",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/611629325/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/611629325",
+          "creator": "xhttttttt",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6147248672,
+          "acceptedScientificName": "Lateolabrax japonicus (Cuvier, 1828)",
+          "country": "Chinese Taipei",
+          "eventDate": "2026-02-06T09:05",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/614337131/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/614337131",
+          "creator": "roarlan",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6163287524,
+          "acceptedScientificName": "Lateolabrax japonicus (Cuvier, 1828)",
+          "country": "China",
+          "eventDate": "2026-02-18T09:15:03",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/616834120/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/616834120",
+          "creator": "李博恒",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6178627613,
+          "acceptedScientificName": "Lateolabrax japonicus (Cuvier, 1828)",
+          "country": "Japan",
+          "eventDate": "2026-02-21T14:48:41",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/618220228/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/618220228",
+          "creator": "kusa-to-uo",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6178922449,
+          "acceptedScientificName": "Lateolabrax japonicus (Cuvier, 1828)",
+          "country": "Japan",
+          "eventDate": "2026-02-20T16:21:40",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/617829812/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/617829812",
+          "creator": "Curtis Mahon",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 23,
+      "nameKo": "점농어",
+      "scientificName": "Lateolabrax spilonotus",
+      "gbifTaxonKey": 2392024,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6130675164,
+          "acceptedScientificName": "Lateolabrax latus Katayama, 1957",
+          "country": "Japan",
+          "eventDate": "2026-01-17T18:56:24",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/608738435/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/608738435",
+          "creator": "リク",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6133022501,
+          "acceptedScientificName": "Lateolabrax japonicus (Cuvier, 1828)",
+          "country": "China",
+          "eventDate": "2026-01-29T16:39:08",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/611629325/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/611629325",
+          "creator": "xhttttttt",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6147248672,
+          "acceptedScientificName": "Lateolabrax japonicus (Cuvier, 1828)",
+          "country": "Chinese Taipei",
+          "eventDate": "2026-02-06T09:05",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/614337131/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/614337131",
+          "creator": "roarlan",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6163287524,
+          "acceptedScientificName": "Lateolabrax japonicus (Cuvier, 1828)",
+          "country": "China",
+          "eventDate": "2026-02-18T09:15:03",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/616834120/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/616834120",
+          "creator": "李博恒",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6178627613,
+          "acceptedScientificName": "Lateolabrax japonicus (Cuvier, 1828)",
+          "country": "Japan",
+          "eventDate": "2026-02-21T14:48:41",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/618220228/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/618220228",
+          "creator": "kusa-to-uo",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 24,
+      "nameKo": "민어",
+      "scientificName": "Miichthys miiuy (Basilewsky, 1855)",
+      "gbifTaxonKey": 2400355,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6131307596,
+          "acceptedScientificName": "Miichthys miiuy (Basilewsky, 1855)",
+          "country": "China",
+          "eventDate": "2026-01-03T09:35:16",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605006606/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/605006606",
+          "creator": "yulingfz",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6195289371,
+          "acceptedScientificName": "Miichthys miiuy (Basilewsky, 1855)",
+          "country": "China",
+          "eventDate": "2026-04-12T06:56:14",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/637053267/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/637053267",
+          "creator": "castle_pendragon",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6195684075,
+          "acceptedScientificName": "Miichthys miiuy (Basilewsky, 1855)",
+          "country": "China",
+          "eventDate": "2026-04-12T06:38:02",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/637063851/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/637063851",
+          "creator": "castle_pendragon",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6195826218,
+          "acceptedScientificName": "Miichthys miiuy (Basilewsky, 1855)",
+          "country": "China",
+          "eventDate": "2026-04-11T15:11:28",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/636433187/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/636433187",
+          "creator": "orcinusss",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6273167505,
+          "acceptedScientificName": "Miichthys miiuy (Basilewsky, 1855)",
+          "country": "China",
+          "eventDate": "2026-04-11T15:11:47",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/639031716/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/639031716",
+          "creator": "fhvc",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 25,
+      "nameKo": "보구치",
+      "scientificName": "Pennahia argentata (Houttuyn, 1782)",
+      "gbifTaxonKey": 2400253,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6185042220,
+          "acceptedScientificName": "Pennahia argentata (Houttuyn, 1782)",
+          "country": "China",
+          "eventDate": "2026-03-12T14:42:28",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/624127859/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/624127859",
+          "creator": "fhvc",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5140490223,
+          "acceptedScientificName": "Pennahia argentata (Houttuyn, 1782)",
+          "country": "China",
+          "eventDate": "2025-04-26T17:27:45",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/492218832/original.jpeg",
+          "sourceUrl": "https://www.inaturalist.org/photos/492218832",
+          "creator": "shudaonan",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5827427124,
+          "acceptedScientificName": "Pennahia argentata (Houttuyn, 1782)",
+          "country": "China",
+          "eventDate": "2025-09-07T09:48:14",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/564423088/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/564423088",
+          "creator": "orcinusss",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5827483540,
+          "acceptedScientificName": "Pennahia argentata (Houttuyn, 1782)",
+          "country": "China",
+          "eventDate": "2025-09-07T10:16:33",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/563960002/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/563960002",
+          "creator": "orcinusss",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5827854214,
+          "acceptedScientificName": "Pennahia argentata (Houttuyn, 1782)",
+          "country": "China",
+          "eventDate": "2025-09-14T10:12:42",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/567214807/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/567214807",
+          "creator": "orcinusss",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 26,
+      "nameKo": "부세",
+      "scientificName": "Larimichthys crocea (Richardson, 1846)",
+      "gbifTaxonKey": 2400181,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6178720912,
+          "acceptedScientificName": "Larimichthys crocea (Richardson, 1846)",
+          "country": "China",
+          "eventDate": "2026-03-11T11:04:48",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/623450625/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/623450625",
+          "creator": "castle_pendragon",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6179061635,
+          "acceptedScientificName": "Larimichthys crocea (Richardson, 1846)",
+          "country": "China",
+          "eventDate": "2026-03-11T11:04:41",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/623450183/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/623450183",
+          "creator": "zgy",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6185329813,
+          "acceptedScientificName": "Larimichthys crocea (Richardson, 1846)",
+          "country": "China",
+          "eventDate": "2026-03-12T14:40:30",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/624141027/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/624141027",
+          "creator": "fhvc",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5063526864,
+          "acceptedScientificName": "Larimichthys crocea (Richardson, 1846)",
+          "country": "China",
+          "eventDate": "2025-01-23T15:27:28",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/466566055/original.jpeg",
+          "sourceUrl": "https://www.inaturalist.org/photos/466566055",
+          "creator": "wresy",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5133992462,
+          "acceptedScientificName": "Larimichthys crocea (Richardson, 1846)",
+          "country": "China",
+          "eventDate": "2025-04-02T16:05:55",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/482048768/original.jpeg",
+          "sourceUrl": "https://www.inaturalist.org/photos/482048768",
+          "creator": "李博恒",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 27,
+      "nameKo": "참조기",
+      "scientificName": "Larimichthys polyactis (Bleeker, 1877)",
+      "gbifTaxonKey": 2400171,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6131183647,
+          "acceptedScientificName": "Larimichthys polyactis (Bleeker, 1877)",
+          "country": "China",
+          "eventDate": "2026-01-15T16:24:35",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/608105956/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/608105956",
+          "creator": "JIN Pin-Tsen",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6184744607,
+          "acceptedScientificName": "Larimichthys polyactis (Bleeker, 1877)",
+          "country": "China",
+          "eventDate": "2026-03-12T14:40",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/625652725/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/625652725",
+          "creator": "orcinusss",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6185365872,
+          "acceptedScientificName": "Larimichthys polyactis (Bleeker, 1877)",
+          "country": "China",
+          "eventDate": "2026-03-14T15:42:52",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/624912944/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/624912944",
+          "creator": "orcinusss",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5063446129,
+          "acceptedScientificName": "Larimichthys polyactis (Bleeker, 1877)",
+          "country": "China",
+          "eventDate": "2025-01-27T19:15:46",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/466350184/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/466350184",
+          "creator": "JIN Pin-Tsen",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6131070920,
+          "acceptedScientificName": "Larimichthys polyactis (Bleeker, 1877)",
+          "country": "China",
+          "eventDate": "2025-01-05T11:46:13",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/461799731/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/461799731",
+          "creator": "JIN Pin-Tsen",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 28,
+      "nameKo": "자바리",
+      "scientificName": "Epinephelus bruneus Bloch, 1793",
+      "gbifTaxonKey": 2388240,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6185369096,
+          "acceptedScientificName": "Epinephelus bruneus Bloch, 1793",
+          "country": "China",
+          "eventDate": "2026-03-19T17:59",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/626298174/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/626298174",
+          "creator": "tubahaier",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6400797174,
+          "acceptedScientificName": "Epinephelus bruneus Bloch, 1793",
+          "country": "Japan",
+          "eventDate": "2026-06-04",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/673178303/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/673178303",
+          "creator": "くらげのげぼく",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6235671731,
+          "acceptedScientificName": "Epinephelus bruneus Bloch, 1793",
+          "country": "China",
+          "eventDate": "2025-03-11T13:59:09",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/642817367/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/642817367",
+          "creator": "李博恒",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6235671731,
+          "acceptedScientificName": "Epinephelus bruneus Bloch, 1793",
+          "country": "China",
+          "eventDate": "2025-03-11T13:59:09",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/642817391/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/642817391",
+          "creator": "李博恒",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6235671731,
+          "acceptedScientificName": "Epinephelus bruneus Bloch, 1793",
+          "country": "China",
+          "eventDate": "2025-03-11T13:59:09",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/642817409/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/642817409",
+          "creator": "李博恒",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 29,
+      "nameKo": "붉바리",
+      "scientificName": "Epinephelus akaara (Temminck & Schlegel, 1842)",
+      "gbifTaxonKey": 2388493,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6234995738,
+          "acceptedScientificName": "Epinephelus akaara (Temminck & Schlegel, 1842)",
+          "country": "Japan",
+          "eventDate": "2026-04-26T11:45",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/647893329/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/647893329",
+          "creator": "akira_jp",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6320060642,
+          "acceptedScientificName": "Epinephelus akaara (Temminck & Schlegel, 1842)",
+          "country": "Japan",
+          "eventDate": "2026-05-11T19:43:09",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/659289421/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/659289421",
+          "creator": "jcowdog",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6320920741,
+          "acceptedScientificName": "Epinephelus akaara (Temminck & Schlegel, 1842)",
+          "country": "Japan",
+          "eventDate": "2026-05-11T20:00:04",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/657925494/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/657925494",
+          "creator": "jcowdog",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6399057454,
+          "acceptedScientificName": "Epinephelus akaara (Temminck & Schlegel, 1842)",
+          "country": "Chinese Taipei",
+          "eventDate": "2026-05-22T14:03:37",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/665539608/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/665539608",
+          "creator": "Ethan Hsieh (谢雨程）",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6400350690,
+          "acceptedScientificName": "Epinephelus akaara (Temminck & Schlegel, 1842)",
+          "country": "Japan",
+          "eventDate": "2026-06-09T10:09:06",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/675902902/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/675902902",
+          "creator": "jcowdog",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 30,
+      "nameKo": "능성어",
+      "scientificName": "Hyporthodus septemfasciatus (Thunberg, 1793)",
+      "gbifTaxonKey": 5788222,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6171200942,
+          "acceptedScientificName": "Hyporthodus septemfasciatus (Thunberg, 1793)",
+          "country": "Japan",
+          "eventDate": "2025-08-12T15:25:58",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/618942920/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/618942920",
+          "creator": "田所浩二",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5890151996,
+          "acceptedScientificName": "Hyporthodus septemfasciatus (Thunberg, 1793)",
+          "country": "Korea, Republic of",
+          "eventDate": "2024-09-07T20:45",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/586264800/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/586264800",
+          "creator": "taiwan_habu",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5166777743,
+          "acceptedScientificName": "Hyporthodus septemfasciatus (Thunberg, 1793)",
+          "country": "Japan",
+          "eventDate": "2023-09-01T09:14:12",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/505569591/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/505569591",
+          "creator": "mojineko",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5166777743,
+          "acceptedScientificName": "Hyporthodus septemfasciatus (Thunberg, 1793)",
+          "country": "Japan",
+          "eventDate": "2023-09-01T09:14:12",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/505569622/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/505569622",
+          "creator": "mojineko",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5166777743,
+          "acceptedScientificName": "Hyporthodus septemfasciatus (Thunberg, 1793)",
+          "country": "Japan",
+          "eventDate": "2023-09-01T09:14:12",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/505569653/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/505569653",
+          "creator": "mojineko",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 31,
+      "nameKo": "고등어",
+      "scientificName": "Scomber japonicus Houttuyn, 1782",
+      "gbifTaxonKey": 7599552,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6130450905,
+          "acceptedScientificName": "Scomber japonicus Houttuyn, 1782",
+          "country": "Mexico",
+          "eventDate": "2026-01-18T10:59:05",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/609517638/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/609517638",
+          "creator": "Jorge Enrique Taylor Curiel",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6130563418,
+          "acceptedScientificName": "Scomber japonicus Houttuyn, 1782",
+          "country": "United States of America",
+          "eventDate": "2026-01-11T10:58",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/607414798/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/607414798",
+          "creator": "Siobhan O'Neill",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6131580105,
+          "acceptedScientificName": "Scomber japonicus Houttuyn, 1782",
+          "country": "South Africa",
+          "eventDate": "2026-01-09T14:31:10",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/606618022/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/606618022",
+          "creator": "Marike",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6131580105,
+          "acceptedScientificName": "Scomber japonicus Houttuyn, 1782",
+          "country": "South Africa",
+          "eventDate": "2026-01-09T14:31:10",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/606618038/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/606618038",
+          "creator": "Marike",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6131580105,
+          "acceptedScientificName": "Scomber japonicus Houttuyn, 1782",
+          "country": "South Africa",
+          "eventDate": "2026-01-09T14:31:10",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/606618058/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/606618058",
+          "creator": "Marike",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 32,
+      "nameKo": "망치고등어",
+      "scientificName": "Scomber australasicus Cuvier, 1832",
+      "gbifTaxonKey": 2374156,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6129838693,
+          "acceptedScientificName": "Scomber australasicus Cuvier, 1832",
+          "country": "Australia",
+          "eventDate": "2026-01-06T19:56:19",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/606104254/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/606104254",
+          "creator": "lynneziviani1965",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6129838693,
+          "acceptedScientificName": "Scomber australasicus Cuvier, 1832",
+          "country": "Australia",
+          "eventDate": "2026-01-06T19:56:19",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/606104274/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/606104274",
+          "creator": "lynneziviani1965",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6129838693,
+          "acceptedScientificName": "Scomber australasicus Cuvier, 1832",
+          "country": "Australia",
+          "eventDate": "2026-01-06T19:56:19",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/606104306/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/606104306",
+          "creator": "lynneziviani1965",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6130939755,
+          "acceptedScientificName": "Scomber australasicus Cuvier, 1832",
+          "country": "Australia",
+          "eventDate": "2026-01-12T12:18",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/608015231/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/608015231",
+          "creator": "David Hancock",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6131480261,
+          "acceptedScientificName": "Scomber australasicus Cuvier, 1832",
+          "country": "Australia",
+          "eventDate": "2026-01-23T08:21:33",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/610069562/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/610069562",
+          "creator": "Nicolò Palumbo",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 33,
+      "nameKo": "전갱이",
+      "scientificName": "Trachurus japonicus (Temminck & Schlegel, 1844)",
+      "gbifTaxonKey": 5210503,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6400827781,
+          "acceptedScientificName": "Trachurus japonicus (Temminck & Schlegel, 1844)",
+          "country": "Korea, Republic of",
+          "eventDate": "2026-05-31T09:46",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/675695045/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/675695045",
+          "creator": "crabini_ysk",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6398970585,
+          "acceptedScientificName": "Trachurus japonicus (Temminck & Schlegel, 1844)",
+          "country": "Japan",
+          "eventDate": "2026-06-08T19:43:08",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/675902832/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/675902832",
+          "creator": "jcowdog",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6413339319,
+          "acceptedScientificName": "Trachurus japonicus (Temminck & Schlegel, 1844)",
+          "country": "China",
+          "eventDate": "2026-06-18T21:02:24",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/681671841/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/681671841",
+          "creator": "qi_zhihao",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6162924040,
+          "acceptedScientificName": "Trachurus japonicus (Temminck & Schlegel, 1844)",
+          "country": "Japan",
+          "eventDate": "2025-02-15T10:57:45",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/616918046/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/616918046",
+          "creator": "youmu",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5104483649,
+          "acceptedScientificName": "Trachurus japonicus (Temminck & Schlegel, 1844)",
+          "country": "Japan",
+          "eventDate": "2025-03-22T09:03:18",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/478515298/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/478515298",
+          "creator": "daichi2023",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 34,
+      "nameKo": "방어",
+      "scientificName": "Seriola quinqueradiata Temminck & Schlegel, 1845",
+      "gbifTaxonKey": 5961724,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 5839850219,
+          "acceptedScientificName": "Seriola quinqueradiata Temminck & Schlegel, 1845",
+          "country": "Russian Federation",
+          "eventDate": "2025-09-25T08:15:43",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/576644268/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/576644268",
+          "creator": "Глеб Колесников",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5920320803,
+          "acceptedScientificName": "Seriola quinqueradiata Temminck & Schlegel, 1845",
+          "country": "Russian Federation",
+          "eventDate": "2025-09-21T15:22",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/595204732/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/595204732",
+          "creator": "Дмитрий Мезенин",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5840202728,
+          "acceptedScientificName": "Seriola quinqueradiata Temminck & Schlegel, 1845",
+          "country": "Russian Federation",
+          "eventDate": "2025-10-02T09:40:50",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/576642114/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/576642114",
+          "creator": "Глеб Колесников",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5932282880,
+          "acceptedScientificName": "Seriola quinqueradiata Temminck & Schlegel, 1845",
+          "country": "Russian Federation",
+          "eventDate": "2024-08-10T15:05",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/597466161/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/597466161",
+          "creator": "@Danilabirdwatcher",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5932282880,
+          "acceptedScientificName": "Seriola quinqueradiata Temminck & Schlegel, 1845",
+          "country": "Russian Federation",
+          "eventDate": "2024-08-10T15:05",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/597466171/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/597466171",
+          "creator": "@Danilabirdwatcher",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 35,
+      "nameKo": "부시리",
+      "scientificName": "Seriola lalandi",
+      "gbifTaxonKey": 5961708,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 5938259504,
+          "acceptedScientificName": "Seriola lalandi Valenciennes, 1833",
+          "country": "Chile",
+          "eventDate": "2026-01-03T06:54",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605568184/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/605568184",
+          "creator": "Pablo Fajardo",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6130144559,
+          "acceptedScientificName": "Seriola lalandi Valenciennes, 1833",
+          "country": "New Zealand",
+          "eventDate": "2026-01-05T10:51",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/610764982/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/610764982",
+          "creator": "Karen Pratt",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6130566825,
+          "acceptedScientificName": "Seriola lalandi Valenciennes, 1833",
+          "country": "Tanzania, United Republic of",
+          "eventDate": "2026-01-02T14:15",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/606591639/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/606591639",
+          "creator": "piotrkz",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6130578655,
+          "acceptedScientificName": "Seriola lalandi Valenciennes, 1833",
+          "country": "South Africa",
+          "eventDate": "2026-01-05T11:47",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605659187/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/605659187",
+          "creator": "setapion",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6130722939,
+          "acceptedScientificName": "Seriola lalandi Valenciennes, 1833",
+          "country": "Australia",
+          "eventDate": "2026-01-16T13:00",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/608828845/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/608828845",
+          "creator": "mgh073",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 36,
+      "nameKo": "삼치",
+      "scientificName": "Scomberomorus niphonius (Cuvier, 1832)",
+      "gbifTaxonKey": 2374296,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6184967862,
+          "acceptedScientificName": "Scomberomorus niphonius (Cuvier, 1832)",
+          "country": "China",
+          "eventDate": "2026-03-12T14:29:11",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/624120414/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/624120414",
+          "creator": "fhvc",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6185904938,
+          "acceptedScientificName": "Scomberomorus niphonius (Cuvier, 1832)",
+          "country": "China",
+          "eventDate": "2026-03-12T14:29",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/625658717/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/625658717",
+          "creator": "orcinusss",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6195349524,
+          "acceptedScientificName": "Scomberomorus niphonius (Cuvier, 1832)",
+          "country": "China",
+          "eventDate": "2026-04-12T05:50:57",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/637067903/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/637067903",
+          "creator": "castle_pendragon",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6195633870,
+          "acceptedScientificName": "Scomberomorus niphonius (Cuvier, 1832)",
+          "country": "China",
+          "eventDate": "2026-04-11T14:42:32",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/636485153/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/636485153",
+          "creator": "orcinusss",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6236189360,
+          "acceptedScientificName": "Scomberomorus niphonius (Cuvier, 1832)",
+          "country": "China",
+          "eventDate": "2026-04-12T05:51:45",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/638015701/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/638015701",
+          "creator": "orcinusss",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 37,
+      "nameKo": "갈치",
+      "scientificName": "Trichiurus japonicus Temminck & Schlegel, 1844",
+      "gbifTaxonKey": 2389414,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6185153312,
+          "acceptedScientificName": "Trichiurus lepturus Linnaeus, 1758",
+          "country": "China",
+          "eventDate": "2026-03-12T14:53:11",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/624127519/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/624127519",
+          "creator": "orcinusss",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5062972485,
+          "acceptedScientificName": "Trichiurus lepturus Linnaeus, 1758",
+          "country": "China",
+          "eventDate": "2025-01-06T12:21:34",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/462049824/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/462049824",
+          "creator": "JIN Pin-Tsen",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5828427581,
+          "acceptedScientificName": "Trichiurus lepturus Linnaeus, 1758",
+          "country": "China",
+          "eventDate": "2025-09-07T10:00:04",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/563973158/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/563973158",
+          "creator": "orcinusss",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5828849791,
+          "acceptedScientificName": "Trichiurus lepturus Linnaeus, 1758",
+          "country": "China",
+          "eventDate": "2025-09-07T10:28:35",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/563953286/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/563953286",
+          "creator": "orcinusss",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5903702809,
+          "acceptedScientificName": "Trichiurus lepturus Linnaeus, 1758",
+          "country": "China",
+          "eventDate": "2025-09-14T10:42:03",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/566736061/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/566736061",
+          "creator": "fhvc",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 38,
+      "nameKo": "청어",
+      "scientificName": "Clupea pallasii Valenciennes, 1847",
+      "gbifTaxonKey": 4284072,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 5938031634,
+          "acceptedScientificName": "Clupea pallasii Valenciennes, 1847",
+          "country": "Canada",
+          "eventDate": "2026-01-02T21:39:39",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/604987963/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/604987963",
+          "creator": "Autumn Wang",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5938053171,
+          "acceptedScientificName": "Clupea pallasii Valenciennes, 1847",
+          "country": "Canada",
+          "eventDate": "2026-01-01T15:57:26",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/604625455/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/604625455",
+          "creator": "Viperidaeeee",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5938053171,
+          "acceptedScientificName": "Clupea pallasii Valenciennes, 1847",
+          "country": "Canada",
+          "eventDate": "2026-01-01T15:57:26",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/604660916/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/604660916",
+          "creator": "Viperidaeeee",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5938053171,
+          "acceptedScientificName": "Clupea pallasii Valenciennes, 1847",
+          "country": "Canada",
+          "eventDate": "2026-01-01T15:57:26",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/604660901/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/604660901",
+          "creator": "Viperidaeeee",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5938053171,
+          "acceptedScientificName": "Clupea pallasii Valenciennes, 1847",
+          "country": "Canada",
+          "eventDate": "2026-01-01T15:57:26",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/604660904/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/604660904",
+          "creator": "Viperidaeeee",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 39,
+      "nameKo": "숭어",
+      "scientificName": "Mugil cephalus Linnaeus, 1758",
+      "gbifTaxonKey": 8189568,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 5938132748,
+          "acceptedScientificName": "Mugil cephalus Linnaeus, 1758",
+          "country": "United States of America",
+          "eventDate": "2026-01-05T09:51:54",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605651073/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/605651073",
+          "creator": "Jemungen",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5938189751,
+          "acceptedScientificName": "Mugil cephalus Linnaeus, 1758",
+          "country": "Japan",
+          "eventDate": "2026-01-04T13:36:55",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605346413/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/605346413",
+          "creator": "T. Kajita",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5938189751,
+          "acceptedScientificName": "Mugil cephalus Linnaeus, 1758",
+          "country": "Japan",
+          "eventDate": "2026-01-04T13:36:55",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605346388/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/605346388",
+          "creator": "T. Kajita",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5938189751,
+          "acceptedScientificName": "Mugil cephalus Linnaeus, 1758",
+          "country": "Japan",
+          "eventDate": "2026-01-04T13:36:55",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605346403/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/605346403",
+          "creator": "T. Kajita",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5938273288,
+          "acceptedScientificName": "Mugil cephalus Linnaeus, 1758",
+          "country": "Australia",
+          "eventDate": "2026-01-03T14:05:24",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/604963502/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/604963502",
+          "creator": "Nightcap Ranger",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 40,
+      "nameKo": "가숭어",
+      "scientificName": "Planiliza haematocheilus (Temminck & Schlegel, 1845)",
+      "gbifTaxonKey": 9377860,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6130753974,
+          "acceptedScientificName": "Planiliza haematocheila (Temminck & Schlegel, 1845)",
+          "country": "China",
+          "eventDate": "2026-01-16T22:37",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/608433674/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/608433674",
+          "creator": "阿白",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6130753974,
+          "acceptedScientificName": "Planiliza haematocheila (Temminck & Schlegel, 1845)",
+          "country": "China",
+          "eventDate": "2026-01-16T22:37",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/608433666/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/608433666",
+          "creator": "阿白",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6130753974,
+          "acceptedScientificName": "Planiliza haematocheila (Temminck & Schlegel, 1845)",
+          "country": "China",
+          "eventDate": "2026-01-16T22:37",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/608433675/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/608433675",
+          "creator": "阿白",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6130753974,
+          "acceptedScientificName": "Planiliza haematocheila (Temminck & Schlegel, 1845)",
+          "country": "China",
+          "eventDate": "2026-01-16T22:37",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/608433706/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/608433706",
+          "creator": "阿白",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6130753974,
+          "acceptedScientificName": "Planiliza haematocheila (Temminck & Schlegel, 1845)",
+          "country": "China",
+          "eventDate": "2026-01-16T22:37",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/608433707/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/608433707",
+          "creator": "阿白",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 41,
+      "nameKo": "전어",
+      "scientificName": "Konosirus punctatus",
+      "gbifTaxonKey": 2413040,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6179332353,
+          "acceptedScientificName": "Konosirus punctatus (Temminck & Schlegel, 1846)",
+          "country": "China",
+          "eventDate": "2026-03-12T14:52:21",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/624140997/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/624140997",
+          "creator": "fhvc",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6179551192,
+          "acceptedScientificName": "Konosirus punctatus (Temminck & Schlegel, 1846)",
+          "country": "Japan",
+          "eventDate": "2026-03-15T13:40:23",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/624921008/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/624921008",
+          "creator": "mmmona30",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6184814774,
+          "acceptedScientificName": "Konosirus punctatus (Temminck & Schlegel, 1846)",
+          "country": "China",
+          "eventDate": "2026-03-12T14:42:39",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/624138700/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/624138700",
+          "creator": "fhvc",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6195508914,
+          "acceptedScientificName": "Konosirus punctatus (Temminck & Schlegel, 1846)",
+          "country": "China",
+          "eventDate": "2026-04-11T14:40:06",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/636492136/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/636492136",
+          "creator": "orcinusss",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6195640180,
+          "acceptedScientificName": "Konosirus punctatus (Temminck & Schlegel, 1846)",
+          "country": "China",
+          "eventDate": "2026-04-11T14:45:24",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/636482206/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/636482206",
+          "creator": "orcinusss",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 42,
+      "nameKo": "꽁치",
+      "scientificName": "Cololabis saira",
+      "gbifTaxonKey": 2369261,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 5231326201,
+          "acceptedScientificName": "Cololabis saira (Brevoort, 1856)",
+          "country": "United States of America",
+          "eventDate": "2025-07-19T07:39",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/540147882/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/540147882",
+          "creator": "toastysn",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5759961292,
+          "acceptedScientificName": "Cololabis saira (Brevoort, 1856)",
+          "country": "United States of America",
+          "eventDate": "2025-08-25T09:48",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/557869505/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/557869505",
+          "creator": "Liam Hutcheson",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5935350424,
+          "acceptedScientificName": "Cololabis saira (Brevoort, 1856)",
+          "country": "United States of America",
+          "eventDate": "2025-08-28T23:23:13",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/601698318/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/601698318",
+          "creator": "Adam",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6251913951,
+          "acceptedScientificName": "Cololabis saira (Brevoort, 1856)",
+          "country": "United States of America",
+          "eventDate": "2025-08-28T20:57:39",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/649716535/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/649716535",
+          "creator": "jacob",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6251913951,
+          "acceptedScientificName": "Cololabis saira (Brevoort, 1856)",
+          "country": "United States of America",
+          "eventDate": "2025-08-28T20:57:39",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/649716544/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/649716544",
+          "creator": "jacob",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 43,
+      "nameKo": "쥐치",
+      "scientificName": "Stephanolepis cirrhifer (Temminck & Schlegel, 1850)",
+      "gbifTaxonKey": 5213457,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6399250815,
+          "acceptedScientificName": "Stephanolepis cirrhifer (Temminck & Schlegel, 1850)",
+          "country": "Hong Kong",
+          "eventDate": "2026-03-28T21:26",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/675870120/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/675870120",
+          "creator": "LEE Yeung, Gabriel",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6235776482,
+          "acceptedScientificName": "Stephanolepis cirrhifer (Temminck & Schlegel, 1850)",
+          "country": "Hong Kong",
+          "eventDate": "2026-04-26T12:35:40",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/647297793/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/647297793",
+          "creator": "justinemmarie",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6422699056,
+          "acceptedScientificName": "Stephanolepis cirrhifer (Temminck & Schlegel, 1850)",
+          "country": "Japan",
+          "eventDate": "2026-04-12T06:59",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/685577702/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/685577702",
+          "creator": "Jodie",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6273355175,
+          "acceptedScientificName": "Stephanolepis cirrhifer (Temminck & Schlegel, 1850)",
+          "country": "Hong Kong",
+          "eventDate": "2026-05-09T14:53:11",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/657252237/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/657252237",
+          "creator": "ST",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6352380046,
+          "acceptedScientificName": "Stephanolepis cirrhifer (Temminck & Schlegel, 1850)",
+          "country": "Hong Kong",
+          "eventDate": "2026-05-31T13:26:22",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/670155196/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/670155196",
+          "creator": "Josy Lai",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 44,
+      "nameKo": "말쥐치",
+      "scientificName": "Thamnaconus modestus (Günther, 1877)",
+      "gbifTaxonKey": 2406652,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6131035987,
+          "acceptedScientificName": "Thamnaconus modestus (Günther, 1877)",
+          "country": "China",
+          "eventDate": "2026-01-19T15:53:14",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/609157999/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/609157999",
+          "creator": "李博恒",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6131035987,
+          "acceptedScientificName": "Thamnaconus modestus (Günther, 1877)",
+          "country": "China",
+          "eventDate": "2026-01-19T15:53:14",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/609158003/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/609158003",
+          "creator": "李博恒",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6131035987,
+          "acceptedScientificName": "Thamnaconus modestus (Günther, 1877)",
+          "country": "China",
+          "eventDate": "2026-01-19T15:53:14",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/609158129/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/609158129",
+          "creator": "李博恒",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6163400354,
+          "acceptedScientificName": "Thamnaconus modestus (Günther, 1877)",
+          "country": "China",
+          "eventDate": "2026-02-21T15:40:42",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/617789797/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/617789797",
+          "creator": "李博恒",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6195390985,
+          "acceptedScientificName": "Thamnaconus modestus (Günther, 1877)",
+          "country": "China",
+          "eventDate": "2026-04-11T14:49:38",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/636479966/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/636479966",
+          "creator": "orcinusss",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 45,
+      "nameKo": "복섬",
+      "scientificName": "Takifugu niphobles (Jordan & Snyder, 1901)",
+      "gbifTaxonKey": 2407534,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 1912820330,
+          "acceptedScientificName": "Takifugu niphobles (Jordan & Snyder, 1901)",
+          "country": "Japan",
+          "eventDate": "2018-03-30",
+          "imageUrl": "http://ffish.asia/index.php?p=none&o=sspm&id=32718",
+          "sourceUrl": "http://ffish.asia/index.php?p=none&o=sspm&id=32718",
+          "creator": "Yuichi Kano",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 1902184585,
+          "acceptedScientificName": "Takifugu niphobles (Jordan & Snyder, 1901)",
+          "country": "Japan",
+          "eventDate": "2017-05-29",
+          "imageUrl": "http://ffish.asia/index.php?p=none&o=sspm&id=32276",
+          "sourceUrl": "http://ffish.asia/index.php?p=none&o=sspm&id=32276",
+          "creator": "Yuichi Kano",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 1902184639,
+          "acceptedScientificName": "Takifugu niphobles (Jordan & Snyder, 1901)",
+          "country": "Japan",
+          "eventDate": "2017-05-29",
+          "imageUrl": "http://ffish.asia/index.php?p=none&o=sspm&id=32277",
+          "sourceUrl": "http://ffish.asia/index.php?p=none&o=sspm&id=32277",
+          "creator": "Yuichi Kano",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 1912820345,
+          "acceptedScientificName": "Takifugu niphobles (Jordan & Snyder, 1901)",
+          "country": "Japan",
+          "eventDate": "2017-11-09",
+          "imageUrl": "http://ffish.asia/index.php?p=none&o=sspm&id=32688",
+          "sourceUrl": "http://ffish.asia/index.php?p=none&o=sspm&id=32688",
+          "creator": "Yuichi Kano",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 1912820351,
+          "acceptedScientificName": "Takifugu niphobles (Jordan & Snyder, 1901)",
+          "country": "Japan",
+          "eventDate": "2017-11-14",
+          "imageUrl": "http://ffish.asia/index.php?p=none&o=sspm&id=32693",
+          "sourceUrl": "http://ffish.asia/index.php?p=none&o=sspm&id=32693",
+          "creator": "Yuichi Kano",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 46,
+      "nameKo": "붕장어",
+      "scientificName": "Conger myriaster (Brevoort, 1856)",
+      "gbifTaxonKey": 2403530,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6130042183,
+          "acceptedScientificName": "Conger myriaster (Brevoort, 1856)",
+          "country": "China",
+          "eventDate": "2026-01-15T16:28",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/609774973/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/609774973",
+          "creator": "虹",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6185118428,
+          "acceptedScientificName": "Conger myriaster (Brevoort, 1856)",
+          "country": "China",
+          "eventDate": "2026-03-27T12:39",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/629648745/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/629648745",
+          "creator": "虹",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6399492931,
+          "acceptedScientificName": "Conger myriaster (Brevoort, 1856)",
+          "country": "China",
+          "eventDate": "2026-06-10T19:22:03",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/676463344/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/676463344",
+          "creator": "虹",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5063448161,
+          "acceptedScientificName": "Conger myriaster (Brevoort, 1856)",
+          "country": "China",
+          "eventDate": "2025-01-27T15:23:28",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/466327146/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/466327146",
+          "creator": "JIN Pin-Tsen",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5063699145,
+          "acceptedScientificName": "Conger myriaster (Brevoort, 1856)",
+          "country": "China",
+          "eventDate": "2025-02-01T19:05:07",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/467326459/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/467326459",
+          "creator": "JIN Pin-Tsen",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 47,
+      "nameKo": "꼬치고기",
+      "scientificName": "Sphyraena pinguis Günther, 1874",
+      "gbifTaxonKey": 2394230,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6131348368,
+          "acceptedScientificName": "Sphyraena pinguis Günther, 1874",
+          "country": "China",
+          "eventDate": "2026-01-13T10:53:03",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/607600893/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/607600893",
+          "creator": "JIN Pin-Tsen",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5827601904,
+          "acceptedScientificName": "Sphyraena pinguis Günther, 1874",
+          "country": "China",
+          "eventDate": "2025-09-07T09:56:47",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/564420631/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/564420631",
+          "creator": "orcinusss",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5827601904,
+          "acceptedScientificName": "Sphyraena pinguis Günther, 1874",
+          "country": "China",
+          "eventDate": "2025-09-07T09:56:47",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/564422076/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/564422076",
+          "creator": "orcinusss",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5827800446,
+          "acceptedScientificName": "Sphyraena pinguis Günther, 1874",
+          "country": "China",
+          "eventDate": "2025-09-07T10:16:33",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/563960253/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/563960253",
+          "creator": "orcinusss",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5827911102,
+          "acceptedScientificName": "Sphyraena pinguis Günther, 1874",
+          "country": "China",
+          "eventDate": "2025-09-07T10:25:52",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/563535527/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/563535527",
+          "creator": "zgy",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 48,
+      "nameKo": "학공치",
+      "scientificName": "Hyporhamphus sajori",
+      "gbifTaxonKey": 2368929,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 5760988919,
+          "acceptedScientificName": "Hyporhamphus sajori (Temminck & Schlegel, 1846)",
+          "country": "Russian Federation",
+          "eventDate": "2025-07-16T15:40:52",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/537433830/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/537433830",
+          "creator": "Alexandra",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5890429116,
+          "acceptedScientificName": "Hyporhamphus sajori (Temminck & Schlegel, 1846)",
+          "country": "Russian Federation",
+          "eventDate": "2025-07-01T18:47",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/549275790/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/549275790",
+          "creator": "Глеб Колесников",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5920187465,
+          "acceptedScientificName": "Hyporhamphus sajori (Temminck & Schlegel, 1846)",
+          "country": "Russian Federation",
+          "eventDate": "2025-07-06T18:54:07",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/533258195/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/533258195",
+          "creator": "alexey_tat",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5282271947,
+          "acceptedScientificName": "Hyporhamphus sajori (Temminck & Schlegel, 1846)",
+          "country": "China",
+          "eventDate": "2025-08-03T19:01:23",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/546816512/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/546816512",
+          "creator": "Guanning Liu",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5292015647,
+          "acceptedScientificName": "Hyporhamphus sajori (Temminck & Schlegel, 1846)",
+          "country": "Russian Federation",
+          "eventDate": "2025-08-07T11:52:36",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/548720700/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/548720700",
+          "creator": "Dmitrii Mostovoi",
+          "license": "http://creativecommons.org/licenses/by/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 49,
+      "nameKo": "보리멸",
+      "scientificName": "Sillago japonica",
+      "gbifTaxonKey": 2391948,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6320469387,
+          "acceptedScientificName": "Sillago japonica Temminck & Schlegel, 1843",
+          "country": "Japan",
+          "eventDate": "2026-05-13T18:49:45",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/659338459/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/659338459",
+          "creator": "Tomioka Masafumi",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6400462853,
+          "acceptedScientificName": "Sillago japonica Temminck & Schlegel, 1843",
+          "country": "Japan",
+          "eventDate": "2026-05-24T12:34:15",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/673921775/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/673921775",
+          "creator": "gisshin",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6422457595,
+          "acceptedScientificName": "Sillago japonica Temminck & Schlegel, 1843",
+          "country": "Japan",
+          "eventDate": "2026-06-19T13:34:21",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/685611955/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/685611955",
+          "creator": "IHUNTA",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5087904639,
+          "acceptedScientificName": "Sillago japonica Temminck & Schlegel, 1843",
+          "country": "China",
+          "eventDate": "2025-03-08T18:44:41",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/474962834/original.jpeg",
+          "sourceUrl": "https://www.inaturalist.org/photos/474962834",
+          "creator": "游魂",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5153128891,
+          "acceptedScientificName": "Sillago japonica Temminck & Schlegel, 1843",
+          "country": "Japan",
+          "eventDate": "2025-04-30T14:49:16",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/497777202/original.jpeg",
+          "sourceUrl": "https://www.inaturalist.org/photos/497777202",
+          "creator": "akio.suzuki",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 50,
+      "nameKo": "양태",
+      "scientificName": "Platycephalus indicus",
+      "gbifTaxonKey": 5201390,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6131454587,
+          "acceptedScientificName": "Platycephalus indicus (Linnaeus, 1758)",
+          "country": "Singapore",
+          "eventDate": "2026-01-04T11:32:26",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605372590/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/605372590",
+          "creator": "sharkdevotee",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6131454587,
+          "acceptedScientificName": "Platycephalus indicus (Linnaeus, 1758)",
+          "country": "Singapore",
+          "eventDate": "2026-01-04T11:32:26",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605372601/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/605372601",
+          "creator": "sharkdevotee",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6187936450,
+          "acceptedScientificName": "Platycephalus indicus (Linnaeus, 1758)",
+          "country": "South Africa",
+          "eventDate": "2026-03-01T12:25:01",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/632251059/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/632251059",
+          "creator": "cameronorban11",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6252456578,
+          "acceptedScientificName": "Platycephalus indicus (Linnaeus, 1758)",
+          "country": "South Africa",
+          "eventDate": "2026-04-08T14:04:22",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/635189585/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/635189585",
+          "creator": "Mark Brown",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6252456578,
+          "acceptedScientificName": "Platycephalus indicus (Linnaeus, 1758)",
+          "country": "South Africa",
+          "eventDate": "2026-04-08T14:04:22",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/635189580/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/635189580",
+          "creator": "Mark Brown",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 51,
+      "nameKo": "독가시치",
+      "scientificName": "Siganus fuscescens",
+      "gbifTaxonKey": 2390191,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6129977857,
+          "acceptedScientificName": "Siganus fuscescens (Houttuyn, 1782)",
+          "country": "New Caledonia",
+          "eventDate": "2026-01-24T09:37",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/610638623/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/610638623",
+          "creator": "Carole BERNARD",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6129979949,
+          "acceptedScientificName": "Siganus fuscescens (Houttuyn, 1782)",
+          "country": "Philippines",
+          "eventDate": "2026-01-11T09:53:59",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/607138493/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/607138493",
+          "creator": "ae201",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6130035234,
+          "acceptedScientificName": "Siganus fuscescens (Houttuyn, 1782)",
+          "country": "Hong Kong",
+          "eventDate": "2026-01-05T11:52:19",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605602578/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/605602578",
+          "creator": "Yifei",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6130978613,
+          "acceptedScientificName": "Siganus fuscescens (Houttuyn, 1782)",
+          "country": "Australia",
+          "eventDate": "2026-01-10T08:20:46",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/606723983/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/606723983",
+          "creator": "Jay Milburn",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6131004669,
+          "acceptedScientificName": "Siganus fuscescens (Houttuyn, 1782)",
+          "country": "China",
+          "eventDate": "2026-01-17T09:39:36",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/608518276/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/608518276",
+          "creator": "zzy369",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 52,
+      "nameKo": "자리돔",
+      "scientificName": "Chromis notata",
+      "gbifTaxonKey": 5212205,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6130930458,
+          "acceptedScientificName": "Chromis notata (Temminck & Schlegel, 1843)",
+          "country": "Hong Kong",
+          "eventDate": "2026-01-18T12:57:25",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/609415054/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/609415054",
+          "creator": "Yifei",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6159233115,
+          "acceptedScientificName": "Chromis notata (Temminck & Schlegel, 1843)",
+          "country": "Hong Kong",
+          "eventDate": "2026-02-15T10:23:25",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/616353958/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/616353958",
+          "creator": "Lily Yeung",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6159233115,
+          "acceptedScientificName": "Chromis notata (Temminck & Schlegel, 1843)",
+          "country": "Hong Kong",
+          "eventDate": "2026-02-15T10:23:25",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/616353969/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/616353969",
+          "creator": "Lily Yeung",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6162768358,
+          "acceptedScientificName": "Chromis notata (Temminck & Schlegel, 1843)",
+          "country": "Hong Kong",
+          "eventDate": "2026-02-15T10:22",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/617301693/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/617301693",
+          "creator": "dod_od",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6162824509,
+          "acceptedScientificName": "Chromis notata (Temminck & Schlegel, 1843)",
+          "country": "Hong Kong",
+          "eventDate": "2026-02-15T10:24",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/617301626/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/617301626",
+          "creator": "dod_od",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 53,
+      "nameKo": "살오징어",
+      "scientificName": "Todarodes pacificus",
+      "gbifTaxonKey": 2290498,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6195615531,
+          "acceptedScientificName": "Todarodes pacificus (Steenstrup, 1880)",
+          "country": "China",
+          "eventDate": "2026-04-11T14:37:30",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/636859856/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/636859856",
+          "creator": "orcinusss",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 4851756027,
+          "acceptedScientificName": "Todarodes pacificus (Steenstrup, 1880)",
+          "country": "Japan",
+          "eventDate": "2024-04-22T20:45:32",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/369251573/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/369251573",
+          "creator": "Dhugal Lindsay",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 4852837146,
+          "acceptedScientificName": "Todarodes pacificus (Steenstrup, 1880)",
+          "country": "Japan",
+          "eventDate": "2024-04-21T19:14:34",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/368823708/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/368823708",
+          "creator": "Dhugal Lindsay",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5177161476,
+          "acceptedScientificName": "Todarodes pacificus (Steenstrup, 1880)",
+          "country": "Chinese Taipei",
+          "eventDate": "2024-08-26T19:09",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/425489740/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/425489740",
+          "creator": "胡正恆(Jackson Hu)",
+          "license": "http://creativecommons.org/licenses/by/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5177161476,
+          "acceptedScientificName": "Todarodes pacificus (Steenstrup, 1880)",
+          "country": "Chinese Taipei",
+          "eventDate": "2024-08-26T19:09",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/425489759/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/425489759",
+          "creator": "胡正恆(Jackson Hu)",
+          "license": "http://creativecommons.org/licenses/by/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 54,
+      "nameKo": "참갑오징어",
+      "scientificName": "Acanthosepion esculentum",
+      "gbifTaxonKey": 12193375,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6178964805,
+          "acceptedScientificName": "Acanthosepion esculentum (Hoyle, 1885)",
+          "country": "China",
+          "eventDate": "2026-03-14T18:34:53",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/624485605/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/624485605",
+          "creator": "lucky fair",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6179080768,
+          "acceptedScientificName": "Acanthosepion esculentum (Hoyle, 1885)",
+          "country": "China",
+          "eventDate": "2026-03-12T10:44:43",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/623785144/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/623785144",
+          "creator": "Vladislav Isaev",
+          "license": "http://creativecommons.org/licenses/by/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6179080768,
+          "acceptedScientificName": "Acanthosepion esculentum (Hoyle, 1885)",
+          "country": "China",
+          "eventDate": "2026-03-12T10:44:43",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/623861758/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/623861758",
+          "creator": "Vladislav Isaev",
+          "license": "http://creativecommons.org/licenses/by/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6179080768,
+          "acceptedScientificName": "Acanthosepion esculentum (Hoyle, 1885)",
+          "country": "China",
+          "eventDate": "2026-03-12T10:44:43",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/623861623/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/623861623",
+          "creator": "Vladislav Isaev",
+          "license": "http://creativecommons.org/licenses/by/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6179080768,
+          "acceptedScientificName": "Acanthosepion esculentum (Hoyle, 1885)",
+          "country": "China",
+          "eventDate": "2026-03-12T10:44:43",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/623861700/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/623861700",
+          "creator": "Vladislav Isaev",
+          "license": "http://creativecommons.org/licenses/by/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 55,
+      "nameKo": "흰꼴뚜기",
+      "scientificName": "Sepioteuthis lessoniana",
+      "gbifTaxonKey": 8920970,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 5938032704,
+          "acceptedScientificName": "Sepioteuthis lessoniana d'Orbigny, 1826",
+          "country": "Australia",
+          "eventDate": "2026-01-02T20:10",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605303907/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/605303907",
+          "creator": "lcuppett",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5938032704,
+          "acceptedScientificName": "Sepioteuthis lessoniana d'Orbigny, 1826",
+          "country": "Australia",
+          "eventDate": "2026-01-02T20:10",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605303908/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/605303908",
+          "creator": "lcuppett",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5938233568,
+          "acceptedScientificName": "Sepioteuthis lessoniana d'Orbigny, 1826",
+          "country": "Australia",
+          "eventDate": "2026-01-01T10:35:28",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/604344461/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/604344461",
+          "creator": "majcki",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5938625940,
+          "acceptedScientificName": "Sepioteuthis lessoniana d'Orbigny, 1826",
+          "country": "Singapore",
+          "eventDate": "2026-01-04T18:00",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605579031/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/605579031",
+          "creator": "Axl P.",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5938625940,
+          "acceptedScientificName": "Sepioteuthis lessoniana d'Orbigny, 1826",
+          "country": "Singapore",
+          "eventDate": "2026-01-04T18:00",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605579028/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/605579028",
+          "creator": "Axl P.",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 56,
+      "nameKo": "창꼴뚜기",
+      "scientificName": "Uroteuthis edulis",
+      "gbifTaxonKey": 2290290,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 4952413931,
+          "acceptedScientificName": "Uroteuthis edulis (Hoyle, 1885)",
+          "country": "India",
+          "eventDate": "2024-09-15T07:50:07",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/430974582/original.jpeg",
+          "sourceUrl": "https://www.inaturalist.org/photos/430974582",
+          "creator": "Ashwit Shetty",
+          "license": "http://creativecommons.org/licenses/by/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 4952413931,
+          "acceptedScientificName": "Uroteuthis edulis (Hoyle, 1885)",
+          "country": "India",
+          "eventDate": "2024-09-15T07:50:07",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/430974633/original.jpeg",
+          "sourceUrl": "https://www.inaturalist.org/photos/430974633",
+          "creator": "Ashwit Shetty",
+          "license": "http://creativecommons.org/licenses/by/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 4952413931,
+          "acceptedScientificName": "Uroteuthis edulis (Hoyle, 1885)",
+          "country": "India",
+          "eventDate": "2024-09-15T07:50:07",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/430974657/original.jpeg",
+          "sourceUrl": "https://www.inaturalist.org/photos/430974657",
+          "creator": "Ashwit Shetty",
+          "license": "http://creativecommons.org/licenses/by/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6130945666,
+          "acceptedScientificName": "Uroteuthis edulis (Hoyle, 1885)",
+          "country": "Australia",
+          "eventDate": "2021-06-13T21:39:34",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/607076153/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/607076153",
+          "creator": "Nicolò Palumbo",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6130945666,
+          "acceptedScientificName": "Uroteuthis edulis (Hoyle, 1885)",
+          "country": "Australia",
+          "eventDate": "2021-06-13T21:39:34",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/607076147/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/607076147",
+          "creator": "Nicolò Palumbo",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 57,
+      "nameKo": "주꾸미",
+      "scientificName": "Amphioctopus fangsiao",
+      "gbifTaxonKey": 5856038,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6179126949,
+          "acceptedScientificName": "Amphioctopus fangsiao (d'Orbigny, 1839)",
+          "country": "China",
+          "eventDate": "2026-03-12T15:58",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/623846653/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/623846653",
+          "creator": "orcinusss",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6398790260,
+          "acceptedScientificName": "Amphioctopus fangsiao (d'Orbigny, 1839)",
+          "country": "Japan",
+          "eventDate": "2026-06-01T08:01:37",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/672273630/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/672273630",
+          "creator": "akio.suzuki",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6398790260,
+          "acceptedScientificName": "Amphioctopus fangsiao (d'Orbigny, 1839)",
+          "country": "Japan",
+          "eventDate": "2026-06-01T08:01:37",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/672273674/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/672273674",
+          "creator": "akio.suzuki",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6398790260,
+          "acceptedScientificName": "Amphioctopus fangsiao (d'Orbigny, 1839)",
+          "country": "Japan",
+          "eventDate": "2026-06-01T08:01:37",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/672273728/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/672273728",
+          "creator": "akio.suzuki",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 6398790260,
+          "acceptedScientificName": "Amphioctopus fangsiao (d'Orbigny, 1839)",
+          "country": "Japan",
+          "eventDate": "2026-06-01T08:01:37",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/672273776/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/672273776",
+          "creator": "akio.suzuki",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 58,
+      "nameKo": "낙지",
+      "scientificName": "Octopus minor",
+      "gbifTaxonKey": 2289697,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 6188287376,
+          "acceptedScientificName": "Octopus minor (Sasaki, 1920)",
+          "country": "China",
+          "eventDate": "2026-04-04T13:30:33",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/634619066/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/634619066",
+          "creator": "fhvc",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 4438986521,
+          "acceptedScientificName": "Octopus minor (Sasaki, 1920)",
+          "country": "China",
+          "eventDate": "2023-11-04T11:25:25",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/333142917/original.jpeg",
+          "sourceUrl": "https://www.inaturalist.org/photos/333142917",
+          "creator": "Julie",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 1057293874,
+          "acceptedScientificName": "Octopus minor (Sasaki, 1920)",
+          "country": "Japan",
+          "eventDate": "1991-07-20",
+          "imageUrl": "https://data.nhm.ac.uk/media/f449a63c-530b-47e1-9c06-3cfd3a052504",
+          "sourceUrl": "https://www.gbif.org/occurrence/1057293874",
+          "creator": "James Ayre",
+          "license": "http://creativecommons.org/licenses/by/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": "inat-364576852",
+          "acceptedScientificName": "Octopus minor (Sasaki, 1920)",
+          "country": "Japan",
+          "eventDate": null,
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/665568853/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/observations/364576852",
+          "creator": "Tomioka Masafumi",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": "inat-349726994",
+          "acceptedScientificName": "Octopus minor (Sasaki, 1920)",
+          "country": null,
+          "eventDate": null,
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/638015281/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/observations/349726994",
+          "creator": "orcinusss",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 59,
+      "nameKo": "참문어",
+      "scientificName": "Octopus vulgaris",
+      "gbifTaxonKey": 2289671,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 5938070861,
+          "acceptedScientificName": "Octopus vulgaris Cuvier, 1797",
+          "country": "Spain",
+          "eventDate": "2026-01-02T11:16",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/604834278/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/604834278",
+          "creator": "Susanne Spindler",
+          "license": "http://creativecommons.org/licenses/by-nc-nd/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5938110934,
+          "acceptedScientificName": "Octopus vulgaris Cuvier, 1797",
+          "country": "Spain",
+          "eventDate": "2026-01-02T09:17",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605692122/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/605692122",
+          "creator": "Juan Rodríguez",
+          "license": "http://creativecommons.org/licenses/by/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5938110934,
+          "acceptedScientificName": "Octopus vulgaris Cuvier, 1797",
+          "country": "Spain",
+          "eventDate": "2026-01-02T09:17",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605692121/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/605692121",
+          "creator": "Juan Rodríguez",
+          "license": "http://creativecommons.org/licenses/by/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5938118569,
+          "acceptedScientificName": "Octopus vulgaris Cuvier, 1797",
+          "country": "Spain",
+          "eventDate": "2026-01-03T10:32",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605134837/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/605134837",
+          "creator": "Susanne Spindler",
+          "license": "http://creativecommons.org/licenses/by-nc-nd/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5938199852,
+          "acceptedScientificName": "Octopus vulgaris Cuvier, 1797",
+          "country": "Portugal",
+          "eventDate": "2026-01-03T08:52:52Z",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605017671/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/605017671",
+          "creator": "Carlo M. Cunha",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    },
+    {
+      "sort": 60,
+      "nameKo": "대문어",
+      "scientificName": "Enteroctopus dofleini",
+      "gbifTaxonKey": 2289485,
+      "candidateCount": 5,
+      "candidates": [
+        {
+          "occurrenceKey": 5938479859,
+          "acceptedScientificName": "Enteroctopus dofleini (Wülker, 1910)",
+          "country": "United States of America",
+          "eventDate": "2026-01-03T21:38",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605291583/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/605291583",
+          "creator": "JA Fields",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5938479859,
+          "acceptedScientificName": "Enteroctopus dofleini (Wülker, 1910)",
+          "country": "United States of America",
+          "eventDate": "2026-01-03T21:38",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605291592/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/605291592",
+          "creator": "JA Fields",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5938479859,
+          "acceptedScientificName": "Enteroctopus dofleini (Wülker, 1910)",
+          "country": "United States of America",
+          "eventDate": "2026-01-03T21:38",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605291622/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/605291622",
+          "creator": "JA Fields",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5938479859,
+          "acceptedScientificName": "Enteroctopus dofleini (Wülker, 1910)",
+          "country": "United States of America",
+          "eventDate": "2026-01-03T21:38",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605291635/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/605291635",
+          "creator": "JA Fields",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        },
+        {
+          "occurrenceKey": 5938479859,
+          "acceptedScientificName": "Enteroctopus dofleini (Wülker, 1910)",
+          "country": "United States of America",
+          "eventDate": "2026-01-03T21:38",
+          "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605291768/original.jpg",
+          "sourceUrl": "https://www.inaturalist.org/photos/605291768",
+          "creator": "JA Fields",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "reviewStatus": "pending"
+        }
+      ]
+    }
+  ]
+}

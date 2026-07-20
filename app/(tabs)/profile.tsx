@@ -10,7 +10,7 @@ import { ArchiveTabHeader } from "@/components/design/ArchiveTabHeader";
 import { FIELD_COLORS, bodySemiBoldFont, monoFont } from "@/src/theme/fieldJournal";
 
 const HARBOR_IMAGE = require("@/assets/images/design/daecheon-harbor.png");
-const PROFILE_IMAGE = require("@/assets/images/design/profile-angler.png");
+const PROFILE_IMAGE = require("@/assets/images/adaptive-icon-baited.png");
 
 const ProfileRow = ({ icon, label, color = FIELD_COLORS.ink, onPress }: { icon: React.ComponentProps<typeof FontAwesome>["name"]; label: string; color?: string; onPress?: () => void }) => (
   <TouchableOpacity onPress={onPress} disabled={!onPress} className="flex-row items-center border-b px-3 py-4" style={{ borderColor: FIELD_COLORS.rule }}>
@@ -36,6 +36,10 @@ const ProfileScreen = () => {
     session?.user?.user_metadata?.display_name ??
     session?.user?.user_metadata?.full_name ??
     null;
+  const avatarUrl =
+    typeof session?.user?.user_metadata?.avatar_url === "string"
+      ? session.user.user_metadata.avatar_url
+      : null;
 
   const handleSignOut = () => Alert.alert("로그아웃", "현재 계정에서 로그아웃할까요?", [{ text: "취소", style: "cancel" }, { text: "로그아웃", style: "destructive", onPress: async () => { await signOut(); router.replace("/(auth)/login"); } }]);
 
@@ -47,11 +51,16 @@ const ProfileScreen = () => {
   const name = displayName ?? email?.split("@")[0] ?? "바다형제";
 
   return <ScrollView className="flex-1" style={{ paddingTop: insets.top, backgroundColor: FIELD_COLORS.foam }} contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}>
-    <ArchiveTabHeader title="프로필" actionLabel="설정" backgroundColor={FIELD_COLORS.foam} />
+    <ArchiveTabHeader
+      title="프로필"
+      actionLabel="설정"
+      backgroundColor={FIELD_COLORS.foam}
+      onAction={() => router.push("/settings")}
+    />
     <View className="px-7">
       <View className="flex-row items-center py-7">
         <Image
-          source={PROFILE_IMAGE}
+          source={avatarUrl ? { uri: avatarUrl } : PROFILE_IMAGE}
           resizeMode="cover"
           style={{ width: 96, height: 96, borderRadius: 48 }}
         />
@@ -61,12 +70,23 @@ const ProfileScreen = () => {
       <View className="flex-row py-5">{[["수집 어종", unlockedFishIds.size], ["조과 기록", catches.length], ["완료 출조", doneTrips]].map(([label, value], index) => <View key={String(label)} className={`flex-1 items-center ${index ? "border-l" : ""}`} style={{ borderColor: FIELD_COLORS.rule }}><Text className="text-sm font-semibold" style={{ color: FIELD_COLORS.ink }}>{label}</Text><Text className="mt-1 text-[40px] font-black" style={{ color: FIELD_COLORS.ink }}>{value}</Text></View>)}</View>
       <ArchiveRule />
       <Text className="mb-1 mt-6 text-xl font-black" style={{ color: FIELD_COLORS.ink }}>나의 기록</Text>
-      <ProfileRow icon="address-card-o" label="내 조과 카드" />
+      <ProfileRow
+        icon="address-card-o"
+        label="내 조과 카드"
+        onPress={() =>
+          router.push({
+            pathname: "/(tabs)/encyclopedia",
+            params: { segment: "cards" },
+          })
+        }
+      />
       <ProfileRow icon="calendar-check-o" label="완료한 출조" onPress={() => router.push("/(tabs)/journal")} />
-      <ProfileRow icon="map-marker" label="저장한 장소" />
+      <ProfileRow icon="map-marker" label="저장한 장소" onPress={() => router.push("/places")} />
       <Text className="mb-1 mt-7 text-xl font-black" style={{ color: FIELD_COLORS.ink }}>계정</Text>
-      <ProfileRow icon="user-o" label="프로필 수정" />
-      <ProfileRow icon="bell-o" label="알림 설정" />
+      <ProfileRow icon="user-o" label="프로필 수정" onPress={() => router.push("/settings/profile")} />
+      <ProfileRow icon="bell-o" label="알림 설정" onPress={() => router.push("/settings/notifications")} />
+      <ProfileRow icon="shield" label="개인정보 처리방침" onPress={() => router.push("/privacy")} />
+      {session ? <ProfileRow icon="user-times" label="계정 탈퇴" color={FIELD_COLORS.red} onPress={() => router.push("/account/delete")} /> : null}
       {session ? <ProfileRow icon="sign-out" label="로그아웃" color={FIELD_COLORS.orange} onPress={handleSignOut} /> : <ProfileRow icon="sign-in" label="로그인" color={FIELD_COLORS.teal} onPress={handleGoLogin} />}
       <Text className="mt-8 text-[11px] tracking-[1.5px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>LAST FIELD NOTE · 2026.07.06 · 대천항</Text>
       <View className="mt-3 overflow-hidden rounded-lg">

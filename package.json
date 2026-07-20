@@ -20,7 +20,23 @@
     "review:core-taxonomy": "ts-node scripts/review-core-taxonomy.ts",
     "review:core-regulations": "ts-node scripts/review-core-regulations.ts",
     "review:core-rarity": "ts-node scripts/review-core-rarity.ts",
-    "review:core-cephalopods": "ts-node scripts/review-core-cephalopods.ts"
+    "review:core-cephalopods": "ts-node scripts/review-core-cephalopods.ts",
+    "qa:fish-recognition": "ts-node scripts/evaluate-fish-recognition.ts",
+    "qa:account-deletion": "ts-node scripts/test-account-deletion.ts",
+    "qa:collect-photo-candidates": "ts-node scripts/collect-fish-photo-candidates.ts",
+    "qa:collect-gbif-candidates": "ts-node scripts/collect-gbif-photo-candidates.ts",
+    "qa:prepare-rejection-data": "ts-node scripts/prepare-rejection-dataset.ts",
+    "qa:smoke-rejection": "ts-node scripts/smoke-test-fish-rejection.ts",
+    "test": "jest",
+    "test:ci": "jest --runInBand --ci --no-watchman",
+    "typecheck": "tsc --noEmit"
+  },
+  "jest": {
+    "preset": "jest-expo",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/supabase/functions/"
+    ]
   },
   "dependencies": {
     "@expo-google-fonts/anton": "0.4.2",
@@ -45,8 +61,8 @@
     "expo-secure-store": "~15.0.8",
     "expo-splash-screen": "~31.0.13",
     "expo-status-bar": "~3.0.9",
-    "expo-web-browser": "~15.0.10",
-    "lottie-react-native": "7.1.0",
+    "expo-web-browser": "~15.0.11",
+    "lottie-react-native": "~7.3.1",
     "nativewind": "^4.2.2",
     "react": "19.1.0",
     "react-dom": "19.1.0",
@@ -60,15 +76,19 @@
     "react-native-worklets": "0.5.1"
   },
   "devDependencies": {
+    "@types/jest": "29.5.14",
     "@types/react": "~19.1.0",
-    "babel-preset-expo": "~13.0.0",
+    "babel-preset-expo": "~54.0.10",
     "dotenv": "17.3.1",
-    "fast-xml-parser": "5.3.6",
+    "fast-xml-parser": "5.10.1",
+    "jest": "29.7.0",
+    "jest-expo": "54.0.17",
     "prettier-plugin-tailwindcss": "^0.5.11",
     "react-test-renderer": "19.1.0",
     "tailwindcss": "^3.4.17",
     "ts-node": "10.9.2",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "ws": "7.5.11"
   },
   "private": true
 }

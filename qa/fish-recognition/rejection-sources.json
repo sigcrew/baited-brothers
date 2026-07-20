@@ -1,0 +1,488 @@
+{
+  "generatedAt": "2026-07-19T22:25:40.839Z",
+  "notice": "비어류 원본의 출처·라이선스와 저품질 파생 조건입니다. 공개 배포 전 라이선스를 재검토하세요.",
+  "nonFish": [
+    {
+      "id": "non-fish-cat-01",
+      "category": "cat",
+      "sourceUrl": "https://www.inaturalist.org/photos/604715008",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/604715008/original.jpg",
+      "title": "Felis catus Linnaeus, 1758",
+      "creator": "Adrian Wang",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-cat-01.jpg"
+    },
+    {
+      "id": "non-fish-cat-02",
+      "category": "cat",
+      "sourceUrl": "https://www.inaturalist.org/photos/605062712",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605062712/original.jpg",
+      "title": "Felis catus Linnaeus, 1758",
+      "creator": "yasin_co",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-cat-02.jpg"
+    },
+    {
+      "id": "non-fish-cat-03",
+      "category": "cat",
+      "sourceUrl": "https://www.inaturalist.org/photos/605085536",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605085536/original.jpg",
+      "title": "Felis catus Linnaeus, 1758",
+      "creator": "nuh_cheema",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-cat-03.jpg"
+    },
+    {
+      "id": "non-fish-cat-04",
+      "category": "cat",
+      "sourceUrl": "https://www.inaturalist.org/photos/604945919",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/604945919/original.jpg",
+      "title": "Felis catus Linnaeus, 1758",
+      "creator": "可愛的羽羽",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-cat-04.jpg"
+    },
+    {
+      "id": "non-fish-cat-05",
+      "category": "cat",
+      "sourceUrl": "https://www.inaturalist.org/photos/605029982",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605029982/original.jpg",
+      "title": "Felis catus Linnaeus, 1758",
+      "creator": "哈基人",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-cat-05.jpg"
+    },
+    {
+      "id": "non-fish-dog-01",
+      "category": "dog",
+      "sourceUrl": "https://www.inaturalist.org/photos/605284711",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605284711/original.jpg",
+      "title": "Canis lupus familiaris Linnaeus, 1758",
+      "creator": "Antonio Maldonado",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-dog-01.jpg"
+    },
+    {
+      "id": "non-fish-dog-02",
+      "category": "dog",
+      "sourceUrl": "https://www.inaturalist.org/photos/605284725",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605284725/original.jpg",
+      "title": "Canis lupus familiaris Linnaeus, 1758",
+      "creator": "Antonio Maldonado",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-dog-02.jpg"
+    },
+    {
+      "id": "non-fish-dog-03",
+      "category": "dog",
+      "sourceUrl": "https://www.inaturalist.org/photos/605284740",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605284740/original.jpg",
+      "title": "Canis lupus familiaris Linnaeus, 1758",
+      "creator": "Antonio Maldonado",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-dog-03.jpg"
+    },
+    {
+      "id": "non-fish-dog-04",
+      "category": "dog",
+      "sourceUrl": "https://www.inaturalist.org/photos/605284751",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605284751/original.jpg",
+      "title": "Canis lupus familiaris Linnaeus, 1758",
+      "creator": "Antonio Maldonado",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-dog-04.jpg"
+    },
+    {
+      "id": "non-fish-dog-05",
+      "category": "dog",
+      "sourceUrl": "https://www.inaturalist.org/photos/605284768",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605284768/original.jpg",
+      "title": "Canis lupus familiaris Linnaeus, 1758",
+      "creator": "Antonio Maldonado",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-dog-05.jpg"
+    },
+    {
+      "id": "non-fish-rabbit-01",
+      "category": "rabbit",
+      "sourceUrl": "https://www.inaturalist.org/photos/605593772",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605593772/original.jpg",
+      "title": "Oryctolagus cuniculus (Linnaeus, 1758)",
+      "creator": "omuxx",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-rabbit-01.jpg"
+    },
+    {
+      "id": "non-fish-rabbit-02",
+      "category": "rabbit",
+      "sourceUrl": "https://www.inaturalist.org/photos/605638051",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605638051/original.jpg",
+      "title": "Oryctolagus cuniculus (Linnaeus, 1758)",
+      "creator": "Phil Miller",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-rabbit-02.jpg"
+    },
+    {
+      "id": "non-fish-rabbit-03",
+      "category": "rabbit",
+      "sourceUrl": "https://www.inaturalist.org/photos/604589753",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/604589753/original.jpg",
+      "title": "Oryctolagus cuniculus (Linnaeus, 1758)",
+      "creator": "EcoNeighbour_",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-rabbit-03.jpg"
+    },
+    {
+      "id": "non-fish-rabbit-04",
+      "category": "rabbit",
+      "sourceUrl": "https://www.inaturalist.org/photos/605664270",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605664270/original.jpg",
+      "title": "Oryctolagus cuniculus (Linnaeus, 1758)",
+      "creator": "mrsdew17",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-rabbit-04.jpg"
+    },
+    {
+      "id": "non-fish-rabbit-05",
+      "category": "rabbit",
+      "sourceUrl": "https://www.inaturalist.org/photos/605664649",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605664649/original.jpg",
+      "title": "Oryctolagus cuniculus (Linnaeus, 1758)",
+      "creator": "mrsdew17",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-rabbit-05.jpg"
+    },
+    {
+      "id": "non-fish-bird-01",
+      "category": "bird",
+      "sourceUrl": "https://www.inaturalist.org/photos/605521795",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605521795/original.jpg",
+      "title": "Larus crassirostris Vieillot, 1818",
+      "creator": "satoyama_love",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-bird-01.jpg"
+    },
+    {
+      "id": "non-fish-bird-02",
+      "category": "bird",
+      "sourceUrl": "https://www.inaturalist.org/photos/605319699",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605319699/original.jpg",
+      "title": "Larus crassirostris Vieillot, 1818",
+      "creator": "roarlan",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-bird-02.jpg"
+    },
+    {
+      "id": "non-fish-bird-03",
+      "category": "bird",
+      "sourceUrl": "https://www.inaturalist.org/photos/605320579",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605320579/original.jpg",
+      "title": "Larus crassirostris Vieillot, 1818",
+      "creator": "roarlan",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-bird-03.jpg"
+    },
+    {
+      "id": "non-fish-bird-04",
+      "category": "bird",
+      "sourceUrl": "https://www.inaturalist.org/photos/605320582",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605320582/original.jpg",
+      "title": "Larus crassirostris Vieillot, 1818",
+      "creator": "roarlan",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-bird-04.jpg"
+    },
+    {
+      "id": "non-fish-bird-05",
+      "category": "bird",
+      "sourceUrl": "https://www.inaturalist.org/photos/605320583",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605320583/original.jpg",
+      "title": "Larus crassirostris Vieillot, 1818",
+      "creator": "roarlan",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-bird-05.jpg"
+    },
+    {
+      "id": "non-fish-starfish-01",
+      "category": "starfish",
+      "sourceUrl": "https://www.inaturalist.org/photos/605329061",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605329061/original.jpg",
+      "title": "Asterias amurensis Lutken, 1871",
+      "creator": "Thomas Nataprawira",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-starfish-01.jpg"
+    },
+    {
+      "id": "non-fish-starfish-02",
+      "category": "starfish",
+      "sourceUrl": "https://www.inaturalist.org/photos/605786010",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605786010/original.jpg",
+      "title": "Asterias amurensis Lutken, 1871",
+      "creator": "Thomas Turner",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-starfish-02.jpg"
+    },
+    {
+      "id": "non-fish-starfish-03",
+      "category": "starfish",
+      "sourceUrl": "https://www.inaturalist.org/photos/605786051",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/605786051/original.jpg",
+      "title": "Asterias amurensis Lutken, 1871",
+      "creator": "Thomas Turner",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-starfish-03.jpg"
+    },
+    {
+      "id": "non-fish-starfish-04",
+      "category": "starfish",
+      "sourceUrl": "https://www.inaturalist.org/photos/609612133",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/609612133/original.jpg",
+      "title": "Asterias amurensis Lutken, 1871",
+      "creator": "李博恒",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-starfish-04.jpg"
+    },
+    {
+      "id": "non-fish-starfish-05",
+      "category": "starfish",
+      "sourceUrl": "https://www.inaturalist.org/photos/609154387",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/609154387/original.jpg",
+      "title": "Asterias amurensis Lutken, 1871",
+      "creator": "eyespye33",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-starfish-05.jpg"
+    },
+    {
+      "id": "non-fish-crab-01",
+      "category": "crab",
+      "sourceUrl": "https://www.inaturalist.org/photos/604447240",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/604447240/original.jpg",
+      "title": "Portunus trituberculatus (Miers, 1876)",
+      "creator": "hongshi",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-crab-01.jpg"
+    },
+    {
+      "id": "non-fish-crab-02",
+      "category": "crab",
+      "sourceUrl": "https://www.inaturalist.org/photos/610422328",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/610422328/original.jpg",
+      "title": "Portunus trituberculatus (Miers, 1876)",
+      "creator": "hangnamori",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-crab-02.jpg"
+    },
+    {
+      "id": "non-fish-crab-03",
+      "category": "crab",
+      "sourceUrl": "https://www.inaturalist.org/photos/615709595",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/615709595/original.jpg",
+      "title": "Portunus trituberculatus (Miers, 1876)",
+      "creator": "张天贵/杨宇航",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-crab-03.jpg"
+    },
+    {
+      "id": "non-fish-crab-04",
+      "category": "crab",
+      "sourceUrl": "https://www.inaturalist.org/photos/617794318",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/617794318/original.jpg",
+      "title": "Portunus trituberculatus (Miers, 1876)",
+      "creator": "李博恒",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-crab-04.jpg"
+    },
+    {
+      "id": "non-fish-crab-05",
+      "category": "crab",
+      "sourceUrl": "https://www.inaturalist.org/photos/623145033",
+      "imageUrl": "https://inaturalist-open-data.s3.amazonaws.com/photos/623145033/original.jpg",
+      "title": "Portunus trituberculatus (Miers, 1876)",
+      "creator": "杨曦",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "file": "rejection-data/non-fish/non-fish-crab-05.jpg"
+    }
+  ],
+  "lowQuality": [
+    {
+      "id": "low-quality-blur-01",
+      "degradation": "blur",
+      "sourceFile": "../../assets/images/species/field60/kareius-bicoloratus.png",
+      "file": "rejection-data/low-quality/low-quality-blur-01.jpg"
+    },
+    {
+      "id": "low-quality-blur-02",
+      "degradation": "blur",
+      "sourceFile": "../../assets/images/species/field60/hyporthodus-septemfasciatus.jpg",
+      "file": "rejection-data/low-quality/low-quality-blur-02.jpg"
+    },
+    {
+      "id": "low-quality-blur-03",
+      "degradation": "blur",
+      "sourceFile": "../../assets/images/species/field60/pseudopleuronectes-herzensteini.png",
+      "file": "rejection-data/low-quality/low-quality-blur-03.jpg"
+    },
+    {
+      "id": "low-quality-blur-04",
+      "degradation": "blur",
+      "sourceFile": "../../assets/images/species/field60/lateolabrax-maculatus.png",
+      "file": "rejection-data/low-quality/low-quality-blur-04.jpg"
+    },
+    {
+      "id": "low-quality-blur-05",
+      "degradation": "blur",
+      "sourceFile": "../../assets/images/species/field60/pseudopleuronectes-yokohamae.png",
+      "file": "rejection-data/low-quality/low-quality-blur-05.jpg"
+    },
+    {
+      "id": "low-quality-dark-01",
+      "degradation": "dark",
+      "sourceFile": "../../assets/images/species/field60/kareius-bicoloratus.png",
+      "file": "rejection-data/low-quality/low-quality-dark-01.jpg"
+    },
+    {
+      "id": "low-quality-dark-02",
+      "degradation": "dark",
+      "sourceFile": "../../assets/images/species/field60/hyporthodus-septemfasciatus.jpg",
+      "file": "rejection-data/low-quality/low-quality-dark-02.jpg"
+    },
+    {
+      "id": "low-quality-dark-03",
+      "degradation": "dark",
+      "sourceFile": "../../assets/images/species/field60/pseudopleuronectes-herzensteini.png",
+      "file": "rejection-data/low-quality/low-quality-dark-03.jpg"
+    },
+    {
+      "id": "low-quality-dark-04",
+      "degradation": "dark",
+      "sourceFile": "../../assets/images/species/field60/lateolabrax-maculatus.png",
+      "file": "rejection-data/low-quality/low-quality-dark-04.jpg"
+    },
+    {
+      "id": "low-quality-dark-05",
+      "degradation": "dark",
+      "sourceFile": "../../assets/images/species/field60/pseudopleuronectes-yokohamae.png",
+      "file": "rejection-data/low-quality/low-quality-dark-05.jpg"
+    },
+    {
+      "id": "low-quality-tiny-subject-01",
+      "degradation": "tiny-subject",
+      "sourceFile": "../../assets/images/species/field60/kareius-bicoloratus.png",
+      "file": "rejection-data/low-quality/low-quality-tiny-subject-01.jpg"
+    },
+    {
+      "id": "low-quality-tiny-subject-02",
+      "degradation": "tiny-subject",
+      "sourceFile": "../../assets/images/species/field60/hyporthodus-septemfasciatus.jpg",
+      "file": "rejection-data/low-quality/low-quality-tiny-subject-02.jpg"
+    },
+    {
+      "id": "low-quality-tiny-subject-03",
+      "degradation": "tiny-subject",
+      "sourceFile": "../../assets/images/species/field60/pseudopleuronectes-herzensteini.png",
+      "file": "rejection-data/low-quality/low-quality-tiny-subject-03.jpg"
+    },
+    {
+      "id": "low-quality-tiny-subject-04",
+      "degradation": "tiny-subject",
+      "sourceFile": "../../assets/images/species/field60/lateolabrax-maculatus.png",
+      "file": "rejection-data/low-quality/low-quality-tiny-subject-04.jpg"
+    },
+    {
+      "id": "low-quality-tiny-subject-05",
+      "degradation": "tiny-subject",
+      "sourceFile": "../../assets/images/species/field60/pseudopleuronectes-yokohamae.png",
+      "file": "rejection-data/low-quality/low-quality-tiny-subject-05.jpg"
+    },
+    {
+      "id": "low-quality-cropped-01",
+      "degradation": "cropped",
+      "sourceFile": "../../assets/images/species/field60/kareius-bicoloratus.png",
+      "file": "rejection-data/low-quality/low-quality-cropped-01.jpg"
+    },
+    {
+      "id": "low-quality-cropped-02",
+      "degradation": "cropped",
+      "sourceFile": "../../assets/images/species/field60/hyporthodus-septemfasciatus.jpg",
+      "file": "rejection-data/low-quality/low-quality-cropped-02.jpg"
+    },
+    {
+      "id": "low-quality-cropped-03",
+      "degradation": "cropped",
+      "sourceFile": "../../assets/images/species/field60/pseudopleuronectes-herzensteini.png",
+      "file": "rejection-data/low-quality/low-quality-cropped-03.jpg"
+    },
+    {
+      "id": "low-quality-cropped-04",
+      "degradation": "cropped",
+      "sourceFile": "../../assets/images/species/field60/lateolabrax-maculatus.png",
+      "file": "rejection-data/low-quality/low-quality-cropped-04.jpg"
+    },
+    {
+      "id": "low-quality-cropped-05",
+      "degradation": "cropped",
+      "sourceFile": "../../assets/images/species/field60/pseudopleuronectes-yokohamae.png",
+      "file": "rejection-data/low-quality/low-quality-cropped-05.jpg"
+    },
+    {
+      "id": "low-quality-overexposed-01",
+      "degradation": "overexposed",
+      "sourceFile": "../../assets/images/species/field60/kareius-bicoloratus.png",
+      "file": "rejection-data/low-quality/low-quality-overexposed-01.jpg"
+    },
+    {
+      "id": "low-quality-overexposed-02",
+      "degradation": "overexposed",
+      "sourceFile": "../../assets/images/species/field60/hyporthodus-septemfasciatus.jpg",
+      "file": "rejection-data/low-quality/low-quality-overexposed-02.jpg"
+    },
+    {
+      "id": "low-quality-overexposed-03",
+      "degradation": "overexposed",
+      "sourceFile": "../../assets/images/species/field60/pseudopleuronectes-herzensteini.png",
+      "file": "rejection-data/low-quality/low-quality-overexposed-03.jpg"
+    },
+    {
+      "id": "low-quality-overexposed-04",
+      "degradation": "overexposed",
+      "sourceFile": "../../assets/images/species/field60/lateolabrax-maculatus.png",
+      "file": "rejection-data/low-quality/low-quality-overexposed-04.jpg"
+    },
+    {
+      "id": "low-quality-overexposed-05",
+      "degradation": "overexposed",
+      "sourceFile": "../../assets/images/species/field60/pseudopleuronectes-yokohamae.png",
+      "file": "rejection-data/low-quality/low-quality-overexposed-05.jpg"
+    },
+    {
+      "id": "low-quality-pixelated-01",
+      "degradation": "pixelated",
+      "sourceFile": "../../assets/images/species/field60/kareius-bicoloratus.png",
+      "file": "rejection-data/low-quality/low-quality-pixelated-01.jpg"
+    },
+    {
+      "id": "low-quality-pixelated-02",
+      "degradation": "pixelated",
+      "sourceFile": "../../assets/images/species/field60/hyporthodus-septemfasciatus.jpg",
+      "file": "rejection-data/low-quality/low-quality-pixelated-02.jpg"
+    },
+    {
+      "id": "low-quality-pixelated-03",
+      "degradation": "pixelated",
+      "sourceFile": "../../assets/images/species/field60/pseudopleuronectes-herzensteini.png",
+      "file": "rejection-data/low-quality/low-quality-pixelated-03.jpg"
+    },
+    {
+      "id": "low-quality-pixelated-04",
+      "degradation": "pixelated",
+      "sourceFile": "../../assets/images/species/field60/lateolabrax-maculatus.png",
+      "file": "rejection-data/low-quality/low-quality-pixelated-04.jpg"
+    },
+    {
+      "id": "low-quality-pixelated-05",
+      "degradation": "pixelated",
+      "sourceFile": "../../assets/images/species/field60/pseudopleuronectes-yokohamae.png",
+      "file": "rejection-data/low-quality/low-quality-pixelated-05.jpg"
+    }
+  ]
+}

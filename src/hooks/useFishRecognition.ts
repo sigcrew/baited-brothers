@@ -1,21 +1,16 @@
 import { useCallback, useState } from "react";
 import { supabase } from "@/src/lib/supabase";
 import type { Fish } from "@/src/hooks/useFishes";
+import { toUserMessage, withTimeout } from "@/src/lib/appErrors";
+import {
+  normalizeRecognitionResponse,
+  type RecognitionResponse,
+} from "@/src/lib/fishRecognition";
 
 export type FishRecognitionCandidate = {
   fishId: string;
   confidence: number;
   reason: string;
-};
-
-type RecognitionResponse = {
-  candidates?: Array<{
-    fish_id?: string;
-    confidence?: number;
-    reason?: string;
-  }>;
-  needs_retake?: boolean;
-  note?: string;
 };
 
 type RecognizeInput = {
@@ -37,54 +32,38 @@ export const useFishRecognition = () => {
     setError(null);
 
     try {
-      const { data, error: invokeError } = await supabase.functions.invoke<
-        RecognitionResponse
-      >("identify-fish", {
-        body: {
-          imageBase64,
-          mimeType,
-          catalog: fishes.slice(0, 80).map((fish) => ({
-            id: fish.id,
-            nameKo: fish.name_ko ?? fish.name,
-            scientificName: fish.name,
-            group: fish.collection_group,
-            identificationFeatures: fish.identification_features,
-            similarSpeciesNotes: fish.similar_species_notes,
-          })),
-        },
-      });
+      const { data, error: invokeError } = await withTimeout(
+        supabase.functions.invoke<RecognitionResponse>("identify-fish", {
+          body: {
+            imageBase64,
+            mimeType,
+            catalog: fishes.slice(0, 80).map((fish) => ({
+              id: fish.id,
+              nameKo: fish.name_ko ?? fish.name,
+              scientificName: fish.name,
+              group: fish.collection_group,
+              identificationFeatures: fish.identification_features,
+              similarSpeciesNotes: fish.similar_species_notes,
+            })),
+          },
+        }),
+        45_000,
+        "AI 판별 시간이 초과되었습니다.",
+      );
 
       if (invokeError) throw invokeError;
 
       const validFishIds = new Set(fishes.map((fish) => fish.id));
-      const candidates = (data?.candidates ?? [])
-        .filter(
-          (candidate): candidate is {
-            fish_id: string;
-            confidence?: number;
-            reason?: string;
-          } =>
-            typeof candidate.fish_id === "string" &&
-            validFishIds.has(candidate.fish_id),
-        )
-        .slice(0, 3)
-        .map((candidate) => ({
-          fishId: candidate.fish_id,
-          confidence: Math.min(1, Math.max(0, candidate.confidence ?? 0)),
-          reason: candidate.reason?.trim() || "사진의 형태와 무늬를 비교했습니다.",
-        }));
+      const normalized = normalizeRecognitionResponse(data, validFishIds);
 
       return {
-        candidates,
-        needsRetake: data?.needs_retake ?? candidates.length === 0,
-        note: data?.note?.trim() || null,
+        ...normalized,
         error: null,
       };
     } catch (recognitionError) {
-      const normalized =
-        recognitionError instanceof Error
-          ? recognitionError
-          : new Error("AI 어종 추천에 실패했습니다.");
+      const normalized = new Error(
+        toUserMessage(recognitionError, "AI 어종 추천에 실패했습니다."),
+      );
       setError(normalized);
       return {
         candidates: [] as FishRecognitionCandidate[],

@@ -17,12 +17,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ArchiveRule } from "@/components/design/ArchiveRule";
 import { TripFormModal } from "@/components/trips/TripFormModal";
+import { CatchEditModal } from "@/components/catches/CatchEditModal";
 import {
   useFishingTrips,
   type FishingTrip,
   type UpdateTripInput,
 } from "@/src/hooks/useFishingTrips";
-import { useUserCatches } from "@/src/hooks/useUserCatches";
+import { useUserCatches, type UserCatch } from "@/src/hooks/useUserCatches";
 import {
   FIELD_COLORS,
   bodyExtraBoldFont,
@@ -54,6 +55,8 @@ const TripDetailScreen = () => {
   const params = useLocalSearchParams<{ id?: string }>();
   const tripId = typeof params.id === "string" ? params.id : "";
   const [editVisible, setEditVisible] = useState(false);
+  const [editingCatch, setEditingCatch] = useState<UserCatch | null>(null);
+  const [isSavingCatch, setIsSavingCatch] = useState(false);
   const {
     trips,
     isLoading,
@@ -70,6 +73,8 @@ const TripDetailScreen = () => {
     isLoading: catchesLoading,
     isRefreshing: catchesRefreshing,
     refetch: refetchCatches,
+    updateCatch,
+    deleteCatch,
   } = useUserCatches(tripId || undefined);
   const trip = trips.find((item) => item.id === tripId);
 
@@ -149,6 +154,27 @@ const TripDetailScreen = () => {
     const { error } = await updateTrip(trip.id, input);
     return error;
   };
+
+  const saveCatchEdit = async (
+    item: UserCatch,
+    input: { sizeCm: number | null; memo: string | null },
+  ) => {
+    setIsSavingCatch(true);
+    const { error } = await updateCatch(item.id, input);
+    setIsSavingCatch(false);
+    if (!error) setEditingCatch(null);
+    return error;
+  };
+
+  const confirmCatchDelete = (item: UserCatch) =>
+    confirmAction(
+      "조과 삭제",
+      `${item.fish?.name_ko ?? item.fish?.name ?? "이 조과"} 기록과 사진을 삭제할까요?`,
+      "삭제",
+      () => deleteCatch(item),
+      undefined,
+      true,
+    );
 
   const goRecord = () =>
     router.push({
@@ -400,6 +426,30 @@ const TripDetailScreen = () => {
                         </Text>
                       </View>
                     ) : null}
+                    <View className="mt-3 flex-row justify-end">
+                      <TouchableOpacity
+                        onPress={() => setEditingCatch(item)}
+                        className="px-3 py-2"
+                      >
+                        <Text
+                          className="text-xs"
+                          style={{ color: FIELD_COLORS.teal, fontFamily: bodySemiBoldFont }}
+                        >
+                          수정
+                        </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => confirmCatchDelete(item)}
+                        className="ml-2 px-3 py-2"
+                      >
+                        <Text
+                          className="text-xs"
+                          style={{ color: FIELD_COLORS.red, fontFamily: bodySemiBoldFont }}
+                        >
+                          삭제
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 );
               })
@@ -422,6 +472,12 @@ const TripDetailScreen = () => {
         isSaving={isSaving}
         onClose={() => setEditVisible(false)}
         onSubmit={submitEdit}
+      />
+      <CatchEditModal
+        item={editingCatch}
+        isSaving={isSavingCatch}
+        onClose={() => setEditingCatch(null)}
+        onSave={saveCatchEdit}
       />
     </View>
   );

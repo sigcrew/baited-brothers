@@ -202,6 +202,7 @@ export type Database = {
           caught_at: string
           candidate_fish_ids: string[]
           capture_method: Database["public"]["Enums"]["capture_method"] | null
+          client_request_id: string | null
           created_at: string | null
           fish_id: string
           id: string
@@ -223,6 +224,7 @@ export type Database = {
           caught_at?: string
           candidate_fish_ids?: string[]
           capture_method?: Database["public"]["Enums"]["capture_method"] | null
+          client_request_id?: string | null
           created_at?: string | null
           fish_id: string
           id?: string
@@ -244,6 +246,7 @@ export type Database = {
           caught_at?: string
           candidate_fish_ids?: string[]
           capture_method?: Database["public"]["Enums"]["capture_method"] | null
+          client_request_id?: string | null
           created_at?: string | null
           fish_id?: string
           id?: string

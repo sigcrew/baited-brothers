@@ -104,6 +104,7 @@ const CollectionScreen = () => {
       updated_at: null,
       candidate_fish_ids: [],
       capture_method: "live_camera",
+      client_request_id: null,
       id_method: "fallback_catalog",
       verification_status: "verified",
       verification_reason: null,

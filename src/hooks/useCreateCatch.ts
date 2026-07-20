@@ -2,6 +2,7 @@ import { useState } from "react";
 import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/contexts/AuthContext";
 import type { Database, TablesInsert } from "@/src/types/database";
+import { toUserMessage, withTimeout } from "@/src/lib/appErrors";
 
 type CreateCatchInput = {
   tripId?: string;
@@ -17,6 +18,7 @@ type CreateCatchInput = {
   candidateFishIds?: string[];
   idMethod?: "closed_set_candidates" | "fallback_catalog";
   verificationReason?: string;
+  clientRequestId: string;
 };
 
 type CreateCatchResult = {
@@ -59,11 +61,20 @@ export const useCreateCatch = () => {
       );
       const isFirstDiscovery = !discoveredFishIds.has(input.fishId);
 
-      const response = await fetch(input.imageUri);
+      const response = await withTimeout(
+        fetch(input.imageUri),
+        15_000,
+        "사진을 읽는 시간이 초과되었습니다.",
+      );
+      if (!response.ok) throw new Error("선택한 사진을 읽지 못했습니다.");
       const image = await response.arrayBuffer();
-      const { error: uploadError } = await supabase.storage
-        .from("user-uploads")
-        .upload(path, image, { contentType: input.mimeType, upsert: false });
+      const { error: uploadError } = await withTimeout(
+        supabase.storage
+          .from("user-uploads")
+          .upload(path, image, { contentType: input.mimeType, upsert: false }),
+        30_000,
+        "사진 업로드 시간이 초과되었습니다.",
+      );
       if (uploadError) throw uploadError;
 
       const { data: publicData } = supabase.storage
@@ -86,6 +97,7 @@ export const useCreateCatch = () => {
         candidate_fish_ids: input.candidateFishIds ?? [],
         verification_status: "verified",
         verification_reason: input.verificationReason?.trim() || null,
+        client_request_id: input.clientRequestId,
       };
 
       const { data: insertedCatch, error: insertError } = await supabase
@@ -93,6 +105,21 @@ export const useCreateCatch = () => {
         .insert(payload)
         .select("id")
         .single();
+      if (insertError?.code === "23505") {
+        await supabase.storage.from("user-uploads").remove([path]);
+        const { data: existingCatch } = await supabase
+          .from("user_catches")
+          .select("id, fish_id")
+          .eq("user_id", userId)
+          .eq("client_request_id", input.clientRequestId)
+          .maybeSingle();
+        return {
+          error: null,
+          catchId: existingCatch?.id ?? null,
+          isFirstDiscovery: false,
+          discoveredCount: discoveredFishIds.size,
+        };
+      }
       if (insertError) {
         await supabase.storage.from("user-uploads").remove([path]);
         throw insertError;
@@ -106,10 +133,7 @@ export const useCreateCatch = () => {
       };
     } catch (error) {
       return {
-        error:
-          error instanceof Error
-            ? error
-            : new Error("조과 저장에 실패했습니다."),
+        error: new Error(toUserMessage(error, "조과 저장에 실패했습니다.")),
         catchId: null,
         isFirstDiscovery: false,
         discoveredCount: 0,
