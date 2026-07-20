@@ -114,6 +114,7 @@ const CollectionScreen = () => {
           completeFieldNotes: 1,
           dawnTrips: 1,
           nightTrips: 0,
+          completedSeasons: 2,
           uniqueSpots: 4,
           maxCatchSize: 58,
           acquiredAt: {
