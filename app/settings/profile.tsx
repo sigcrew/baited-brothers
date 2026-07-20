@@ -12,6 +12,7 @@ import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { supabase } from "@/src/lib/supabase";
+import { optimizeUserPhoto } from "@/src/lib/optimizeUserPhoto";
 import { SettingsScaffold } from "@/components/settings/SettingsScaffold";
 import {
   FIELD_COLORS,
@@ -79,19 +80,20 @@ export default function ProfileEditScreen() {
           : null;
 
       if (selectedAvatar) {
-        const extension =
-          selectedAvatar.fileName?.split(".").pop()?.toLowerCase() === "png"
-            ? "png"
-            : "jpg";
-        const contentType =
-          selectedAvatar.mimeType === "image/png" ? "image/png" : "image/jpeg";
-        uploadedPath = `${session.user.id}/profile/${Date.now()}-${Math.random().toString(36).slice(2, 9)}.${extension}`;
-        const response = await fetch(selectedAvatar.uri);
+        const optimized = await optimizeUserPhoto({
+          uri: selectedAvatar.uri,
+          width: selectedAvatar.width,
+          height: selectedAvatar.height,
+          maxDimension: 768,
+          compress: 0.8,
+        });
+        uploadedPath = `${session.user.id}/profile/${Date.now()}-${Math.random().toString(36).slice(2, 9)}.jpg`;
+        const response = await fetch(optimized.uri);
         if (!response.ok) throw new Error("프로필 사진을 읽지 못했습니다.");
         const { error: uploadError } = await supabase.storage
           .from("user-uploads")
           .upload(uploadedPath, await response.arrayBuffer(), {
-            contentType,
+            contentType: optimized.mimeType,
             upsert: false,
           });
         if (uploadError) throw uploadError;

@@ -30,6 +30,8 @@ const toTripCoverImage = (asset: ImagePicker.ImagePickerAsset): TripCoverImage =
   uri: asset.uri,
   fileName: asset.fileName,
   mimeType: asset.mimeType,
+  width: asset.width,
+  height: asset.height,
 });
 
 export const TripCoverActionSheet = ({

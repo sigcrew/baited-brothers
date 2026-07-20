@@ -17,11 +17,9 @@ import { AuthProvider } from '@/src/contexts/AuthContext';
 import { BlackHanSans_400Regular } from '@expo-google-fonts/black-han-sans';
 import { Anton_400Regular } from '@expo-google-fonts/anton';
 import { DoHyeon_400Regular } from '@expo-google-fonts/do-hyeon';
-import {
-  NotoSansKR_400Regular,
-  NotoSansKR_600SemiBold,
-  NotoSansKR_800ExtraBold,
-} from '@expo-google-fonts/noto-sans-kr';
+import { NotoSansKR_400Regular } from '@expo-google-fonts/noto-sans-kr/400Regular';
+import { NotoSansKR_600SemiBold } from '@expo-google-fonts/noto-sans-kr/600SemiBold';
+import { NotoSansKR_800ExtraBold } from '@expo-google-fonts/noto-sans-kr/800ExtraBold';
 
 export {
   // Catch any errors thrown by the Layout component.

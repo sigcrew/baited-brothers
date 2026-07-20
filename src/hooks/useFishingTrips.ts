@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/contexts/AuthContext";
 import type { Tables, TablesInsert, TablesUpdate } from "@/src/types/database";
+import { optimizeUserPhoto } from "@/src/lib/optimizeUserPhoto";
 
 export type FishingTrip = Tables<"fishing_trips">;
 
@@ -21,27 +22,24 @@ export type TripCoverImage = {
   uri: string;
   fileName?: string | null;
   mimeType?: string | null;
+  width?: number | null;
+  height?: number | null;
 };
 
 const uploadTripCover = async (userId: string, image: TripCoverImage) => {
-  const knownExtensions = new Set(["jpg", "jpeg", "png", "webp"]);
-  const fileExtension = image.fileName?.split(".").pop()?.toLowerCase();
-  const extension = fileExtension && knownExtensions.has(fileExtension)
-    ? fileExtension
-    : image.mimeType === "image/png"
-      ? "png"
-      : image.mimeType === "image/webp"
-        ? "webp"
-        : "jpg";
-  const contentType = image.mimeType && ["image/jpeg", "image/png", "image/webp"].includes(image.mimeType)
-    ? image.mimeType
-    : "image/jpeg";
-  const path = `${userId}/trips/${Date.now()}-${Math.random().toString(36).slice(2, 10)}.${extension}`;
-  const response = await fetch(image.uri);
+  const optimized = await optimizeUserPhoto({
+    uri: image.uri,
+    width: image.width,
+    height: image.height,
+    maxDimension: 1600,
+    compress: 0.8,
+  });
+  const path = `${userId}/trips/${Date.now()}-${Math.random().toString(36).slice(2, 10)}.jpg`;
+  const response = await fetch(optimized.uri);
   const imageBuffer = await response.arrayBuffer();
   const { error } = await supabase.storage
     .from("user-uploads")
-    .upload(path, imageBuffer, { contentType, upsert: false });
+    .upload(path, imageBuffer, { contentType: optimized.mimeType, upsert: false });
 
   if (error) throw error;
 

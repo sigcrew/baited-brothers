@@ -76,9 +76,9 @@ export default function PrivacyScreen() {
         보관 의무가 있는 경우에는 해당 기간 동안 별도로 보관할 수 있습니다.
       </Section>
       <Section title="사용자 권리와 문의">
-        사용자는 앱에서 자신의 기록을 수정·삭제할 수 있습니다. 스토어 제출 전
-        운영 주체 SIGCREW의 공개 지원 채널
-        (github.com/sigcrew/baited-brothers/issues)을 통해 문의할 수 있습니다.
+        사용자는 앱에서 자신의 기록을 수정·삭제할 수 있습니다. 개인정보 관련
+        문의와 권리 행사는 운영 주체 SIGCREW의 지원 이메일
+        (sigcrew@sigcrew.com)을 통해 요청할 수 있습니다.
       </Section>
     </ScrollView>
   );

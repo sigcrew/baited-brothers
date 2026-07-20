@@ -1,9 +1,11 @@
-import { useMemo, useRef, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   Image,
   KeyboardAvoidingView,
+  Linking,
   Platform,
   ScrollView,
   Text,
@@ -25,6 +27,7 @@ import {
 import { CatchCompletionView } from "@/components/record/CatchCompletionView";
 import { FishCatalogSheet } from "@/components/record/FishCatalogSheet";
 import { getField60Illustration } from "@/src/data/field60Illustrations";
+import { optimizeUserPhoto } from "@/src/lib/optimizeUserPhoto";
 import { FIELD_COLORS, bodyExtraBoldFont, bodyFont, monoFont } from "@/src/theme/fieldJournal";
 
 type Capture = {
@@ -49,6 +52,9 @@ type CompletionResult = {
 
 const DEV_FILE_TEST_ENABLED = __DEV__;
 const MAX_RECOGNITION_BASE64_LENGTH = 13_500_000;
+const AI_PHOTO_CONSENT_KEY = "ai-photo-consent-v1";
+const PRIVACY_POLICY_URL =
+  "https://sigcrew.github.io/baited-brothers/privacy/";
 
 const RecordScreen = () => {
   const router = useRouter();
@@ -83,6 +89,9 @@ const RecordScreen = () => {
   const [recognitionNote, setRecognitionNote] = useState<string | null>(null);
   const [needsRetake, setNeedsRetake] = useState(false);
   const [catalogVisible, setCatalogVisible] = useState(false);
+  const [aiConsent, setAiConsent] = useState<
+    "loading" | "pending" | "accepted"
+  >("loading");
   const { fishes, isLoading: fishesLoading } = useFishes(null, "core");
   const { createCatch, isSaving } = useCreateCatch();
   const {
@@ -111,6 +120,31 @@ const RecordScreen = () => {
           sizeCm: completionPreviewMode === "existing" ? 32.5 : undefined,
         }
       : null);
+
+  useEffect(() => {
+    let active = true;
+
+    AsyncStorage.getItem(AI_PHOTO_CONSENT_KEY)
+      .then((value) => {
+        if (active) setAiConsent(value === "accepted" ? "accepted" : "pending");
+      })
+      .catch(() => {
+        if (active) setAiConsent("pending");
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const acceptAiPhotoConsent = async () => {
+    setAiConsent("accepted");
+    try {
+      await AsyncStorage.setItem(AI_PHOTO_CONSENT_KEY, "accepted");
+    } catch {
+      // 현재 사용 흐름에서는 동의를 유지하고 다음 실행에서 다시 안내합니다.
+    }
+  };
 
   const candidateRows = useMemo(
     () =>
@@ -162,23 +196,31 @@ const RecordScreen = () => {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
         allowsMultipleSelection: false,
-        base64: true,
-        quality: 0.75,
+        quality: 0.9,
       });
       if (result.canceled) return;
 
       const asset = result.assets[0];
-      if (!asset?.uri || !asset.base64) {
+      if (!asset?.uri) {
         throw new Error("판별에 필요한 이미지 데이터를 읽지 못했습니다.");
       }
-      if (asset.base64.length > MAX_RECOGNITION_BASE64_LENGTH) {
+      const optimized = await optimizeUserPhoto({
+        uri: asset.uri,
+        width: asset.width,
+        height: asset.height,
+        includeBase64: true,
+      });
+      if (
+        !optimized.base64 ||
+        optimized.base64.length > MAX_RECOGNITION_BASE64_LENGTH
+      ) {
         throw new Error("사진이 너무 큽니다. 10MB 이하의 JPG 또는 PNG를 선택해 주세요.");
       }
 
       await analyzeCapture({
-        uri: asset.uri,
-        base64: asset.base64,
-        mimeType: asset.mimeType === "image/png" ? "image/png" : "image/jpeg",
+        uri: optimized.uri,
+        base64: optimized.base64,
+        mimeType: optimized.mimeType,
         latitude: null,
         longitude: null,
         locationCapturedAt: null,
@@ -219,17 +261,29 @@ const RecordScreen = () => {
       }
 
       const [photo, position] = await Promise.all([
-        cameraRef.current.takePictureAsync({ quality: 0.65, base64: true }),
+        cameraRef.current.takePictureAsync({ quality: 0.9 }),
         Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High }),
       ]);
-      if (!photo?.uri || !photo.base64) {
+      if (!photo?.uri) {
         throw new Error("AI 판정을 위한 사진 데이터를 만들지 못했습니다.");
+      }
+      const optimized = await optimizeUserPhoto({
+        uri: photo.uri,
+        width: photo.width,
+        height: photo.height,
+        includeBase64: true,
+      });
+      if (
+        !optimized.base64 ||
+        optimized.base64.length > MAX_RECOGNITION_BASE64_LENGTH
+      ) {
+        throw new Error("사진을 전송 가능한 크기로 최적화하지 못했습니다.");
       }
 
       const nextCapture: Capture = {
-        uri: photo.uri,
-        base64: photo.base64,
-        mimeType: "image/jpeg",
+        uri: optimized.uri,
+        base64: optimized.base64,
+        mimeType: optimized.mimeType,
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
         locationCapturedAt: new Date(position.timestamp).toISOString(),
@@ -332,6 +386,86 @@ const RecordScreen = () => {
         onViewEncyclopedia={viewCompletionEncyclopedia}
         onGoHome={() => router.replace("/(tabs)")}
       />
+    );
+  }
+
+  if (aiConsent === "loading") {
+    return (
+      <View className="flex-1 items-center justify-center px-8" style={{ backgroundColor: FIELD_COLORS.foam }}>
+        <ActivityIndicator color={FIELD_COLORS.teal} />
+        <Text className="mt-4 text-sm" style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}>
+          사진 처리 동의 상태를 확인하고 있어요
+        </Text>
+      </View>
+    );
+  }
+
+  if (aiConsent === "pending") {
+    return (
+      <View
+        className="flex-1 justify-center px-7"
+        style={{
+          backgroundColor: FIELD_COLORS.foam,
+          paddingTop: insets.top + 24,
+          paddingBottom: insets.bottom + 24,
+        }}
+      >
+        <Text
+          className="text-[10px] tracking-[1.5px]"
+          style={{ color: FIELD_COLORS.teal, fontFamily: monoFont }}
+        >
+          AI PHOTO ANALYSIS
+        </Text>
+        <Text
+          className="mt-4 text-[32px] leading-[42px]"
+          style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}
+        >
+          사진 판별 전{`\n`}확인이 필요해요
+        </Text>
+        <Text
+          className="mt-5 text-[15px] leading-7"
+          style={{ color: FIELD_COLORS.ink, fontFamily: bodyFont }}
+        >
+          촬영한 물고기 사진은 어종 후보 추천을 위해 Supabase 보안 함수를
+          거쳐 Anthropic으로 전송됩니다. 위치 정보는 AI에 전송하지 않으며,
+          사진은 어종을 확정해 기록할 때만 앱 저장소에 보관됩니다.
+        </Text>
+        <View
+          className="mt-6 border-l-4 bg-white px-4 py-4"
+          style={{ borderLeftColor: FIELD_COLORS.orange }}
+        >
+          <Text
+            className="text-sm leading-6"
+            style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
+          >
+            AI 결과는 참고용이며 최종 어종은 사용자가 직접 선택합니다.
+          </Text>
+        </View>
+        <TouchableOpacity
+          accessibilityRole="button"
+          onPress={acceptAiPhotoConsent}
+          className="mt-7 items-center py-4"
+          style={{ backgroundColor: FIELD_COLORS.teal }}
+        >
+          <Text className="text-base text-white" style={{ fontFamily: bodyExtraBoldFont }}>
+            동의하고 카메라 열기
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          accessibilityRole="link"
+          onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}
+          className="mt-4 items-center py-2"
+        >
+          <Text style={{ color: FIELD_COLORS.teal, fontFamily: bodyExtraBoldFont }}>
+            개인정보 처리방침 보기
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => router.back()} className="mt-2 items-center py-2">
+          <Text style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}>
+            동의하지 않고 돌아가기
+          </Text>
+        </TouchableOpacity>
+      </View>
     );
   }
 
