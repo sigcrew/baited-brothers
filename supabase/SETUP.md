@@ -43,7 +43,8 @@ secret을 등록합니다.
 
 `.p8` 파일과 생성된 JWT는 저장소에 커밋하지 않습니다. 최초 설정 후 GitHub
 Actions에서 **Refresh Apple client secret**을 한 번 수동 실행해 Function
-secret을 즉시 등록합니다.
+secret을 즉시 등록합니다. 예약 실행과 수동 실행은 워크플로 파일이 저장소의
+기본 브랜치에 병합된 뒤 활성화됩니다.
 
 ### Google 로그인 설정
 
