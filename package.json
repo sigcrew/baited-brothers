@@ -27,6 +27,7 @@
     "qa:collect-gbif-candidates": "ts-node scripts/collect-gbif-photo-candidates.ts",
     "qa:prepare-rejection-data": "ts-node scripts/prepare-rejection-dataset.ts",
     "qa:smoke-rejection": "ts-node scripts/smoke-test-fish-rejection.ts",
+    "test:apple-client-secret": "node --test scripts/generate-apple-client-secret.test.mjs",
     "test": "jest",
     "test:ci": "jest --runInBand --ci --no-watchman",
     "typecheck": "tsc --noEmit"
