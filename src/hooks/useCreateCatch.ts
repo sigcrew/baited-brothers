@@ -7,6 +7,7 @@ import {
   removeUserMedia,
   uploadUserPhotoVariants,
 } from "@/src/lib/userMedia";
+import { trackAnalyticsEvent } from "@/src/lib/analytics";
 
 type CreateCatchInput = {
   tripId?: string;
@@ -127,6 +128,14 @@ export const useCreateCatch = () => {
         await removeUserMedia(uploadedPaths);
         throw insertError;
       }
+      void trackAnalyticsEvent("catch_created", {
+        id_method: payload.id_method ?? "unknown",
+        capture_method: payload.capture_method ?? "unknown",
+        first_discovery: isFirstDiscovery,
+        has_trip: Boolean(input.tripId),
+        has_size: input.sizeCm != null,
+        has_note: Boolean(input.memo?.trim()),
+      });
       return {
         error: null,
         catchId: insertedCatch.id,

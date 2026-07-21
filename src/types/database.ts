@@ -9,6 +9,42 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      analytics_events: {
+        Row: {
+          app_version: string
+          build_number: string | null
+          event_name: string
+          id: string
+          occurred_at: string
+          platform: string
+          properties: Json
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          app_version: string
+          build_number?: string | null
+          event_name: string
+          id?: string
+          occurred_at?: string
+          platform: string
+          properties?: Json
+          session_id: string
+          user_id?: string
+        }
+        Update: {
+          app_version?: string
+          build_number?: string | null
+          event_name?: string
+          id?: string
+          occurred_at?: string
+          platform?: string
+          properties?: Json
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       fishes: {
         Row: {
           aliases: string[]

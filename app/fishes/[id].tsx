@@ -1,4 +1,5 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { useEffect, useRef } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -17,6 +18,7 @@ import { FishThumb } from "@/components/collection/FishThumb";
 import { getCatalogGroupLabel } from "@/src/hooks/useFishes";
 import { useFishDetail } from "@/src/hooks/useFishDetail";
 import { getField60Illustration } from "@/src/data/field60Illustrations";
+import { trackAnalyticsEvent } from "@/src/lib/analytics";
 import {
   FIELD_COLORS,
   bodyExtraBoldFont,
@@ -291,6 +293,16 @@ const FishDetailScreen = () => {
     error,
     refetch,
   } = useFishDetail(fishId);
+  const trackedFishId = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!fish || trackedFishId.current === fish.id) return;
+    trackedFishId.current = fish.id;
+    void trackAnalyticsEvent("fish_detail_viewed", {
+      unlocked: isUnlocked,
+      catalog_order: fish.catalog_sort_order,
+    });
+  }, [fish, isUnlocked]);
 
   if (isLoading) {
     return (

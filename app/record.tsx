@@ -28,6 +28,7 @@ import { CatchCompletionView } from "@/components/record/CatchCompletionView";
 import { FishCatalogSheet } from "@/components/record/FishCatalogSheet";
 import { getField60Illustration } from "@/src/data/field60Illustrations";
 import { optimizeUserPhoto } from "@/src/lib/optimizeUserPhoto";
+import { trackAnalyticsEvent } from "@/src/lib/analytics";
 import { FIELD_COLORS, bodyExtraBoldFont, bodyFont, monoFont } from "@/src/theme/fieldJournal";
 
 type Capture = {
@@ -365,6 +366,19 @@ const RecordScreen = () => {
     if (result.error) {
       Alert.alert("저장 실패", result.error.message);
       return;
+    }
+    if (selectedCandidate) {
+      void trackAnalyticsEvent("ai_candidate_confirmed", {
+        candidate_rank:
+          recognitionCandidates.findIndex(
+            (candidate) => candidate.fishId === selectedFish.id,
+          ) + 1,
+        candidate_count: recognitionCandidates.length,
+      });
+    } else {
+      void trackAnalyticsEvent("manual_species_confirmed", {
+        had_ai_candidates: recognitionCandidates.length > 0,
+      });
     }
     setCompletion({
       fish: selectedFish,

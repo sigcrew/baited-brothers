@@ -12,6 +12,7 @@ import { ArchiveTabHeader } from "@/components/design/ArchiveTabHeader";
 import { createBadgeUnlockContext } from "@/src/data/badges";
 import { FIELD_COLORS } from "@/src/theme/fieldJournal";
 import type { UserCatch } from "@/src/hooks/useUserCatches";
+import { trackAnalyticsEvent } from "@/src/lib/analytics";
 
 type CollectionSegment = "encyclopedia" | "badges" | "cards";
 
@@ -40,6 +41,10 @@ const CollectionScreen = () => {
       setSegment(params.segment);
     }
   }, [params.segment]);
+
+  useEffect(() => {
+    void trackAnalyticsEvent("collection_viewed", { segment });
+  }, [segment]);
 
   const handleRequestedCatchOpened = useCallback(() => {
     router.setParams({ catchId: "" });

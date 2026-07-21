@@ -6,6 +6,7 @@ import {
   normalizeRecognitionResponse,
   type RecognitionResponse,
 } from "@/src/lib/fishRecognition";
+import { trackAnalyticsEvent } from "@/src/lib/analytics";
 
 export type FishRecognitionCandidate = {
   fishId: string;
@@ -29,8 +30,12 @@ export const useFishRecognition = () => {
       mimeType = "image/jpeg",
       fishes,
     }: RecognizeInput) => {
+      const startedAt = Date.now();
       setIsRecognizing(true);
       setError(null);
+      void trackAnalyticsEvent("ai_analysis_started", {
+        catalog_count: fishes.length,
+      });
 
       try {
         const { data, error: invokeError } = await withTimeout(
@@ -57,14 +62,30 @@ export const useFishRecognition = () => {
         const validFishIds = new Set(fishes.map((fish) => fish.id));
         const normalized = normalizeRecognitionResponse(data, validFishIds);
 
+        void trackAnalyticsEvent(
+          normalized.needsRetake || normalized.candidates.length === 0
+            ? "ai_analysis_rejected"
+            : "ai_analysis_succeeded",
+          {
+            duration_ms: Date.now() - startedAt,
+            candidate_count: normalized.candidates.length,
+            needs_retake: normalized.needsRetake,
+          },
+        );
+
         return {
           ...normalized,
           error: null,
         };
       } catch (recognitionError) {
+        const durationMs = Date.now() - startedAt;
         const normalized = new Error(
           toUserMessage(recognitionError, "AI 어종 추천에 실패했습니다."),
         );
+        void trackAnalyticsEvent("ai_analysis_failed", {
+          duration_ms: durationMs,
+          failure_kind: normalized.message.includes("초과") ? "timeout" : "request",
+        });
         setError(normalized);
         return {
           candidates: [] as FishRecognitionCandidate[],

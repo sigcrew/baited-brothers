@@ -20,6 +20,7 @@ import {
   bodyExtraBoldFont,
   monoFont,
 } from "@/src/theme/fieldJournal";
+import { trackAnalyticsEvent } from "@/src/lib/analytics";
 
 type CardsPanelProps = {
   insetsBottom: number;
@@ -147,6 +148,7 @@ export const CardsPanel = ({
     if (!requestedCatch) return;
 
     setSelected(requestedCatch);
+    void trackAnalyticsEvent("catch_card_opened", { source: "linked" });
     onRequestedCatchOpened?.();
   }, [catches, onRequestedCatchOpened, requestedCatchId]);
 
@@ -220,7 +222,15 @@ export const CardsPanel = ({
           </View>
         }
         renderItem={({ item }) => (
-          <CatchCardTile item={item} onPress={() => setSelected(item)} />
+          <CatchCardTile
+            item={item}
+            onPress={() => {
+              setSelected(item);
+              void trackAnalyticsEvent("catch_card_opened", {
+                source: "archive",
+              });
+            }}
+          />
         )}
       />
       <CatchDetailModal

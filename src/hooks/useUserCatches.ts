@@ -6,6 +6,7 @@ import {
   createSignedUserMediaUrls,
   removeUserMedia,
 } from "@/src/lib/userMedia";
+import { trackAnalyticsEvent } from "@/src/lib/analytics";
 
 export type UserCatch = Tables<"user_catches"> & {
   thumbnail_url?: string | null;
@@ -114,7 +115,13 @@ export const useUserCatches = (tripId?: string) => {
       })
       .eq("id", catchId)
       .eq("user_id", userId);
-    if (!updateError) await fetchCatches(true);
+    if (!updateError) {
+      void trackAnalyticsEvent("catch_updated", {
+        has_size: input.sizeCm != null,
+        has_note: Boolean(input.memo?.trim()),
+      });
+      await fetchCatches(true);
+    }
     return { error: updateError ? (updateError as Error) : null };
   };
 
@@ -136,6 +143,7 @@ export const useUserCatches = (tripId?: string) => {
       item.thumbnail_path,
       legacyPath,
     ]);
+    void trackAnalyticsEvent("catch_deleted");
     await fetchCatches(true);
     return { error: null };
   };

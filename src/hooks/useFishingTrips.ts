@@ -8,6 +8,7 @@ import {
   removeUserMedia,
   uploadUserPhotoVariants,
 } from "@/src/lib/userMedia";
+import { trackAnalyticsEvent } from "@/src/lib/analytics";
 
 export type FishingTrip = Tables<"fishing_trips"> & {
   cover_thumbnail_url?: string | null;
@@ -184,6 +185,14 @@ export const useFishingTrips = ({ autoFetch = true }: UseFishingTripsOptions = {
           .insert(payload);
 
         if (insertError) throw insertError;
+        void trackAnalyticsEvent("trip_created", {
+          has_note: Boolean(input.memo?.trim()),
+          has_cover: Boolean(uploadedCover),
+          days_until_trip: Math.max(
+            0,
+            Math.ceil((input.scheduledAt.getTime() - Date.now()) / 86_400_000),
+          ),
+        });
       } catch (createError) {
         await removeUserMedia(uploadedPaths);
         return {
@@ -227,6 +236,10 @@ export const useFishingTrips = ({ autoFetch = true }: UseFishingTripsOptions = {
 
         if (updateError) throw updateError;
 
+        void trackAnalyticsEvent("trip_updated", {
+          cover_changed: true,
+        });
+
         await removeUserMedia([
           trip.cover_image_path,
           trip.cover_thumbnail_path,
@@ -267,6 +280,7 @@ export const useFishingTrips = ({ autoFetch = true }: UseFishingTripsOptions = {
           .eq("user_id", userId);
 
         if (updateError) throw updateError;
+        void trackAnalyticsEvent("trip_updated", { cover_changed: true });
         await removeUserMedia([
           trip.cover_image_path,
           trip.cover_thumbnail_path,
@@ -335,6 +349,11 @@ export const useFishingTrips = ({ autoFetch = true }: UseFishingTripsOptions = {
 
         if (updateError) throw updateError;
 
+        void trackAnalyticsEvent("trip_updated", {
+          has_note: Boolean(input.memo?.trim()),
+          cover_changed: Boolean(uploadedCover || input.removeCover),
+        });
+
         if (uploadedCover || input.removeCover) {
           await removeUserMedia([
             trip.cover_image_path,
@@ -379,6 +398,7 @@ export const useFishingTrips = ({ autoFetch = true }: UseFishingTripsOptions = {
           trip.cover_image_path,
           trip.cover_thumbnail_path,
         ]);
+        void trackAnalyticsEvent("trip_deleted", { previous_status: trip.status });
       } catch (deleteError) {
         return {
           error: deleteError instanceof Error
@@ -414,6 +434,7 @@ export const useFishingTrips = ({ autoFetch = true }: UseFishingTripsOptions = {
         return { error: updateError as Error };
       }
 
+      void trackAnalyticsEvent("trip_completed");
       await fetchTrips(true);
       return { error: null };
     },
@@ -439,6 +460,7 @@ export const useFishingTrips = ({ autoFetch = true }: UseFishingTripsOptions = {
         return { error: updateError as Error };
       }
 
+      void trackAnalyticsEvent("trip_canceled");
       await fetchTrips(true);
       return { error: null };
     },
