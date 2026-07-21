@@ -2,8 +2,13 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/contexts/AuthContext";
 import type { Tables } from "@/src/types/database";
+import {
+  createSignedUserMediaUrls,
+  removeUserMedia,
+} from "@/src/lib/userMedia";
 
 export type UserCatch = Tables<"user_catches"> & {
+  thumbnail_url?: string | null;
   fish?: Pick<
     Tables<"fishes">,
     | "id"
@@ -55,7 +60,27 @@ export const useUserCatches = (tripId?: string) => {
         setError(fetchError as Error);
         setCatches([]);
       } else {
-        setCatches((data as UserCatch[]) ?? []);
+        const rows = (data as UserCatch[]) ?? [];
+        try {
+          const signedUrls = await createSignedUserMediaUrls(
+            rows.flatMap((item) => [item.image_path, item.thumbnail_path]),
+          );
+          setCatches(
+            rows.map((item) => ({
+              ...item,
+              image_url:
+                (item.image_path ? signedUrls.get(item.image_path) : null) ??
+                item.image_url,
+              thumbnail_url:
+                (item.thumbnail_path
+                  ? signedUrls.get(item.thumbnail_path)
+                  : null) ?? null,
+            })),
+          );
+        } catch (signError) {
+          setError(signError as Error);
+          setCatches(rows);
+        }
       }
 
       if (isRefresh) setIsRefreshing(false);
@@ -102,13 +127,15 @@ export const useUserCatches = (tripId?: string) => {
       .eq("user_id", userId);
     if (deleteError) return { error: deleteError as Error };
 
-    const marker = "/storage/v1/object/public/user-uploads/";
-    const objectPath = item.image_url?.includes(marker)
-      ? decodeURIComponent(item.image_url.split(marker)[1] ?? "")
-      : "";
-    if (objectPath) {
-      await supabase.storage.from("user-uploads").remove([objectPath]);
-    }
+    const legacyMarker = "/storage/v1/object/public/user-uploads/";
+    const legacyPath = item.image_url?.includes(legacyMarker)
+      ? decodeURIComponent(item.image_url.split(legacyMarker)[1] ?? "")
+      : null;
+    await removeUserMedia([
+      item.image_path,
+      item.thumbnail_path,
+      legacyPath,
+    ]);
     await fetchCatches(true);
     return { error: null };
   };

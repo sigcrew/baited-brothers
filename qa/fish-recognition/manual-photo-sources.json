@@ -1,0 +1,77 @@
+{
+  "notice": "논문·공공기관에서 종과 라이선스가 명시된 수동 보강 이미지입니다. 파생 crop은 원본 단위로 분할합니다.",
+  "sources": [
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/25-pennahia-argentata/90-literature-mdpi-fishes-10-00622-g002-crop.jpg",
+      "provider": "literature",
+      "providerAssetId": "10.3390/fishes10120622:figure-2",
+      "sourceUrl": "https://www.mdpi.com/2410-3888/10/12/622",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "creator": "Bingzhong Yang and Bent Herrmann",
+      "attribution": "Yang B, Herrmann B (2025), Fishes 10(12):622, Figure 2",
+      "biologicalReview": "pending",
+      "photoTypeReview": "approved"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/05-platichthys-bicoloratus/91-mbris-kogl1-mabik-pi00051762.jpg",
+      "provider": "mbris",
+      "providerAssetId": "SIRM00000027161",
+      "sourceUrl": "https://www.mbris.kr/pub/marine/tsearch/tsearchDetail.do?spcTxnId=270000008944",
+      "license": "KOGL-TYPE-1",
+      "licenseUrl": "https://www.kogl.or.kr/info/licenseType1.do",
+      "creator": "국립해양생물자원관",
+      "attribution": "국립해양생물자원관 MBRIS, MABIK PI00051762",
+      "biologicalReview": "pending",
+      "photoTypeReview": "approved"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/25-pennahia-argentata/91-mbris-kogl1-mabik-pi00051704.jpg",
+      "provider": "mbris",
+      "providerAssetId": "SIRM00000027126",
+      "sourceUrl": "https://www.mbris.kr/pub/marine/tsearch/tsearchDetail.do?spcTxnId=270000013293",
+      "license": "KOGL-TYPE-1",
+      "licenseUrl": "https://www.kogl.or.kr/info/licenseType1.do",
+      "creator": "국립해양생물자원관",
+      "attribution": "국립해양생물자원관 MBRIS, MABIK PI00051704",
+      "biologicalReview": "pending",
+      "photoTypeReview": "approved"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/03-pseudopleuronectes-yokohamae/91-mbris-kogl1-mabik-pi00051763.jpg",
+      "provider": "mbris",
+      "providerAssetId": "SIRM00000027162",
+      "sourceUrl": "https://www.mbris.kr/pub/marine/tsearch/tsearchDetail.do?spcTxnId=270000014983",
+      "license": "KOGL-TYPE-1",
+      "licenseUrl": "https://www.kogl.or.kr/info/licenseType1.do",
+      "creator": "국립해양생물자원관",
+      "attribution": "국립해양생물자원관 MBRIS, MABIK PI00051763",
+      "biologicalReview": "pending",
+      "photoTypeReview": "approved"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/12-hexagrammos-agrammus/91-mbris-kogl1-mabik-pi00051654.jpg",
+      "provider": "mbris",
+      "providerAssetId": "SIRM00000027093",
+      "sourceUrl": "https://www.mbris.kr/pub/marine/tsearch/tsearchDetail.do?spcTxnId=270000008283",
+      "license": "KOGL-TYPE-1",
+      "licenseUrl": "https://www.kogl.or.kr/info/licenseType1.do",
+      "creator": "국립해양생물자원관",
+      "attribution": "국립해양생물자원관 MBRIS, MABIK PI00051654",
+      "biologicalReview": "pending",
+      "photoTypeReview": "approved"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/58-octopus-minor/91-mbris-kogl1-mabik-mo00178105.jpg",
+      "provider": "mbris",
+      "providerAssetId": "SIRM00000025301",
+      "sourceUrl": "https://www.mbris.kr/pub/marine/tsearch/tsearchDetail.do?spcTxnId=270000012007",
+      "license": "KOGL-TYPE-1",
+      "licenseUrl": "https://www.kogl.or.kr/info/licenseType1.do",
+      "creator": "국립해양생물자원관",
+      "attribution": "국립해양생물자원관 MBRIS, MABIK MO00178105",
+      "biologicalReview": "pending",
+      "photoTypeReview": "approved"
+    }
+  ]
+}

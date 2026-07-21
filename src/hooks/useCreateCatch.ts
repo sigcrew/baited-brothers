@@ -3,12 +3,18 @@ import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/contexts/AuthContext";
 import type { Database, TablesInsert } from "@/src/types/database";
 import { toUserMessage, withTimeout } from "@/src/lib/appErrors";
+import {
+  removeUserMedia,
+  uploadUserPhotoVariants,
+} from "@/src/lib/userMedia";
 
 type CreateCatchInput = {
   tripId?: string;
   fishId: string;
   imageUri: string;
   mimeType: "image/jpeg" | "image/png";
+  imageWidth: number;
+  imageHeight: number;
   latitude?: number;
   longitude?: number;
   locationCapturedAt?: string;
@@ -46,8 +52,7 @@ export const useCreateCatch = () => {
     }
 
     setIsSaving(true);
-    const extension = input.mimeType === "image/png" ? "png" : "jpg";
-    const path = `${userId}/${Date.now()}.${extension}`;
+    let uploadedPaths: string[] = [];
 
     try {
       const { data: discoveryRows, error: discoveryError } = await supabase
@@ -61,31 +66,29 @@ export const useCreateCatch = () => {
       );
       const isFirstDiscovery = !discoveredFishIds.has(input.fishId);
 
-      const response = await withTimeout(
-        fetch(input.imageUri),
-        15_000,
-        "사진을 읽는 시간이 초과되었습니다.",
-      );
-      if (!response.ok) throw new Error("선택한 사진을 읽지 못했습니다.");
-      const image = await response.arrayBuffer();
-      const { error: uploadError } = await withTimeout(
-        supabase.storage
-          .from("user-uploads")
-          .upload(path, image, { contentType: input.mimeType, upsert: false }),
-        30_000,
+      const uploaded = await withTimeout(
+        uploadUserPhotoVariants({
+          userId,
+          folder: "catches",
+          photo: {
+            uri: input.imageUri,
+            width: input.imageWidth,
+            height: input.imageHeight,
+            mimeType: "image/jpeg",
+          },
+        }),
+        45_000,
         "사진 업로드 시간이 초과되었습니다.",
       );
-      if (uploadError) throw uploadError;
-
-      const { data: publicData } = supabase.storage
-        .from("user-uploads")
-        .getPublicUrl(path);
+      uploadedPaths = [uploaded.imagePath, uploaded.thumbnailPath];
 
       const payload: TablesInsert<"user_catches"> = {
         user_id: userId,
         trip_id: input.tripId ?? null,
         fish_id: input.fishId,
-        image_url: publicData.publicUrl,
+        image_url: null,
+        image_path: uploaded.imagePath,
+        thumbnail_path: uploaded.thumbnailPath,
         caught_at: new Date().toISOString(),
         location_lat: input.latitude ?? null,
         location_lng: input.longitude ?? null,
@@ -106,7 +109,7 @@ export const useCreateCatch = () => {
         .select("id")
         .single();
       if (insertError?.code === "23505") {
-        await supabase.storage.from("user-uploads").remove([path]);
+        await removeUserMedia(uploadedPaths);
         const { data: existingCatch } = await supabase
           .from("user_catches")
           .select("id, fish_id")
@@ -121,7 +124,7 @@ export const useCreateCatch = () => {
         };
       }
       if (insertError) {
-        await supabase.storage.from("user-uploads").remove([path]);
+        await removeUserMedia(uploadedPaths);
         throw insertError;
       }
       return {

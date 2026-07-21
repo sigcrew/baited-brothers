@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { useUserCatches } from "@/src/hooks/useUserCatches";
 import { useFishingTrips } from "@/src/hooks/useFishingTrips";
+import { useUserAvatar } from "@/src/hooks/useUserAvatar";
 import { ArchiveRule } from "@/components/design/ArchiveRule";
 import { ArchiveTabHeader } from "@/components/design/ArchiveTabHeader";
 import {
@@ -35,17 +36,13 @@ const ProfileScreen = () => {
   const { session, signOut } = useAuth();
   const { catches, unlockedFishIds } = useUserCatches();
   const { trips } = useFishingTrips();
+  const avatarUrl = useUserAvatar();
 
   const email = session?.user?.email;
   const displayName =
     session?.user?.user_metadata?.display_name ??
     session?.user?.user_metadata?.full_name ??
     null;
-  const avatarUrl =
-    typeof session?.user?.user_metadata?.avatar_url === "string"
-      ? session.user.user_metadata.avatar_url
-      : null;
-
   const handleSignOut = () => Alert.alert("로그아웃", "현재 계정에서 로그아웃할까요?", [{ text: "취소", style: "cancel" }, { text: "로그아웃", style: "destructive", onPress: async () => { await signOut(); router.replace("/(auth)/login"); } }]);
 
   const handleGoLogin = () => {

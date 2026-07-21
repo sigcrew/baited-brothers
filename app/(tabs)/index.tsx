@@ -398,9 +398,9 @@ const HomeScreen = () => {
                     borderColor: FIELD_COLORS.rule,
                   }}
                 >
-                  {item.image_url ? (
+                  {item.thumbnail_url ?? item.image_url ? (
                     <Image
-                      source={{ uri: item.image_url }}
+                      source={{ uri: item.thumbnail_url ?? item.image_url! }}
                       resizeMode="cover"
                       style={{ width: "100%", height: 96 }}
                     />

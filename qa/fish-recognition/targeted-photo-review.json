@@ -1,0 +1,59 @@
+{
+  "reviewedAt": "2026-07-21T00:00:00+09:00",
+  "scope": "11개 취약 종의 신규 후보 중 육안으로 명백한 비실사·비식별 사진만 제외한 1차 사진 유형 검수",
+  "notice": "photoTypeReview만 판정했습니다. 종 동정 biologicalReview는 전문가 승인 전까지 pending입니다.",
+  "decisions": [
+    { "file": "qa/fish-recognition/open-photo-candidates/03-pseudopleuronectes-yokohamae/21-gbif-1057513026-0.jpg", "photoTypeReview": "rejected", "reason": "표본 문서 페이지" },
+    { "file": "qa/fish-recognition/open-photo-candidates/03-pseudopleuronectes-yokohamae/22-gbif-1320787151-0.jpg", "photoTypeReview": "rejected", "reason": "엑스레이" },
+    { "file": "qa/fish-recognition/open-photo-candidates/04-pseudopleuronectes-herzensteini/50-gbif-6131016217-0.jpg", "photoTypeReview": "rejected", "reason": "피사체 식별 불가" },
+
+    { "file": "qa/fish-recognition/open-photo-candidates/12-hexagrammos-agrammus/05-wikimedia-e4173e83702a6a67903417ee2719bfc863725999.jpg", "photoTypeReview": "rejected", "reason": "삽화" },
+    { "file": "qa/fish-recognition/open-photo-candidates/12-hexagrammos-agrammus/23-gbif-2432732575-0.jpg", "photoTypeReview": "rejected", "reason": "표본 상자" },
+    { "file": "qa/fish-recognition/open-photo-candidates/12-hexagrammos-agrammus/27-gbif-2432733573-0.jpg", "photoTypeReview": "rejected", "reason": "표본 상자" },
+    { "file": "qa/fish-recognition/open-photo-candidates/12-hexagrammos-agrammus/31-gbif-2432734574-0.jpg", "photoTypeReview": "rejected", "reason": "표본 상자" },
+    { "file": "qa/fish-recognition/open-photo-candidates/12-hexagrammos-agrammus/35-gbif-2432734575-0.jpg", "photoTypeReview": "rejected", "reason": "표본 상자" },
+    { "file": "qa/fish-recognition/open-photo-candidates/12-hexagrammos-agrammus/39-gbif-2432735574-0.jpg", "photoTypeReview": "rejected", "reason": "표본 상자" },
+    { "file": "qa/fish-recognition/open-photo-candidates/12-hexagrammos-agrammus/43-gbif-2432795574-0.jpg", "photoTypeReview": "rejected", "reason": "표본 상자" },
+    { "file": "qa/fish-recognition/open-photo-candidates/12-hexagrammos-agrammus/47-gbif-2432797575-0.jpg", "photoTypeReview": "rejected", "reason": "표본 상자" },
+
+    { "file": "qa/fish-recognition/open-photo-candidates/21-dentex-hypselosomus/03-wikimedia-7653a494ec3b5364497dcd9702e9f8b45dbc857f.jpg", "photoTypeReview": "rejected", "reason": "삽화" },
+    { "file": "qa/fish-recognition/open-photo-candidates/23-lateolabrax-spilonotus/06-wikimedia-75a00f070c9f66c3af2ad5e3ffa707abc546acb6.jpg", "photoTypeReview": "rejected", "reason": "엑스레이 패널" },
+    { "file": "qa/fish-recognition/open-photo-candidates/23-lateolabrax-spilonotus/17-wikimedia-dc5fbda55cb1263ef95befe13129678e39ec5068.jpg", "photoTypeReview": "rejected", "reason": "조리 음식" },
+    { "file": "qa/fish-recognition/open-photo-candidates/23-lateolabrax-spilonotus/09-gbif-1056741650-0.jpg", "photoTypeReview": "rejected", "reason": "표본 문서" },
+    { "file": "qa/fish-recognition/open-photo-candidates/23-lateolabrax-spilonotus/11-gbif-1056741650-1.jpg", "photoTypeReview": "rejected", "reason": "표본 등록 문서" },
+    { "file": "qa/fish-recognition/open-photo-candidates/23-lateolabrax-spilonotus/13-gbif-1056741650-2.jpg", "photoTypeReview": "rejected", "reason": "표본 라벨" },
+    { "file": "qa/fish-recognition/open-photo-candidates/23-lateolabrax-spilonotus/15-gbif-1056741650-3.jpg", "photoTypeReview": "rejected", "reason": "표본 문서" },
+    { "file": "qa/fish-recognition/open-photo-candidates/23-lateolabrax-spilonotus/90-wikimedia-c4e44d1c83bf6601dd2f146770e459b198156f71-panel-c.jpg", "photoTypeReview": "approved", "reason": "CC BY 4.0 논문의 L. maculatus C 전신 패널" },
+    { "file": "qa/fish-recognition/open-photo-candidates/23-lateolabrax-spilonotus/91-wikimedia-c4e44d1c83bf6601dd2f146770e459b198156f71-panel-d.jpg", "photoTypeReview": "approved", "reason": "CC BY 4.0 논문의 L. maculatus D 전신 패널" },
+    { "file": "qa/fish-recognition/open-photo-candidates/23-lateolabrax-spilonotus/92-wikimedia-21ed3aa86ca238260e4df768f54d2e27b82c50e2-panel-b.jpg", "photoTypeReview": "approved", "reason": "CC BY 4.0 논문의 L. maculatus B 반점 패널" },
+
+    { "file": "qa/fish-recognition/open-photo-candidates/25-pennahia-argentata/02-wikimedia-33f52a95b9d23714a54fa84a48c5aec3b37f46f3.jpg", "photoTypeReview": "rejected", "reason": "삽화" },
+    { "file": "qa/fish-recognition/open-photo-candidates/25-pennahia-argentata/06-wikimedia-731c53490d4fa937763139e8569f21bfd103bd24.jpg", "photoTypeReview": "rejected", "reason": "도감 판화" },
+    { "file": "qa/fish-recognition/open-photo-candidates/25-pennahia-argentata/09-wikimedia-d9c8cfb7e58ab162193eff5d111055fe5e869e39.jpg", "photoTypeReview": "rejected", "reason": "복수 종 삽화" },
+    { "file": "qa/fish-recognition/open-photo-candidates/25-pennahia-argentata/10-wikimedia-886368556831b3046e0a8c7e6bde4261f225faf8.jpg", "photoTypeReview": "rejected", "reason": "삽화" },
+    { "file": "qa/fish-recognition/open-photo-candidates/25-pennahia-argentata/11-wikimedia-36ea16ca91606cea55ddab53e2a1be1ae123432e.jpg", "photoTypeReview": "rejected", "reason": "삽화" },
+    { "file": "qa/fish-recognition/open-photo-candidates/25-pennahia-argentata/12-wikimedia-8a00a0311dc57864ad6c2743920b490f045b2275.jpg", "photoTypeReview": "rejected", "reason": "삽화" },
+    { "file": "qa/fish-recognition/open-photo-candidates/25-pennahia-argentata/13-wikimedia-4262e2b25cde40fc2a4af82ad70d19fd839bc181.jpg", "photoTypeReview": "rejected", "reason": "복수 종 삽화" },
+
+    { "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/03-wikimedia-94cbde12ebf7ee2ae96e6617cedb7db019370046.jpg", "photoTypeReview": "rejected", "reason": "초밥" },
+    { "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/08-wikimedia-747ea4950b1014b1c1bfc272469d1cd85fc7d147.jpg", "photoTypeReview": "rejected", "reason": "삽화" },
+    { "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/10-wikimedia-a2cca0ff728b355aef55a0db3c90a94d7eaca3b6.jpg", "photoTypeReview": "rejected", "reason": "삽화" },
+    { "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/20-wikimedia-182a2a47d39d56de36e563633aebde877c388a47.jpg", "photoTypeReview": "rejected", "reason": "문서" },
+    { "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/22-wikimedia-120cbac3781a54c65dbf7f507a0059b530c79356.jpg", "photoTypeReview": "rejected", "reason": "조리 음식" },
+    { "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/24-wikimedia-00dec445ab95026bd8d038e7288af5579f955d19.jpg", "photoTypeReview": "rejected", "reason": "초밥" },
+    { "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/26-wikimedia-b4833f844d63cf3bb29a25933055ba4d3dbb0001.jpg", "photoTypeReview": "rejected", "reason": "초밥" },
+    { "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/28-wikimedia-bd723712e9b1905d5cba0e4d485725793a8f229d.jpg", "photoTypeReview": "rejected", "reason": "초밥" },
+    { "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/30-wikimedia-992913012776e4cbb8cb1773c3273c25e020d81f.jpg", "photoTypeReview": "rejected", "reason": "초밥" },
+    { "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/34-wikimedia-909abfc928624b0caa82856f1a4f134764bbf9c2.jpg", "photoTypeReview": "rejected", "reason": "표적 생물 외 피사체" },
+    { "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/36-wikimedia-a72f5f90e58a54c94f283ad83d656549d7ae34fc.jpg", "photoTypeReview": "rejected", "reason": "초밥" },
+
+    { "file": "qa/fish-recognition/open-photo-candidates/53-todarodes-pacificus/04-inaturalist-425489764.jpg", "photoTypeReview": "rejected", "reason": "조리 음식" },
+    { "file": "qa/fish-recognition/open-photo-candidates/53-todarodes-pacificus/08-wikimedia-1bb2d6305481827aecd7e0e181f5504885c6a95b.jpg", "photoTypeReview": "rejected", "reason": "주석 이미지" },
+    { "file": "qa/fish-recognition/open-photo-candidates/53-todarodes-pacificus/10-wikimedia-ca318a8c1f4dfd8564f161cd8f3b233aa17a0a6b.jpg", "photoTypeReview": "rejected", "reason": "삽화" },
+    { "file": "qa/fish-recognition/open-photo-candidates/53-todarodes-pacificus/12-wikimedia-438b19b2a22e9f05f50baa5e9a84eaa671fd02f5.jpg", "photoTypeReview": "rejected", "reason": "삽화" },
+    { "file": "qa/fish-recognition/open-photo-candidates/53-todarodes-pacificus/20-wikimedia-0aff055feffbbf7e90830f5330be5f4f0dc9c0e1.jpg", "photoTypeReview": "rejected", "reason": "표적 생물 없음" },
+
+    { "file": "qa/fish-recognition/open-photo-candidates/56-uroteuthis-edulis/03-wikimedia-9657bebea606f89ec61dd4d95118c3a5aab1d08e.jpg", "photoTypeReview": "rejected", "reason": "초밥" },
+    { "file": "qa/fish-recognition/open-photo-candidates/58-octopus-minor/05-wikimedia-a13ced5abcde7f944684acb8dd70d94ac9352179.jpg", "photoTypeReview": "rejected", "reason": "시장 내 복수 개체·부분 피사체" }
+  ]
+}

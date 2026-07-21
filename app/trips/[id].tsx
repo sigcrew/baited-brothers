@@ -344,9 +344,9 @@ const TripDetailScreen = () => {
                     style={{ borderColor: FIELD_COLORS.rule }}
                   >
                     <View className="flex-row">
-                      {item.image_url ? (
+                      {item.thumbnail_url ?? item.image_url ? (
                         <Image
-                          source={{ uri: item.image_url }}
+                          source={{ uri: item.thumbnail_url ?? item.image_url! }}
                           resizeMode="cover"
                           style={{ width: 112, height: 112 }}
                         />

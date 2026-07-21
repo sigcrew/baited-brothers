@@ -13,6 +13,11 @@ import * as ImagePicker from "expo-image-picker";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { supabase } from "@/src/lib/supabase";
 import { optimizeUserPhoto } from "@/src/lib/optimizeUserPhoto";
+import { useUserAvatar } from "@/src/hooks/useUserAvatar";
+import {
+  removeUserMedia,
+  uploadUserPhotoVariants,
+} from "@/src/lib/userMedia";
 import { SettingsScaffold } from "@/components/settings/SettingsScaffold";
 import {
   FIELD_COLORS,
@@ -25,6 +30,7 @@ const DEFAULT_PROFILE_IMAGE = require("@/assets/images/adaptive-icon-baited.png"
 export default function ProfileEditScreen() {
   const router = useRouter();
   const { session } = useAuth();
+  const signedAvatarUrl = useUserAvatar();
   const [displayName, setDisplayName] = useState("");
   const [selectedAvatar, setSelectedAvatar] =
     useState<ImagePicker.ImagePickerAsset | null>(null);
@@ -39,10 +45,7 @@ export default function ProfileEditScreen() {
     );
   }, [session]);
 
-  const currentAvatarUrl =
-    typeof session?.user.user_metadata?.avatar_url === "string"
-      ? session.user.user_metadata.avatar_url
-      : null;
+  const currentAvatarUrl = signedAvatarUrl;
   const avatarSource = selectedAvatar?.uri
     ? { uri: selectedAvatar.uri }
     : !removeAvatar && currentAvatarUrl
@@ -69,15 +72,20 @@ export default function ProfileEditScreen() {
     }
     if (!session) return;
     setIsSaving(true);
-    let uploadedPath: string | null = null;
+    let uploadedPaths: string[] = [];
 
     try {
-      let avatarUrl = removeAvatar ? null : currentAvatarUrl;
       let avatarPath = removeAvatar
         ? null
         : typeof session.user.user_metadata?.avatar_path === "string"
           ? session.user.user_metadata.avatar_path
           : null;
+      let avatarUrl =
+        removeAvatar || avatarPath
+          ? null
+          : typeof session.user.user_metadata?.avatar_url === "string"
+            ? session.user.user_metadata.avatar_url
+            : null;
 
       if (selectedAvatar) {
         const optimized = await optimizeUserPhoto({
@@ -85,51 +93,51 @@ export default function ProfileEditScreen() {
           width: selectedAvatar.width,
           height: selectedAvatar.height,
           maxDimension: 768,
-          compress: 0.8,
+          compress: 0.75,
         });
-        uploadedPath = `${session.user.id}/profile/${Date.now()}-${Math.random().toString(36).slice(2, 9)}.jpg`;
-        const response = await fetch(optimized.uri);
-        if (!response.ok) throw new Error("프로필 사진을 읽지 못했습니다.");
-        const { error: uploadError } = await supabase.storage
-          .from("user-uploads")
-          .upload(uploadedPath, await response.arrayBuffer(), {
-            contentType: optimized.mimeType,
-            upsert: false,
-          });
-        if (uploadError) throw uploadError;
-        const { data } = supabase.storage
-          .from("user-uploads")
-          .getPublicUrl(uploadedPath);
-        avatarUrl = data.publicUrl;
-        avatarPath = uploadedPath;
+        const uploaded = await uploadUserPhotoVariants({
+          userId: session.user.id,
+          folder: "profile",
+          photo: optimized,
+        });
+        uploadedPaths = [uploaded.imagePath, uploaded.thumbnailPath];
+        avatarUrl = null;
+        avatarPath = uploaded.imagePath;
       }
 
       const previousAvatarPath =
         typeof session.user.user_metadata?.avatar_path === "string"
           ? session.user.user_metadata.avatar_path
           : null;
+      const previousAvatarThumbnailPath =
+        typeof session.user.user_metadata?.avatar_thumbnail_path === "string"
+          ? session.user.user_metadata.avatar_thumbnail_path
+          : null;
       const { error } = await supabase.auth.updateUser({
         data: {
           display_name: nextName,
           avatar_url: avatarUrl,
           avatar_path: avatarPath,
+          avatar_thumbnail_path:
+            removeAvatar
+              ? null
+              : uploadedPaths[1] ?? previousAvatarThumbnailPath,
         },
       });
       if (error) throw error;
 
-      if (
-        previousAvatarPath &&
-        previousAvatarPath !== avatarPath &&
-        previousAvatarPath.startsWith(`${session.user.id}/`)
-      ) {
-        await supabase.storage
-          .from("user-uploads")
-          .remove([previousAvatarPath]);
+      if (previousAvatarPath !== avatarPath) {
+        await removeUserMedia([
+          previousAvatarPath?.startsWith(`${session.user.id}/`)
+            ? previousAvatarPath
+            : null,
+          previousAvatarThumbnailPath?.startsWith(`${session.user.id}/`)
+            ? previousAvatarThumbnailPath
+            : null,
+        ]);
       }
     } catch {
-      if (uploadedPath) {
-        await supabase.storage.from("user-uploads").remove([uploadedPath]);
-      }
+      await removeUserMedia(uploadedPaths);
       setIsSaving(false);
       Alert.alert("저장 실패", "프로필 사진과 이름을 저장하지 못했습니다.");
       return;

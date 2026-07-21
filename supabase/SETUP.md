@@ -26,8 +26,9 @@
 #### Apple Client Secret 자동 갱신
 
 `.github/workflows/refresh-apple-client-secret.yml`은 매월 1일 Apple Client
-Secret JWT를 새로 발급해 Supabase Edge Function secret을 갱신합니다. JWT
-유효기간은 Apple 제한보다 짧은 150일이며, 워크플로는 수동 실행도 지원합니다.
+Secret JWT를 새로 발급해 Supabase Auth의 Apple Provider 설정과 계정 탈퇴
+Edge Function secret을 함께 갱신합니다. JWT 유효기간은 Apple 제한보다 짧은
+150일이며, 워크플로는 수동 실행도 지원합니다.
 
 GitHub 저장소의 **Settings → Secrets and variables → Actions**에 다음 repository
 secret을 등록합니다.
@@ -42,9 +43,9 @@ secret을 등록합니다.
 | `SUPABASE_PROJECT_REF` | Supabase project ref (`zfezkimynicyvhmwgzoi`) |
 
 `.p8` 파일과 생성된 JWT는 저장소에 커밋하지 않습니다. 최초 설정 후 GitHub
-Actions에서 **Refresh Apple client secret**을 한 번 수동 실행해 Function
-secret을 즉시 등록합니다. 예약 실행과 수동 실행은 워크플로 파일이 저장소의
-기본 브랜치에 병합된 뒤 활성화됩니다.
+Actions에서 **Refresh Apple client secret**을 한 번 수동 실행해 Auth Provider와
+Function secret을 즉시 등록합니다. 예약 실행과 수동 실행은 워크플로 파일이
+저장소의 기본 브랜치에 병합된 뒤 활성화됩니다.
 
 ### Google 로그인 설정
 
@@ -71,7 +72,14 @@ secret을 즉시 등록합니다. 예약 실행과 수동 실행은 워크플로
 
 1. **Storage** → **New bucket**
 2. `fish-images`: Public, 5MB 제한
-3. `user-uploads`: Public, 5MB 제한
+3. `user-uploads`: Private, 5MB 제한
+
+사용자 사진은 DB에 객체 경로만 저장하며 앱에서 소유자용 signed URL을 생성합니다.
+새 사진은 상세용 1280px과 목록용 480px 썸네일로 분리되고, 변경되지 않는
+타임스탬프 경로에는 1년 브라우저 캐시가 적용됩니다.
+
+기존 공개 사용자 사진을 새 비공개 경로로 옮기고 썸네일을 생성할 때는
+`npx ts-node scripts/backfill-user-media-thumbnails.ts`를 한 번 실행합니다.
 
 ## 6. 환경 변수 (.env)
 

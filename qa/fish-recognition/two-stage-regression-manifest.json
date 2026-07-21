@@ -1,0 +1,45 @@
+{
+  "notes": "Two-stage quality gate and group-shortlisting regression smoke set.",
+  "cases": [
+    {
+      "id": "real-kareius-bicoloratus-01",
+      "path": "../../assets/images/species/field60/kareius-bicoloratus.png",
+      "kind": "fish",
+      "expectedScientificName": "Kareius bicoloratus"
+    },
+    {
+      "id": "real-hyporthodus-septemfasciatus-01",
+      "path": "../../assets/images/species/field60/hyporthodus-septemfasciatus.jpg",
+      "kind": "fish",
+      "expectedScientificName": "Hyporthodus septemfasciatus"
+    },
+    {
+      "id": "real-pseudopleuronectes-herzensteini-01",
+      "path": "../../assets/images/species/field60/pseudopleuronectes-herzensteini.png",
+      "kind": "fish",
+      "expectedScientificName": "Pseudopleuronectes herzensteini"
+    },
+    {
+      "id": "real-lateolabrax-maculatus-01",
+      "path": "../../assets/images/species/field60/lateolabrax-maculatus.png",
+      "kind": "fish",
+      "expectedScientificName": "Lateolabrax maculatus"
+    },
+    {
+      "id": "real-pseudopleuronectes-yokohamae-01",
+      "path": "../../assets/images/species/field60/pseudopleuronectes-yokohamae.png",
+      "kind": "fish",
+      "expectedScientificName": "Pseudopleuronectes yokohamae"
+    },
+    {
+      "id": "low-quality-cropped-04",
+      "path": "rejection-data/low-quality/low-quality-cropped-04.jpg",
+      "kind": "low_quality"
+    },
+    {
+      "id": "low-quality-overexposed-05",
+      "path": "rejection-data/low-quality/low-quality-overexposed-05.jpg",
+      "kind": "low_quality"
+    }
+  ]
+}

@@ -206,6 +206,7 @@ export type Database = {
           created_at: string | null
           fish_id: string
           id: string
+          image_path: string | null
           image_url: string | null
           id_method: Database["public"]["Enums"]["catch_id_method"] | null
           location_lat: number | null
@@ -215,6 +216,7 @@ export type Database = {
           memo: string | null
           size_cm: number | null
           trip_id: string | null
+          thumbnail_path: string | null
           updated_at: string | null
           user_id: string
           verification_reason: string | null
@@ -228,6 +230,7 @@ export type Database = {
           created_at?: string | null
           fish_id: string
           id?: string
+          image_path?: string | null
           image_url?: string | null
           id_method?: Database["public"]["Enums"]["catch_id_method"] | null
           location_lat?: number | null
@@ -237,6 +240,7 @@ export type Database = {
           memo?: string | null
           size_cm?: number | null
           trip_id?: string | null
+          thumbnail_path?: string | null
           updated_at?: string | null
           user_id: string
           verification_reason?: string | null
@@ -250,6 +254,7 @@ export type Database = {
           created_at?: string | null
           fish_id?: string
           id?: string
+          image_path?: string | null
           image_url?: string | null
           id_method?: Database["public"]["Enums"]["catch_id_method"] | null
           location_lat?: number | null
@@ -259,6 +264,7 @@ export type Database = {
           memo?: string | null
           size_cm?: number | null
           trip_id?: string | null
+          thumbnail_path?: string | null
           updated_at?: string | null
           user_id?: string
           verification_reason?: string | null
@@ -308,6 +314,7 @@ export type Database = {
       fishing_trips: {
         Row: {
           cover_image_path: string | null
+          cover_thumbnail_path: string | null
           cover_image_url: string | null
           id: string
           user_id: string
@@ -321,6 +328,7 @@ export type Database = {
         }
         Insert: {
           cover_image_path?: string | null
+          cover_thumbnail_path?: string | null
           cover_image_url?: string | null
           id?: string
           user_id: string
@@ -334,6 +342,7 @@ export type Database = {
         }
         Update: {
           cover_image_path?: string | null
+          cover_thumbnail_path?: string | null
           cover_image_url?: string | null
           id?: string
           user_id?: string

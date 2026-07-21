@@ -21,8 +21,8 @@ export const optimizeUserPhoto = async ({
   uri,
   width,
   height,
-  maxDimension = 1600,
-  compress = 0.8,
+  maxDimension = 1280,
+  compress = 0.75,
   includeBase64 = false,
 }: OptimizeUserPhotoOptions): Promise<OptimizedUserPhoto> => {
   const context = ImageManipulator.manipulate(uri);

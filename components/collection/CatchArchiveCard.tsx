@@ -200,7 +200,10 @@ const CardPhoto = ({
   compact: boolean;
 }) => {
   const [photoFailed, setPhotoFailed] = useState(false);
-  const showPhoto = Boolean(item.image_url) && !photoFailed;
+  const photoUrl = compact
+    ? item.thumbnail_url ?? item.image_url
+    : item.image_url ?? item.thumbnail_url;
+  const showPhoto = Boolean(photoUrl) && !photoFailed;
 
   return (
     <View
@@ -214,7 +217,7 @@ const CardPhoto = ({
     >
       {showPhoto ? (
         <Image
-          source={{ uri: item.image_url! }}
+          source={{ uri: photoUrl! }}
           resizeMode="cover"
           onError={() => setPhotoFailed(true)}
           style={{ width: "100%", height: "100%" }}

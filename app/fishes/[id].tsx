@@ -538,7 +538,7 @@ const FishDetailScreen = () => {
                   style={{ borderColor: FIELD_COLORS.rule }}
                 >
                   <View className="h-32 items-center justify-center" style={{ backgroundColor: FIELD_COLORS.locked }}>
-                    {item.image_url ? <Image source={{ uri: item.image_url }} className="h-full w-full" resizeMode="cover" /> : <FontAwesome name="camera" size={22} color={FIELD_COLORS.muted} />}
+                    {item.thumbnail_url ?? item.image_url ? <Image source={{ uri: item.thumbnail_url ?? item.image_url! }} className="h-full w-full" resizeMode="cover" /> : <FontAwesome name="camera" size={22} color={FIELD_COLORS.muted} />}
                   </View>
                   <View className="p-3">
                     <Text className="text-[12px]" style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>{item.location_name ?? "장소 미기록"}</Text>

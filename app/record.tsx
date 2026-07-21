@@ -32,6 +32,8 @@ import { FIELD_COLORS, bodyExtraBoldFont, bodyFont, monoFont } from "@/src/theme
 
 type Capture = {
   uri: string;
+  width: number;
+  height: number;
   base64: string;
   mimeType: "image/jpeg" | "image/png";
   latitude: number | null;
@@ -180,9 +182,21 @@ const RecordScreen = () => {
     setRecognitionCandidates(result.candidates);
     setRecognitionNote(result.note);
     setNeedsRetake(result.needsRetake);
-    if (result.error || result.candidates.length === 0) {
-      setCatalogVisible(true);
-    }
+  };
+
+  const retryRecognition = async () => {
+    if (!capture || isRecognizing) return;
+    await analyzeCapture(capture);
+  };
+
+  const retakePhoto = () => {
+    setCapture(null);
+    setSelectedFish(null);
+    setCompletion(null);
+    setRecognitionCandidates([]);
+    setRecognitionNote(null);
+    setNeedsRetake(false);
+    setCatalogVisible(false);
   };
 
   const pickDevPhoto = async () => {
@@ -219,6 +233,8 @@ const RecordScreen = () => {
 
       await analyzeCapture({
         uri: optimized.uri,
+        width: optimized.width,
+        height: optimized.height,
         base64: optimized.base64,
         mimeType: optimized.mimeType,
         latitude: null,
@@ -282,6 +298,8 @@ const RecordScreen = () => {
 
       const nextCapture: Capture = {
         uri: optimized.uri,
+        width: optimized.width,
+        height: optimized.height,
         base64: optimized.base64,
         mimeType: optimized.mimeType,
         latitude: position.coords.latitude,
@@ -320,6 +338,8 @@ const RecordScreen = () => {
       fishId: selectedFish.id,
       imageUri: capture.uri,
       mimeType: capture.mimeType,
+      imageWidth: capture.width,
+      imageHeight: capture.height,
       latitude: capture.latitude ?? undefined,
       longitude: capture.longitude ?? undefined,
       locationCapturedAt: capture.locationCapturedAt ?? undefined,
@@ -596,6 +616,18 @@ const RecordScreen = () => {
               AI가 도감 60종 안에서 후보를 찾습니다. 추천 결과는 참고용이며
               최종 선택은 직접 확인해 주세요.
             </Text>
+            <View
+              className="mt-4 border-l-4 bg-white px-4 py-3"
+              style={{ borderLeftColor: FIELD_COLORS.orange }}
+            >
+              <Text
+                className="text-xs leading-5"
+                style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
+              >
+                AI가 어종을 자동으로 확정하거나 기록하지 않습니다. 후보 또는
+                도감 검색에서 어종을 선택한 뒤 직접 기록해 주세요.
+              </Text>
+            </View>
             {selectedFish ? (
               <View
                 className="mt-4 border p-4"
@@ -667,7 +699,7 @@ const RecordScreen = () => {
                         className="text-lg"
                         style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}
                       >
-                        AI 추천 후보
+                        AI 어종 후보 추천
                       </Text>
                       <Text
                         className="text-[9px] tracking-[1px]"
@@ -685,7 +717,7 @@ const RecordScreen = () => {
                         <TouchableOpacity
                           key={fish.id}
                           accessibilityRole="button"
-                          accessibilityLabel={`${fish.name_ko ?? fish.name}, AI 신뢰도 ${Math.round(candidate.confidence * 100)}퍼센트`}
+                          accessibilityLabel={`${index + 1}순위 후보, ${fish.name_ko ?? fish.name}`}
                           onPress={() => {
                             setSelectedFish(fish);
                             setCompletion(null);
@@ -717,7 +749,7 @@ const RecordScreen = () => {
                                 className="text-sm"
                                 style={{ color: FIELD_COLORS.orange, fontFamily: bodyExtraBoldFont }}
                               >
-                                {Math.round(candidate.confidence * 100)}%
+                                {index + 1}순위
                               </Text>
                             </View>
                             <Text
@@ -767,19 +799,62 @@ const RecordScreen = () => {
                     >
                       다시 촬영하거나 아래 도감 검색에서 직접 선택할 수 있습니다.
                     </Text>
+                    <View className="mt-4 flex-row">
+                      {recognitionError ? (
+                        <TouchableOpacity
+                          accessibilityRole="button"
+                          accessibilityLabel="AI 어종 후보 추천 다시 시도"
+                          disabled={isRecognizing}
+                          onPress={retryRecognition}
+                          className="mr-3 border px-4 py-2"
+                          style={{ borderColor: FIELD_COLORS.teal }}
+                        >
+                          <Text
+                            style={{
+                              color: FIELD_COLORS.teal,
+                              fontFamily: bodyExtraBoldFont,
+                            }}
+                          >
+                            다시 시도
+                          </Text>
+                        </TouchableOpacity>
+                      ) : null}
+                      <TouchableOpacity
+                        accessibilityRole="button"
+                        accessibilityLabel="사진 다시 촬영"
+                        onPress={retakePhoto}
+                        className="border px-4 py-2"
+                        style={{ borderColor: FIELD_COLORS.rule }}
+                      >
+                        <Text
+                          style={{
+                            color: FIELD_COLORS.ink,
+                            fontFamily: bodyExtraBoldFont,
+                          }}
+                        >
+                          다시 촬영
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 ) : null}
 
                 {!isRecognizing ? (
                   <TouchableOpacity
                     accessibilityRole="button"
-                    accessibilityLabel="도감에서 직접 어종 찾기"
+                    accessibilityLabel={
+                      candidateRows.length > 0
+                        ? "추천 후보에 없는 어종을 도감에서 직접 검색"
+                        : "도감에서 직접 어종 찾기"
+                    }
                     onPress={() => setCatalogVisible(true)}
                     className="mt-5 items-center border py-3"
                     style={{ borderColor: FIELD_COLORS.rule }}
                   >
                     <Text style={{ color: FIELD_COLORS.teal, fontFamily: bodyExtraBoldFont }}>
-                      도감에서 직접 찾기
+                      {candidateRows.length > 0
+                        ? "후보에 없어요 · 직접 검색"
+                        : "도감에서 직접 찾기"}
                     </Text>
                   </TouchableOpacity>
                 ) : null}
@@ -838,7 +913,7 @@ const RecordScreen = () => {
                     <ActivityIndicator color="#fff" />
                   ) : (
                     <Text className="text-center font-semibold text-white">
-                      이 어종으로 기록
+                      사용자 확인 후 이 어종으로 기록
                     </Text>
                   )}
                 </TouchableOpacity>

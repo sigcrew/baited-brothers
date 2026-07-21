@@ -3,12 +3,21 @@ import { useAuth } from "@/src/contexts/AuthContext";
 import { supabase } from "@/src/lib/supabase";
 import type { Fish } from "@/src/hooks/useFishes";
 import type { Tables } from "@/src/types/database";
+import { createSignedUserMediaUrls } from "@/src/lib/userMedia";
 
 export type FishRegulation = Tables<"fish_regulations">;
 export type FishCatchRecord = Pick<
   Tables<"user_catches">,
-  "id" | "caught_at" | "location_name" | "size_cm" | "image_url" | "trip_id" | "memo"
->;
+  | "id"
+  | "caught_at"
+  | "location_name"
+  | "size_cm"
+  | "image_url"
+  | "image_path"
+  | "thumbnail_path"
+  | "trip_id"
+  | "memo"
+> & { thumbnail_url?: string | null };
 
 type FishDetailState = {
   fish: Fish | null;
@@ -52,7 +61,7 @@ export const useFishDetail = (fishId?: string) => {
     const catchesPromise = userId
       ? supabase
           .from("user_catches")
-          .select("id, caught_at, location_name, size_cm, image_url, trip_id, memo")
+          .select("id, caught_at, location_name, size_cm, image_url, image_path, thumbnail_path, trip_id, memo")
           .eq("user_id", userId)
           .eq("fish_id", fishId)
           .eq("verification_status", "verified")
@@ -71,10 +80,35 @@ export const useFishDetail = (fishId?: string) => {
       return;
     }
 
+    const catchRows = (catchesResult.data as FishCatchRecord[]) ?? [];
+    let resolvedCatches = catchRows;
+    try {
+      const signedUrls = await createSignedUserMediaUrls(
+        catchRows.flatMap((item) => [item.image_path, item.thumbnail_path]),
+      );
+      resolvedCatches = catchRows.map((item) => ({
+        ...item,
+        image_url:
+          (item.image_path ? signedUrls.get(item.image_path) : null) ??
+          item.image_url,
+        thumbnail_url:
+          (item.thumbnail_path
+            ? signedUrls.get(item.thumbnail_path)
+            : null) ?? null,
+      }));
+    } catch (signError) {
+      setState({
+        ...EMPTY_STATE,
+        isLoading: false,
+        error: signError as Error,
+      });
+      return;
+    }
+
     setState({
       fish: fishResult.data,
       regulations: regulationsResult.data ?? [],
-      catches: (catchesResult.data as FishCatchRecord[]) ?? [],
+      catches: resolvedCatches,
       isLoading: false,
       error: null,
     });
