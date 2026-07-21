@@ -10,7 +10,6 @@ import {
 import { Stack, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/src/contexts/AuthContext";
-import * as AppleAuthentication from "expo-apple-authentication";
 import {
   FIELD_COLORS,
   bodyExtraBoldFont,
@@ -20,45 +19,25 @@ import {
 export default function DeleteAccountScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { deleteAccount, session } = useAuth();
+  const { deleteAccount } = useAuth();
   const [confirmation, setConfirmation] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const canDelete = confirmation.trim() === "계정 삭제";
-  const isAppleUser =
-    session?.user.app_metadata?.provider === "apple" ||
-    session?.user.identities?.some((identity) => identity.provider === "apple");
-
   const handleDelete = async () => {
     if (!canDelete || isDeleting) return;
     setIsDeleting(true);
-    let appleAuthorizationCode: string | undefined;
-    if (isAppleUser) {
-      try {
-        const credential = await AppleAuthentication.signInAsync({
-          requestedScopes: [],
-        });
-        appleAuthorizationCode = credential.authorizationCode ?? undefined;
-        if (!appleAuthorizationCode) {
-          throw new Error("Apple 인증 코드를 받지 못했습니다.");
-        }
-      } catch (error) {
-        setIsDeleting(false);
-        if (
-          error &&
-          typeof error === "object" &&
-          "code" in error &&
-          (error as { code: string }).code === "ERR_REQUEST_CANCELED"
-        ) {
-          return;
-        }
-        Alert.alert("Apple 확인 실패", "Apple 계정을 다시 확인해 주세요.");
-        return;
-      }
-    }
-    const { error } = await deleteAccount(appleAuthorizationCode);
+    const { appleRevocation, error } = await deleteAccount();
     setIsDeleting(false);
     if (error) {
       Alert.alert("탈퇴 실패", "잠시 후 다시 시도해 주세요.");
+      return;
+    }
+    if (appleRevocation === "manual_action_required") {
+      Alert.alert(
+        "Apple 연결도 해제해 주세요",
+        "계정 데이터는 삭제되었습니다. iPhone 설정의 Apple 계정 → Apple로 로그인에서 낚시당한 녀석들을 선택해 연결을 직접 해제해 주세요.",
+        [{ text: "확인", onPress: () => router.replace("/(auth)/login") }],
+      );
       return;
     }
     router.replace("/(auth)/login");

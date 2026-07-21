@@ -10,7 +10,7 @@
 - 앱 내 개인정보 처리방침 초안 및 계정 탈퇴 화면
 - 계정 데이터와 `user-uploads` 파일을 삭제하는 인증 필수 Edge Function
 - 임시 테스트 계정의 Auth·조과·Storage 전체 삭제 통합 검증
-- Apple 계정 탈퇴 전 재인증 코드로 토큰 교환·폐기하는 서버 처리
+- Apple 로그인 시 refresh token을 서버에서 암호화 보관하고 탈퇴 시 폐기하는 서버 처리
 - AI 응답의 폐쇄형 도감 검증과 자동 테스트
 - 실제 사진 평가용 manifest·평가 스크립트·출시 기준
 - GBIF·iNaturalist 공개 라이선스 실제 사진 후보 300건 수집(60종 각 5장)
@@ -41,7 +41,7 @@
 - Google 로그인: 개발·프리뷰·프로덕션 빌드 각각 OAuth 리디렉션 확인
 - Supabase Auth Redirect URLs에 `baited-brothers://google-auth` 등록 확인
 - 이메일 테스트 계정 전체 삭제는 자동 통합 테스트 통과
-- Apple 계정은 Edge Function에 `APPLE_CLIENT_ID`, `APPLE_CLIENT_SECRET`을 설정한 뒤 실계정으로 토큰 폐기와 전체 삭제 확인
+- Apple 계정은 Edge Function에 Apple 장기 키와 토큰 암호화 키를 설정한 뒤 신규 실계정으로 로그인·토큰 폐기·전체 삭제 확인
 
 ### 스토어
 

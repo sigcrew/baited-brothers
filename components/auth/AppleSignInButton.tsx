@@ -1,6 +1,7 @@
 import * as AppleAuthentication from "expo-apple-authentication";
 import { router } from "expo-router";
 import { Alert, Platform } from "react-native";
+import { useAuth } from "@/src/contexts/AuthContext";
 import { supabase } from "@/src/lib/supabase";
 
 type AppleSignInButtonProps = {
@@ -8,6 +9,7 @@ type AppleSignInButtonProps = {
 };
 
 const AppleSignInButton = ({ fieldJournal = false }: AppleSignInButtonProps) => {
+  const { signInWithApple } = useAuth();
   if (Platform.OS !== "ios") return null;
 
   const handlePress = async () => {
@@ -19,14 +21,14 @@ const AppleSignInButton = ({ fieldJournal = false }: AppleSignInButtonProps) => 
         ],
       });
 
-      if (!credential.identityToken) {
-        return;
+      if (!credential.identityToken || !credential.authorizationCode) {
+        throw new Error("Apple 인증 정보를 받지 못했습니다.");
       }
 
-      const { error } = await supabase.auth.signInWithIdToken({
-        provider: "apple",
-        token: credential.identityToken,
-      });
+      const { error } = await signInWithApple(
+        credential.identityToken,
+        credential.authorizationCode,
+      );
 
       if (error) throw error;
 

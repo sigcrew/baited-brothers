@@ -14,13 +14,29 @@ type AuthContextType = {
     email: string,
     password: string
   ) => Promise<{ error: Error | null; session: Session | null }>;
-  signInWithApple: (identityToken: string) => Promise<{ error: Error | null }>;
+  signInWithApple: (
+    identityToken: string,
+    authorizationCode: string,
+  ) => Promise<{ error: Error | null }>;
   signInWithGoogle: () => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
-  deleteAccount: (
-    appleAuthorizationCode?: string,
-  ) => Promise<{ error: Error | null }>;
+  deleteAccount: () => Promise<{
+    appleRevocation: AppleRevocationStatus;
+    error: Error | null;
+  }>;
 };
+
+export type AppleRevocationStatus =
+  | "not_applicable"
+  | "revoked"
+  | "manual_action_required";
+
+type DeleteAccountResult = {
+  appleRevocation: AppleRevocationStatus;
+  deleted: boolean;
+};
+
+const APPLE_NATIVE_CLIENT_ID = "com.sigcrew.baitedbrothers";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -57,21 +73,50 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     await supabase.auth.signOut();
   };
 
-  const deleteAccount = async (appleAuthorizationCode?: string) => {
-    const { error } = await supabase.functions.invoke("delete-account", {
-      body: { confirm: true, appleAuthorizationCode },
-    });
-    if (error) return { error };
+  const deleteAccount = async () => {
+    const { data, error } = await supabase.functions.invoke<DeleteAccountResult>(
+      "delete-account",
+      { body: { confirm: true } },
+    );
+    if (error) {
+      return { appleRevocation: "not_applicable" as const, error };
+    }
     await supabase.auth.signOut({ scope: "local" });
-    return { error: null };
+    return {
+      appleRevocation: data?.appleRevocation ?? "not_applicable",
+      error: null,
+    };
   };
 
-  const signInWithApple = async (identityToken: string) => {
+  const signInWithApple = async (
+    identityToken: string,
+    authorizationCode: string,
+  ) => {
     const { error } = await supabase.auth.signInWithIdToken({
       provider: "apple",
       token: identityToken,
     });
-    return { error: error ?? null };
+    if (error) return { error };
+
+    const { error: tokenStorageError } = await supabase.functions.invoke(
+      "store-apple-token",
+      {
+        body: {
+          authorizationCode,
+          clientId: APPLE_NATIVE_CLIENT_ID,
+        },
+      },
+    );
+    if (tokenStorageError) {
+      await supabase.auth.signOut({ scope: "local" }).catch(() => undefined);
+      return {
+        error: new Error(
+          "Apple 계정 연결 정보를 안전하게 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.",
+        ),
+      };
+    }
+
+    return { error: null };
   };
 
   const signInWithGoogle = async () => {

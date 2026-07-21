@@ -1,4 +1,15 @@
 import { createClient } from "npm:@supabase/supabase-js@2.49.1";
+import {
+  decryptAppleRefreshToken,
+  isAppleUser,
+  revokeAppleRefreshToken,
+} from "../_shared/appleAuth.ts";
+
+type AppleTokenRow = {
+  client_id: string;
+  refresh_token_ciphertext: string;
+  refresh_token_iv: string;
+};
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -42,52 +53,6 @@ const listObjectPaths = async (
   return paths;
 };
 
-const revokeAppleAuthorization = async (authorizationCode: string) => {
-  const clientId = Deno.env.get("APPLE_CLIENT_ID");
-  const clientSecret = Deno.env.get("APPLE_CLIENT_SECRET");
-  if (!clientId || !clientSecret) {
-    throw new Error("Apple revocation secrets are not configured.");
-  }
-
-  const tokenResponse = await fetch("https://appleid.apple.com/auth/token", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      client_id: clientId,
-      client_secret: clientSecret,
-      code: authorizationCode,
-      grant_type: "authorization_code",
-    }),
-  });
-  const tokenBody = await tokenResponse.json();
-  const revocationToken =
-    typeof tokenBody.refresh_token === "string"
-      ? tokenBody.refresh_token
-      : typeof tokenBody.access_token === "string"
-        ? tokenBody.access_token
-        : null;
-  if (!tokenResponse.ok || !revocationToken) {
-    throw new Error("Apple authorization code exchange failed.");
-  }
-
-  const revokeResponse = await fetch("https://appleid.apple.com/auth/revoke", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      client_id: clientId,
-      client_secret: clientSecret,
-      token: revocationToken,
-      token_type_hint:
-        typeof tokenBody.refresh_token === "string"
-          ? "refresh_token"
-          : "access_token",
-    }),
-  });
-  if (!revokeResponse.ok) {
-    throw new Error("Apple token revocation failed.");
-  }
-};
-
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -118,15 +83,35 @@ Deno.serve(async (req) => {
   });
 
   try {
-    const body = await req.json().catch(() => ({}));
-    const isAppleUser = user.identities?.some(
-      (identity) => identity.provider === "apple",
-    );
-    if (isAppleUser) {
-      if (typeof body.appleAuthorizationCode !== "string") {
-        return json({ error: "Apple reauthentication required." }, 400);
+    let appleRevocation: "not_applicable" | "revoked" | "manual_action_required" =
+      "not_applicable";
+    if (isAppleUser(user)) {
+      const { data: appleToken, error: appleTokenError } = await adminClient
+        .from("apple_auth_tokens")
+        .select("client_id, refresh_token_ciphertext, refresh_token_iv")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (appleTokenError) throw appleTokenError;
+
+      const storedToken = appleToken as AppleTokenRow | null;
+      if (storedToken) {
+        try {
+          const refreshToken = await decryptAppleRefreshToken({
+            ciphertext: storedToken.refresh_token_ciphertext,
+            iv: storedToken.refresh_token_iv,
+          });
+          await revokeAppleRefreshToken({
+            clientId: storedToken.client_id,
+            refreshToken,
+          });
+          appleRevocation = "revoked";
+        } catch (revocationError) {
+          console.error("Apple token revocation failed", revocationError);
+          appleRevocation = "manual_action_required";
+        }
+      } else {
+        appleRevocation = "manual_action_required";
       }
-      await revokeAppleAuthorization(body.appleAuthorizationCode);
     }
 
     const paths = await listObjectPaths(adminClient, "user-uploads", user.id);
@@ -141,7 +126,7 @@ Deno.serve(async (req) => {
       await adminClient.auth.admin.deleteUser(user.id);
     if (deleteError) throw deleteError;
 
-    return json({ deleted: true });
+    return json({ appleRevocation, deleted: true });
   } catch (error) {
     console.error("Account deletion failed", error);
     return json({ error: "Account deletion failed." }, 500);

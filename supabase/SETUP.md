@@ -19,16 +19,15 @@
 
 1. [Apple Developer Console](https://developer.apple.com/account) → **Identifiers** → App ID에 Sign in with Apple Capability 추가
 2. Supabase 대시보드 → **Authentication** → **Providers** → **Apple** 활성화
-3. **네이티브 iOS** 방식 사용 시 별도 Services ID/시크릿 키 불필요 (Expo Go에서 테스트 가능)
-4. Apple 계정 연결 해제는 `delete-account` Edge Function에서 수행하므로
-   `APPLE_CLIENT_ID`, `APPLE_CLIENT_SECRET` Function secret이 필요합니다.
+3. 네이티브 iOS 로그인은 Bundle ID `com.sigcrew.baitedbrothers`를 Client ID로 사용
+4. 로그인 직후 `store-apple-token`이 Apple refresh token을 암호화해 서버에 보관
+5. 계정 탈퇴 시 `delete-account`가 저장된 토큰을 먼저 Apple에 폐기
 
 #### Apple Client Secret 자동 갱신
 
 `.github/workflows/refresh-apple-client-secret.yml`은 매월 1일 Apple Client
-Secret JWT를 새로 발급해 Supabase Auth의 Apple Provider 설정과 계정 탈퇴
-Edge Function secret을 함께 갱신합니다. JWT 유효기간은 Apple 제한보다 짧은
-150일이며, 워크플로는 수동 실행도 지원합니다.
+Secret JWT를 새로 발급해 Supabase Auth의 Apple Provider 설정만 갱신합니다. JWT
+유효기간은 Apple 제한보다 짧은 150일이며, 워크플로는 수동 실행도 지원합니다.
 
 GitHub 저장소의 **Settings → Secrets and variables → Actions**에 다음 repository
 secret을 등록합니다.
@@ -43,9 +42,24 @@ secret을 등록합니다.
 | `SUPABASE_PROJECT_REF` | Supabase project ref (`zfezkimynicyvhmwgzoi`) |
 
 `.p8` 파일과 생성된 JWT는 저장소에 커밋하지 않습니다. 최초 설정 후 GitHub
-Actions에서 **Refresh Apple client secret**을 한 번 수동 실행해 Auth Provider와
-Function secret을 즉시 등록합니다. 예약 실행과 수동 실행은 워크플로 파일이
-저장소의 기본 브랜치에 병합된 뒤 활성화됩니다.
+Actions에서 **Refresh Apple client secret**을 한 번 수동 실행해 Auth Provider를
+즉시 갱신합니다. 예약 실행과 수동 실행은 워크플로 파일이 저장소의 기본 브랜치에
+병합된 뒤 활성화됩니다.
+
+계정 탈퇴 Edge Function에는 만료되는 `APPLE_CLIENT_SECRET` 대신 다음 장기 secret을
+한 번 등록합니다.
+
+| Function secret | 값 |
+|---|---|
+| `APPLE_TEAM_ID` | Apple Developer Team ID |
+| `APPLE_KEY_ID` | Sign in with Apple Key ID |
+| `APPLE_CLIENT_ID` | `com.sigcrew.baitedbrothers` |
+| `APPLE_NATIVE_CLIENT_ID` | `com.sigcrew.baitedbrothers` |
+| `APPLE_PRIVATE_KEY` | begin/end 줄을 포함한 `.p8` 원문 |
+| `APPLE_TOKEN_ENCRYPTION_KEY` | Base64로 인코딩한 임의의 32바이트 키 |
+
+함수는 필요할 때마다 5분짜리 JWT를 생성합니다. 전체 흐름과 배포 순서는
+[`docs/apple-auth-secret-rotation.md`](../docs/apple-auth-secret-rotation.md)를 참고합니다.
 
 ### Google 로그인 설정
 
