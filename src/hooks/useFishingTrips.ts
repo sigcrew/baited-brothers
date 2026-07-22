@@ -9,6 +9,11 @@ import {
   uploadUserPhotoVariants,
 } from "@/src/lib/userMedia";
 import { trackAnalyticsEvent } from "@/src/lib/analytics";
+import {
+  cancelTripReminder,
+  scheduleTripReminder,
+  syncTripReminders,
+} from "@/src/lib/tripNotifications";
 
 export type FishingTrip = Tables<"fishing_trips"> & {
   cover_thumbnail_url?: string | null;
@@ -149,6 +154,15 @@ export const useFishingTrips = ({ autoFetch = true }: UseFishingTripsOptions = {
     [trips]
   );
 
+  useEffect(() => {
+    if (!autoFetch || isLoading || !userId) return;
+    void syncTripReminders(plannedTrips.map((trip) => ({
+      id: trip.id,
+      spotName: trip.spot_name,
+      scheduledAt: trip.scheduled_at,
+    }))).catch(() => undefined);
+  }, [autoFetch, isLoading, plannedTrips, userId]);
+
   const createTrip = useCallback(
     async (input: CreateTripInput) => {
       if (!userId) {
@@ -162,6 +176,7 @@ export const useFishingTrips = ({ autoFetch = true }: UseFishingTripsOptions = {
 
       setIsSaving(true);
       let uploadedPaths: string[] = [];
+      let createdTrip: Tables<"fishing_trips"> | null = null;
 
       try {
         const uploadedCover = input.coverImage
@@ -184,11 +199,14 @@ export const useFishingTrips = ({ autoFetch = true }: UseFishingTripsOptions = {
           cover_thumbnail_path: uploadedCover?.thumbnailPath ?? null,
         };
 
-        const { error: insertError } = await supabase
+        const { data: insertedTrip, error: insertError } = await supabase
           .from("fishing_trips")
-          .insert(payload);
+          .insert(payload)
+          .select("*")
+          .single();
 
         if (insertError) throw insertError;
+        createdTrip = insertedTrip;
         void trackAnalyticsEvent("trip_created", {
           has_note: Boolean(input.memo?.trim()),
           has_cover: Boolean(uploadedCover),
@@ -206,6 +224,14 @@ export const useFishingTrips = ({ autoFetch = true }: UseFishingTripsOptions = {
         };
       } finally {
         setIsSaving(false);
+      }
+
+      if (createdTrip) {
+        void scheduleTripReminder({
+          id: createdTrip.id,
+          spotName: createdTrip.spot_name,
+          scheduledAt: createdTrip.scheduled_at,
+        }).catch(() => undefined);
       }
 
       if (autoFetch) await fetchTrips(true);
@@ -378,6 +404,14 @@ export const useFishingTrips = ({ autoFetch = true }: UseFishingTripsOptions = {
         setIsSaving(false);
       }
 
+      if (trip.status === "planned") {
+        void scheduleTripReminder({
+          id: tripId,
+          spotName,
+          scheduledAt: input.scheduledAt,
+        }).catch(() => undefined);
+      }
+
       await fetchTrips(true);
       return { error: null };
     },
@@ -400,6 +434,8 @@ export const useFishingTrips = ({ autoFetch = true }: UseFishingTripsOptions = {
           .eq("user_id", userId);
 
         if (deleteError) throw deleteError;
+
+        await cancelTripReminder(tripId);
 
         await removeUserMedia([
           trip.cover_image_path,
@@ -441,6 +477,7 @@ export const useFishingTrips = ({ autoFetch = true }: UseFishingTripsOptions = {
         return { error: updateError as Error };
       }
 
+      await cancelTripReminder(tripId);
       void trackAnalyticsEvent("trip_completed");
       await fetchTrips(true);
       return { error: null };
@@ -467,6 +504,7 @@ export const useFishingTrips = ({ autoFetch = true }: UseFishingTripsOptions = {
         return { error: updateError as Error };
       }
 
+      await cancelTripReminder(tripId);
       void trackAnalyticsEvent("trip_canceled");
       await fetchTrips(true);
       return { error: null };

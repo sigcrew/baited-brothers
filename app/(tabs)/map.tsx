@@ -1,14 +1,16 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import * as Location from "expo-location";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useLocalSearchParams, useRouter } from "expo-router";
 
 import { ArchiveTabHeader } from "@/components/design/ArchiveTabHeader";
 import { FieldAlertModal } from "@/components/design/FieldAlertModal";
@@ -17,9 +19,11 @@ import { FishingMap } from "@/components/map/FishingMap";
 import type { FishingMapPoint } from "@/components/map/FishingMap.types";
 import { TripFormModal } from "@/components/trips/TripFormModal";
 import { useFishingTrips, type UpdateTripInput } from "@/src/hooks/useFishingTrips";
+import { useFavoriteFishingSpots } from "@/src/hooks/useFavoriteFishingSpots";
 import { useMarineConditions } from "@/src/hooks/useMarineConditions";
 import { useUserCatches } from "@/src/hooks/useUserCatches";
 import { evaluateCoastalSelection } from "@/src/lib/coastalSelection";
+import { countDistinctMapCoordinates } from "@/src/lib/mapClustering";
 import {
   FIELD_COLORS,
   bodyExtraBoldFont,
@@ -31,12 +35,15 @@ import {
 
 type MapEntry = {
   id: string;
-  kind: "catch" | "trip" | "current" | "selected";
+  kind: "catch" | "trip" | "favorite" | "current" | "selected";
   latitude: number;
   longitude: number;
   name: string;
   shouldReverseGeocode: boolean;
   fishId?: string;
+  recordId?: string;
+  recordedAt?: string;
+  detailName?: string;
 };
 
 type MapAlert = {
@@ -44,6 +51,15 @@ type MapAlert = {
   title: string;
   message: string;
 };
+
+type MapFilter = "all" | "favorite" | "trip" | "catch";
+
+const MAP_FILTERS: { key: MapFilter; label: string }[] = [
+  { key: "all", label: "전체" },
+  { key: "favorite", label: "즐겨찾기" },
+  { key: "trip", label: "출조" },
+  { key: "catch", label: "조과" },
+];
 
 const isKoreaCoordinate = (latitude: number, longitude: number) =>
   latitude >= 32.5 && latitude <= 39.0 && longitude >= 124.0 && longitude <= 132.5;
@@ -80,6 +96,22 @@ const formatObservedAgo = (value?: string | null) => {
   if (minutes < 60) return `${minutes}분 전`;
   const hours = Math.round(minutes / 60);
   return hours < 24 ? `${hours}시간 전` : `${Math.round(hours / 24)}일 전`;
+};
+
+const formatTimelineClock = (value: string) => {
+  const date = new Date(value);
+  const isTomorrow = date.getDate() !== new Date().getDate();
+  return `${isTomorrow ? "내일 " : ""}${String(date.getHours()).padStart(2, "0")}:00`;
+};
+
+const formatRecordDate = (value?: string) => {
+  if (!value) return "날짜 미기록";
+  return new Intl.DateTimeFormat("ko-KR", {
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
 };
 
 const weatherIconName = (
@@ -120,8 +152,11 @@ const Metric = ({ label, value }: { label: string; value: string }) => (
 
 export default function MapScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
+  const params = useLocalSearchParams<{ focusId?: string }>();
   const infoSheetRef = useRef<BottomSheet>(null);
   const selectionRequestRef = useRef(0);
+  const handledFocusRef = useRef<string | null>(null);
   const { catches, isLoading: catchesLoading } = useUserCatches();
   const {
     trips,
@@ -129,12 +164,25 @@ export default function MapScreen() {
     isSaving,
     createTrip,
   } = useFishingTrips();
+  const {
+    spots: favoriteSpots,
+    isLoading: favoritesLoading,
+    isSaving: favoriteSaving,
+    isLoggedIn,
+    findByCoordinate,
+    toggleFavorite,
+  } = useFavoriteFishingSpots();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [activeFilter, setActiveFilter] = useState<MapFilter>("all");
   const [currentEntry, setCurrentEntry] = useState<MapEntry | null>(null);
   const [placeName, setPlaceName] = useState<string | null>(null);
   const [formVisible, setFormVisible] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
   const [mapAlert, setMapAlert] = useState<MapAlert | null>(null);
+  const [sheetMode, setSheetMode] = useState<"info" | "records">("info");
+  const [clusterRecordIds, setClusterRecordIds] = useState<string[] | null>(null);
+  const [focusPointId, setFocusPointId] = useState<string | null>(null);
+  const [focusLatitudeDelta, setFocusLatitudeDelta] = useState<number | null>(null);
 
   const showMapAlert = (title: string, message: string, eyebrow = "MAP NOTICE · COAST ONLY") => {
     setMapAlert({ eyebrow, title, message });
@@ -157,6 +205,9 @@ export default function MapScreen() {
         name: item.location_name?.trim() || item.fish?.name_ko || "조과 기록",
         shouldReverseGeocode: !item.location_name?.trim(),
         fishId: item.fish_id,
+        recordId: item.id,
+        recordedAt: item.caught_at,
+        detailName: item.fish?.name_ko || item.fish?.name || "어종 미확인",
       }];
     });
     const tripEntries = trips.flatMap((trip): MapEntry[] => {
@@ -174,15 +225,83 @@ export default function MapScreen() {
         longitude,
         name: trip.spot_name,
         shouldReverseGeocode: false,
+        recordId: trip.id,
+        recordedAt: trip.scheduled_at,
+        detailName: trip.status === "planned" ? "출조 예정" : trip.status === "done" ? "출조 완료" : "출조 취소",
       }];
     });
-    return currentEntry ? [currentEntry, ...catchEntries, ...tripEntries] : [...catchEntries, ...tripEntries];
-  }, [catches, currentEntry, trips]);
+    const favoriteEntries = favoriteSpots.map((spot): MapEntry => ({
+      id: `favorite:${spot.id}`,
+      kind: "favorite",
+      latitude: Number(spot.latitude),
+      longitude: Number(spot.longitude),
+      name: spot.name,
+      shouldReverseGeocode: false,
+    }));
+    return currentEntry
+      ? [currentEntry, ...favoriteEntries, ...catchEntries, ...tripEntries]
+      : [...favoriteEntries, ...catchEntries, ...tripEntries];
+  }, [catches, currentEntry, favoriteSpots, trips]);
 
   useEffect(() => {
-    if (!selectedId && entries[0]) setSelectedId(entries[0].id);
+    const focusId = typeof params.focusId === "string" ? params.focusId : null;
+    if (!focusId) {
+      handledFocusRef.current = null;
+      setFocusPointId(null);
+      setFocusLatitudeDelta(null);
+      return;
+    }
+    if (handledFocusRef.current === focusId) return;
+    const focusEntry = entries.find((entry) => entry.id === focusId);
+    if (!focusEntry) return;
+    const colocatedRecordIds = entries
+      .filter((entry) =>
+        (entry.kind === "catch" || entry.kind === "trip") &&
+        Math.abs(entry.latitude - focusEntry.latitude) <= 0.00001 &&
+        Math.abs(entry.longitude - focusEntry.longitude) <= 0.00001,
+      )
+      .map((entry) => entry.id);
+    const showColocatedRecords = colocatedRecordIds.length > 1;
+    handledFocusRef.current = focusId;
+    selectionRequestRef.current += 1;
+    setCurrentEntry(null);
+    setActiveFilter("all");
+    setSelectedId(focusId);
+    setFocusLatitudeDelta(0.05);
+    setFocusPointId(focusId);
+    setSheetMode(showColocatedRecords ? "records" : "info");
+    setClusterRecordIds(showColocatedRecords ? colocatedRecordIds : null);
+    requestAnimationFrame(() => infoSheetRef.current?.snapToIndex(showColocatedRecords ? 2 : 1));
+    router.setParams({ focusId: "" });
+  }, [entries, params.focusId, router]);
+
+  const filterCounts = useMemo<Record<MapFilter, number>>(() => {
+    const countable = entries.filter((entry) => !["current", "selected"].includes(entry.kind));
+    const countPlaces = (items: MapEntry[]) => countDistinctMapCoordinates(items, 0.00001);
+    return {
+      all: countPlaces(countable),
+      favorite: countPlaces(countable.filter((entry) => entry.kind === "favorite")),
+      trip: countPlaces(countable.filter((entry) => entry.kind === "trip")),
+      catch: countPlaces(countable.filter((entry) => entry.kind === "catch")),
+    };
+  }, [entries]);
+
+  const visibleEntries = useMemo(
+    () => entries.filter((entry) =>
+      activeFilter === "all" ||
+      entry.kind === activeFilter ||
+      (activeFilter === "favorite" &&
+        (entry.kind === "catch" || entry.kind === "trip") &&
+        Boolean(findByCoordinate(entry.latitude, entry.longitude))) ||
+      entry.id === selectedId ||
+      entry.kind === "current" ||
+      entry.kind === "selected"),
+    [activeFilter, entries, findByCoordinate, selectedId],
+  );
+
+  useEffect(() => {
     if (selectedId && !entries.some((entry) => entry.id === selectedId)) {
-      setSelectedId(entries[0]?.id ?? null);
+      setSelectedId(null);
     }
   }, [entries, selectedId]);
 
@@ -193,17 +312,24 @@ export default function MapScreen() {
       infoSheetRef.current?.close();
       return;
     }
-    const frame = requestAnimationFrame(() => infoSheetRef.current?.snapToIndex(1));
+    const frame = requestAnimationFrame(() => infoSheetRef.current?.snapToIndex(sheetMode === "records" ? 2 : 1));
     return () => cancelAnimationFrame(frame);
-  }, [selected?.id, selected?.latitude, selected?.longitude]);
+  }, [selected?.id, selected?.latitude, selected?.longitude, sheetMode]);
   const nearbyEntries = useMemo(
-    () => selected ? entries.filter((entry) => !["current", "selected"].includes(entry.kind) && distanceKm(selected, entry) <= 2) : [],
+    () => selected ? entries.filter((entry) => !["current", "selected", "favorite"].includes(entry.kind) && distanceKm(selected, entry) <= 2) : [],
     [entries, selected],
   );
-  const nearbyCatchCount = nearbyEntries.filter((entry) => entry.kind === "catch").length;
-  const nearbyTripCount = nearbyEntries.filter((entry) => entry.kind === "trip").length;
+  const recordEntries = useMemo(() => {
+    if (!clusterRecordIds) return nearbyEntries;
+    const idSet = new Set(clusterRecordIds);
+    return entries.filter((entry) =>
+      idSet.has(entry.id) && (entry.kind === "catch" || entry.kind === "trip"),
+    );
+  }, [clusterRecordIds, entries, nearbyEntries]);
+  const nearbyCatchCount = recordEntries.filter((entry) => entry.kind === "catch").length;
+  const nearbyTripCount = recordEntries.filter((entry) => entry.kind === "trip").length;
   const nearbySpeciesCount = new Set(
-    nearbyEntries.flatMap((entry) => entry.fishId ? [entry.fishId] : []),
+    recordEntries.flatMap((entry) => entry.fishId ? [entry.fishId] : []),
   ).size;
 
   useEffect(() => {
@@ -232,25 +358,45 @@ export default function MapScreen() {
   } = useMarineConditions(selected?.latitude, selected?.longitude);
 
   const points = useMemo<FishingMapPoint[]>(
-    () => entries.map((entry) => ({
-      id: entry.id,
-      latitude: entry.latitude,
-      longitude: entry.longitude,
-      label: entry.kind === "trip"
-        ? "출조"
-        : entry.kind === "current"
-          ? "현재"
-          : entry.kind === "selected"
-            ? "선택"
-            : entry.name,
-      kind: entry.kind,
-      selected: entry.id === selectedId,
-    })),
-    [entries, selectedId],
+    () => {
+      const favoriteIdsCoveredByRecords = new Set(
+        entries.flatMap((entry) => {
+          if (entry.kind !== "catch" && entry.kind !== "trip") return [];
+          const favoriteSpot = findByCoordinate(entry.latitude, entry.longitude);
+          return favoriteSpot ? [`favorite:${favoriteSpot.id}`] : [];
+        }),
+      );
+
+      return visibleEntries.flatMap((entry): FishingMapPoint[] => {
+        if (entry.kind === "favorite" && favoriteIdsCoveredByRecords.has(entry.id)) return [];
+        const favoriteSpot = entry.kind === "catch" || entry.kind === "trip"
+          ? findByCoordinate(entry.latitude, entry.longitude)
+          : null;
+        return [{
+          id: entry.id,
+          latitude: entry.latitude,
+          longitude: entry.longitude,
+          label: entry.kind === "trip"
+            ? "출조"
+            : entry.kind === "favorite"
+              ? "즐겨찾기"
+            : entry.kind === "current"
+              ? "현재"
+              : entry.kind === "selected"
+                ? "선택"
+                : entry.name,
+          kind: entry.kind,
+          selected: entry.id === selectedId || Boolean(favoriteSpot && selectedId === `favorite:${favoriteSpot.id}`),
+          favorite: Boolean(favoriteSpot),
+        }];
+      });
+    },
+    [entries, findByCoordinate, selectedId, visibleEntries],
   );
 
   const locateMe = async () => {
     if (isLocating) return;
+    selectionRequestRef.current += 1;
     setIsLocating(true);
     try {
       const permission = await Location.requestForegroundPermissionsAsync();
@@ -284,6 +430,7 @@ export default function MapScreen() {
       };
       setCurrentEntry(entry);
       setSelectedId(entry.id);
+      setClusterRecordIds(null);
     } catch {
       showMapAlert(
         "현재 위치를 확인하지 못했습니다",
@@ -295,9 +442,56 @@ export default function MapScreen() {
     }
   };
 
+  const clearTemporaryMapSelection = (nextId?: string) => {
+    if (currentEntry?.kind !== "selected" || currentEntry.id === nextId) return;
+    selectionRequestRef.current += 1;
+    setCurrentEntry(null);
+  };
+
+  const focusMapPoint = (id: string, latitudeDelta: number | null = null) => {
+    setFocusPointId(null);
+    setFocusLatitudeDelta(latitudeDelta);
+    requestAnimationFrame(() => setFocusPointId(id));
+  };
+
   const selectPoint = (id: string) => {
+    clearTemporaryMapSelection(id);
     setSelectedId(id);
+    setSheetMode("info");
+    setClusterRecordIds(null);
     requestAnimationFrame(() => infoSheetRef.current?.snapToIndex(1));
+  };
+
+  const selectCluster = (ids: string[]) => {
+    clearTemporaryMapSelection();
+    const clusterEntries = ids.flatMap((id) => {
+      const entry = entries.find((item) => item.id === id);
+      return entry ? [entry] : [];
+    });
+    if (!clusterEntries.length) return;
+
+    const preferredEntry = clusterEntries.find((entry) => entry.kind === "catch")
+      ?? clusterEntries.find((entry) => entry.kind === "trip")
+      ?? clusterEntries[0];
+    setSelectedId(preferredEntry.id);
+    setClusterRecordIds(ids);
+    setSheetMode("records");
+  };
+
+  const clearPlaceSelection = () => {
+    if (selected?.kind === "selected") {
+      selectionRequestRef.current += 1;
+      setCurrentEntry(null);
+    }
+    setSelectedId(null);
+    setClusterRecordIds(null);
+    setSheetMode("info");
+    setPlaceName(null);
+  };
+
+  const closePlaceSheet = () => {
+    clearPlaceSelection();
+    infoSheetRef.current?.close();
   };
 
   const selectCoordinate = async (coordinate: { latitude: number; longitude: number }) => {
@@ -346,12 +540,44 @@ export default function MapScreen() {
     };
     setCurrentEntry(entry);
     setSelectedId(entry.id);
+    setSheetMode("info");
+    setClusterRecordIds(null);
     requestAnimationFrame(() => infoSheetRef.current?.snapToIndex(1));
   };
 
   const submitTrip = async (input: UpdateTripInput) => {
     const result = await createTrip(input);
     return result.error;
+  };
+
+  const selectedFavorite = selected
+    ? findByCoordinate(selected.latitude, selected.longitude)
+    : null;
+
+  const toggleSelectedFavorite = async () => {
+    if (!selected || favoriteSaving) return;
+    if (!isLoggedIn) {
+      showMapAlert(
+        "로그인이 필요합니다",
+        "즐겨찾는 장소를 계정에 저장하려면 먼저 로그인해 주세요.",
+        "FAVORITE PLACE",
+      );
+      return;
+    }
+    const result = await toggleFavorite({
+      name: placeName || selected.name,
+      latitude: selected.latitude,
+      longitude: selected.longitude,
+    });
+    if (result.error) {
+      showMapAlert("즐겨찾기를 저장하지 못했습니다", result.error.message, "FAVORITE ERROR");
+      return;
+    }
+    if (result.isFavorite && result.spot) {
+      clearTemporaryMapSelection(`favorite:${result.spot.id}`);
+      setSelectedId(`favorite:${result.spot.id}`);
+      setClusterRecordIds(null);
+    }
   };
 
   const highTide = conditions?.tides.find((item) => item.type === "high");
@@ -394,10 +620,89 @@ export default function MapScreen() {
         </Text>
       </View>
 
+      {favoriteSpots.length > 0 || favoritesLoading ? (
+        <View className="border-t px-5 py-2" style={{ borderColor: FIELD_COLORS.rule, backgroundColor: FIELD_COLORS.foam }}>
+          <View className="mb-1.5 flex-row items-center">
+            <FontAwesome name="star" size={11} color={FIELD_COLORS.orange} />
+            <Text className="ml-1.5 text-[9px] tracking-[1px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>
+              FAVORITE COASTS
+            </Text>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+            {favoritesLoading && favoriteSpots.length === 0 ? (
+              <ActivityIndicator size="small" color={FIELD_COLORS.teal} />
+            ) : favoriteSpots.map((spot) => (
+              <TouchableOpacity
+                key={spot.id}
+                accessibilityRole="button"
+                accessibilityLabel={`${spot.name} 즐겨찾기 장소로 이동`}
+                onPress={() => {
+                  const favoriteId = `favorite:${spot.id}`;
+                  const recordAtFavorite = entries.find((entry) =>
+                    (entry.kind === "catch" || entry.kind === "trip") &&
+                    Math.abs(entry.latitude - Number(spot.latitude)) <= 0.00001 &&
+                    Math.abs(entry.longitude - Number(spot.longitude)) <= 0.00001,
+                  );
+                  clearTemporaryMapSelection(favoriteId);
+                  setActiveFilter("favorite");
+                  setSelectedId(favoriteId);
+                  focusMapPoint(recordAtFavorite?.id ?? favoriteId);
+                  setSheetMode("info");
+                  setClusterRecordIds(null);
+                }}
+                className="border px-3 py-1.5"
+                style={{
+                  borderColor: selectedId === `favorite:${spot.id}` ? FIELD_COLORS.orange : FIELD_COLORS.rule,
+                  backgroundColor: "#FFFFFF",
+                }}
+              >
+                <Text className="text-[11px]" style={{ color: FIELD_COLORS.ink, fontFamily: bodySemiBoldFont }}>
+                  {spot.name}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      ) : null}
+
+      <View className="border-t px-5 py-2" style={{ borderColor: FIELD_COLORS.rule, backgroundColor: "#FFFFFF" }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+          {MAP_FILTERS.map((filter) => {
+            const active = activeFilter === filter.key;
+            return (
+              <TouchableOpacity
+                key={filter.key}
+                accessibilityRole="button"
+                accessibilityState={{ selected: active }}
+                accessibilityLabel={`${filter.label} 지도 필터 ${filterCounts[filter.key]}곳`}
+                onPress={() => setActiveFilter(filter.key)}
+                className="flex-row items-center border px-3 py-2"
+                style={{
+                  borderColor: active ? FIELD_COLORS.teal : FIELD_COLORS.rule,
+                  backgroundColor: active ? FIELD_COLORS.teal : "#FFFFFF",
+                }}
+              >
+                <Text className="text-[11px]" style={{ color: active ? "#FFFFFF" : FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>
+                  {filter.label}
+                </Text>
+                <View className="ml-2 min-w-5 items-center px-1 py-0.5" style={{ backgroundColor: active ? "#FFFFFF" : FIELD_COLORS.locked }}>
+                  <Text className="text-[9px]" style={{ color: active ? FIELD_COLORS.teal : FIELD_COLORS.muted, fontFamily: monoFont }}>
+                    {filterCounts[filter.key]}곳
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      </View>
+
       <View className="relative flex-1">
         <FishingMap
           points={points}
+          focusPointId={focusPointId}
+          focusLatitudeDelta={focusLatitudeDelta}
           onSelectPoint={selectPoint}
+          onSelectCluster={selectCluster}
           onSelectCoordinate={selectCoordinate}
         />
 
@@ -416,6 +721,7 @@ export default function MapScreen() {
           <BottomSheet
             ref={infoSheetRef}
             index={1}
+            onClose={clearPlaceSelection}
             backgroundStyle={{
               backgroundColor: "#FFFFFF",
               borderColor: FIELD_COLORS.ink,
@@ -433,19 +739,37 @@ export default function MapScreen() {
             handleStyle={{ paddingBottom: 6, paddingTop: 10 }}
             snapPoints={INFO_SHEET_SNAP_POINTS}
           >
-            <BottomSheetView style={{ paddingBottom: 12, paddingHorizontal: 16 }}>
+            <BottomSheetScrollView contentContainerStyle={{ paddingBottom: 20, paddingHorizontal: 16 }}>
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center">
-                <FishingBobberMarker kind="selected" compact />
+                {selected.kind === "catch" || selected.kind === "trip" ? (
+                  <FishingBobberMarker kind={selected.kind} compact />
+                ) : (
+                  <View className="h-6 w-5 items-center justify-center">
+                    <FontAwesome
+                      name={selected.kind === "current" ? "crosshairs" : selected.kind === "favorite" ? "star" : "map-marker"}
+                      size={selected.kind === "favorite" ? 14 : 15}
+                      color={selected.kind === "favorite" ? FIELD_COLORS.orange : FIELD_COLORS.teal}
+                    />
+                  </View>
+                )}
                 <Text className="ml-2 text-[10px] tracking-[1.2px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>
-                  SELECTED PLACE
+                  {selected.kind === "catch"
+                    ? "CATCH PLACE"
+                    : selected.kind === "trip"
+                      ? "TRIP PLACE"
+                      : selected.kind === "favorite"
+                        ? "FAVORITE PLACE"
+                        : selected.kind === "current"
+                          ? "CURRENT LOCATION"
+                          : "SELECTED PLACE"}
                 </Text>
               </View>
               <TouchableOpacity
                 accessibilityRole="button"
                 accessibilityLabel="선택 장소 정보 닫기"
                 hitSlop={8}
-                onPress={() => infoSheetRef.current?.close()}
+                onPress={closePlaceSheet}
                 className="h-8 w-8 items-center justify-center"
               >
                 <FontAwesome name="close" size={15} color={FIELD_COLORS.ink} />
@@ -462,6 +786,21 @@ export default function MapScreen() {
                 </Text>
               </View>
               <View className="items-end">
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  accessibilityLabel={selectedFavorite ? "즐겨찾기에서 제거" : "즐겨찾기에 추가"}
+                  disabled={favoriteSaving}
+                  onPress={toggleSelectedFavorite}
+                  className="mb-2 h-9 w-9 items-center justify-center border"
+                  style={{
+                    borderColor: selectedFavorite ? FIELD_COLORS.orange : FIELD_COLORS.rule,
+                    backgroundColor: selectedFavorite ? "#FFF0E9" : "#FFFFFF",
+                  }}
+                >
+                  {favoriteSaving
+                    ? <ActivityIndicator size="small" color={FIELD_COLORS.orange} />
+                    : <FontAwesome name={selectedFavorite ? "star" : "star-o"} size={17} color={selectedFavorite ? FIELD_COLORS.orange : FIELD_COLORS.ink} />}
+                </TouchableOpacity>
                 {conditions?.weather ? (
                   <View className="items-end">
                     <View className="flex-row items-center">
@@ -500,6 +839,142 @@ export default function MapScreen() {
                 ) : null}
               </View>
             </View>
+
+            <View className="mt-3 flex-row border-b" style={{ borderColor: FIELD_COLORS.rule }}>
+              {(["info", "records"] as const).map((mode) => {
+                const active = sheetMode === mode;
+                return (
+                  <TouchableOpacity
+                    key={mode}
+                    accessibilityRole="tab"
+                    accessibilityState={{ selected: active }}
+                    onPress={() => {
+                      setSheetMode(mode);
+                      if (mode === "records") infoSheetRef.current?.snapToIndex(2);
+                    }}
+                    className="flex-1 items-center py-2.5"
+                    style={{ borderBottomWidth: active ? 3 : 0, borderColor: FIELD_COLORS.teal }}
+                  >
+                    <Text style={{ color: active ? FIELD_COLORS.teal : FIELD_COLORS.muted, fontFamily: bodyExtraBoldFont }}>
+                      {mode === "info" ? "장소 정보" : `기록 ${recordEntries.length}`}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            {sheetMode === "records" ? (
+              <View className="pt-2">
+                {recordEntries.length ? (
+                  [...recordEntries]
+                    .sort((left, right) => (right.recordedAt ?? "").localeCompare(left.recordedAt ?? ""))
+                    .map((entry) => (
+                      <TouchableOpacity
+                        key={entry.id}
+                        accessibilityRole="button"
+                        accessibilityLabel={`${entry.detailName ?? entry.name} 기록 열기`}
+                        onPress={() => {
+                          if (!entry.recordId) return;
+                          if (entry.kind === "catch") {
+                            router.push({
+                              pathname: "/(tabs)/encyclopedia",
+                              params: { segment: "cards", catchId: entry.recordId },
+                            });
+                          } else if (entry.kind === "trip") {
+                            router.push({ pathname: "/trips/[id]", params: { id: entry.recordId } });
+                          }
+                        }}
+                        className="flex-row items-center border-b py-4"
+                        style={{ borderColor: FIELD_COLORS.rule }}
+                      >
+                        <View
+                          className="h-10 w-10 items-center justify-center border"
+                          style={{ borderColor: entry.kind === "catch" ? FIELD_COLORS.orange : FIELD_COLORS.teal }}
+                        >
+                          <FontAwesome
+                            name={entry.kind === "catch" ? "camera" : "calendar-o"}
+                            size={16}
+                            color={entry.kind === "catch" ? FIELD_COLORS.orange : FIELD_COLORS.teal}
+                          />
+                        </View>
+                        <View className="min-w-0 flex-1 px-3">
+                          <Text numberOfLines={1} className="text-sm" style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>
+                            {entry.detailName ?? entry.name}
+                          </Text>
+                          <Text numberOfLines={1} className="mt-1 text-[11px]" style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}>
+                            {entry.kind === "catch" ? "조과" : "출조"} · {formatRecordDate(entry.recordedAt)} · {entry.name}
+                          </Text>
+                        </View>
+                        <FontAwesome name="long-arrow-right" size={15} color={FIELD_COLORS.ink} />
+                      </TouchableOpacity>
+                    ))
+                ) : (
+                  <View className="items-center px-6 py-10">
+                    <FontAwesome name="map-o" size={24} color={FIELD_COLORS.muted} />
+                    <Text className="mt-3 text-base" style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>
+                      반경 2km 안에 기록이 없습니다
+                    </Text>
+                    <Text className="mt-2 text-center text-xs leading-5" style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}>
+                      이 장소로 출조를 만들거나 조과 위치를 남기면 여기에서 함께 볼 수 있습니다.
+                    </Text>
+                  </View>
+                )}
+              </View>
+            ) : (
+            <>
+            {conditions?.weatherTimeline?.length ? (
+              <View className="mt-3 border-y py-3" style={{ borderColor: FIELD_COLORS.rule }}>
+                <View className="mb-2 flex-row items-center justify-between">
+                  <Text className="text-[9px] tracking-[1.2px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>
+                    24H OUTLOOK · 시간대별 출조 정보
+                  </Text>
+                  <Text className="text-[9px]" style={{ color: FIELD_COLORS.teal, fontFamily: bodySemiBoldFont }}>
+                    기상청 예보
+                  </Text>
+                </View>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+                  {conditions.weatherTimeline.map((forecast) => (
+                    <View
+                      key={forecast.forecastAt}
+                      className="w-[92px] border px-2.5 py-2"
+                      style={{ borderColor: FIELD_COLORS.rule, backgroundColor: FIELD_COLORS.foam }}
+                    >
+                      <Text className="text-[10px]" style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>
+                        {formatTimelineClock(forecast.forecastAt)}
+                      </Text>
+                      <View className="mt-1.5 flex-row items-center">
+                        <FontAwesome name={weatherIconName(forecast.condition)} size={13} color={FIELD_COLORS.orange} />
+                        <Text className="ml-1.5 text-base" style={{ color: FIELD_COLORS.ink, fontFamily: displayFont }}>
+                          {forecast.temperatureC == null ? "-" : `${forecast.temperatureC.toFixed(0)}°`}
+                        </Text>
+                      </View>
+                      <Text className="mt-1 text-[9px]" style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}>
+                        강수 {forecast.precipitationProbabilityPercent == null ? "-" : `${forecast.precipitationProbabilityPercent.toFixed(0)}%`}
+                      </Text>
+                      <Text className="mt-0.5 text-[9px]" style={{ color: FIELD_COLORS.teal, fontFamily: bodySemiBoldFont }}>
+                        {forecast.windDirection ?? "-"} {forecast.windSpeedMs == null ? "-" : `${forecast.windSpeedMs.toFixed(1)}m/s`}
+                      </Text>
+                    </View>
+                  ))}
+                </ScrollView>
+                {conditions.tides.length ? (
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mt-2" contentContainerStyle={{ gap: 6 }}>
+                    {conditions.tides.map((tide) => (
+                      <View key={`${tide.type}:${tide.at}`} className="flex-row items-center px-2 py-1" style={{ backgroundColor: tide.type === "high" ? "#E6F5F2" : FIELD_COLORS.locked }}>
+                        <Text className="text-[9px]" style={{ color: FIELD_COLORS.teal, fontFamily: bodyExtraBoldFont }}>
+                          {tide.type === "high" ? "만조" : "간조"} {formatClock(tide.at)}
+                        </Text>
+                        {tide.heightCm == null ? null : (
+                          <Text className="ml-1 text-[9px]" style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}>
+                            {tide.heightCm.toFixed(0)}cm
+                          </Text>
+                        )}
+                      </View>
+                    ))}
+                  </ScrollView>
+                ) : null}
+              </View>
+            ) : null}
 
             <View className="mt-2.5 flex-row border-y" style={{ borderColor: FIELD_COLORS.rule }}>
               <Metric label="다음 만조" value={formatClock(highTide?.at)} />
@@ -579,7 +1054,9 @@ export default function MapScreen() {
                 이 장소로 출조 계획
               </Text>
             </TouchableOpacity>
-            </BottomSheetView>
+            </>
+            )}
+            </BottomSheetScrollView>
           </BottomSheet>
         ) : null}
       </View>

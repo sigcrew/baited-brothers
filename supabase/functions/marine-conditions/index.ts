@@ -459,12 +459,19 @@ const weatherDescription = (precipitationType: number, sky: number) => {
     6: { condition: "rain-snow", label: "빗방울 또는 눈날림" },
     7: { condition: "snow", label: "눈날림" },
   };
-  if (precipitation > 0 && precipitation[precipitationType]) {
+  if (precipitationType > 0 && precipitation[precipitationType]) {
     return precipitation[precipitationType];
   }
   if (sky === 1) return { condition: "clear" as const, label: "맑음" };
   if (sky === 3) return { condition: "partly-cloudy" as const, label: "구름 많음" };
   return { condition: "cloudy" as const, label: "흐림" };
+};
+
+const compassDirection = (degrees: number | null) => {
+  if (degrees == null) return null;
+  const labels = ["북", "북동", "동", "남동", "남", "남서", "서", "북서"];
+  const normalized = ((degrees % 360) + 360) % 360;
+  return labels[Math.round(normalized / 45) % labels.length];
 };
 
 const fetchWeatherForecast = async (latitude: number, longitude: number) => {
@@ -492,27 +499,45 @@ const fetchWeatherForecast = async (latitude: number, longitude: number) => {
     grouped.set(key, { ...grouped.get(key), [category]: value });
   });
 
-  const forecast = [...grouped.entries()]
+  const forecasts = [...grouped.entries()]
     .flatMap(([key, values]) => {
       const at = parseDate(key);
       return at && values.TMP != null && (values.SKY != null || values.PTY != null)
         ? [{ at, values }]
         : [];
     })
-    .sort(
-      (left, right) =>
-        Math.abs(left.at.getTime() - Date.now()) - Math.abs(right.at.getTime() - Date.now()),
-    )[0];
-  if (!forecast) return null;
+    .sort((left, right) => left.at.getTime() - right.at.getTime());
+  if (forecasts.length === 0) return { current: null, timeline: [] };
 
-  const description = weatherDescription(forecast.values.PTY ?? 0, forecast.values.SKY ?? 4);
+  const toForecast = (forecast: typeof forecasts[number]) => {
+    const description = weatherDescription(forecast.values.PTY ?? 0, forecast.values.SKY ?? 4);
+    return {
+      forecastAt: forecast.at.toISOString(),
+      condition: description.condition,
+      label: description.label,
+      temperatureC: forecast.values.TMP,
+      precipitationProbabilityPercent: forecast.values.POP ?? null,
+      humidityPercent: forecast.values.REH ?? null,
+      windSpeedMs: forecast.values.WSD ?? null,
+      windDirection: compassDirection(forecast.values.VEC ?? null),
+    };
+  };
+  const current = [...forecasts].sort(
+    (left, right) =>
+      Math.abs(left.at.getTime() - Date.now()) - Math.abs(right.at.getTime() - Date.now()),
+  )[0];
+  const timelineStart = Date.now() - 60 * 60 * 1_000;
+  const timelineEnd = Date.now() + 30 * 60 * 60 * 1_000;
+
   return {
-    forecastAt: forecast.at.toISOString(),
-    condition: description.condition,
-    label: description.label,
-    temperatureC: forecast.values.TMP,
-    precipitationProbabilityPercent: forecast.values.POP ?? null,
-    humidityPercent: forecast.values.REH ?? null,
+    current: current ? toForecast(current) : null,
+    timeline: forecasts
+      .filter((forecast) => {
+        const timestamp = forecast.at.getTime();
+        return timestamp >= timelineStart && timestamp <= timelineEnd;
+      })
+      .slice(0, 24)
+      .map(toForecast),
   };
 };
 
@@ -578,11 +603,11 @@ Deno.serve(async (request) => {
         () => [],
       ),
       withCache(
-        `weather:v1:${grid.x}:${grid.y}:${forecastBase.date}${forecastBase.time}`,
+        `weather:v3:${grid.x}:${grid.y}:${forecastBase.date}${forecastBase.time}`,
         CACHE_TTL.weather.fresh,
         CACHE_TTL.weather.stale,
         () => fetchWeatherForecast(latitude, longitude),
-        () => null,
+        () => ({ current: null, timeline: [] }),
       ),
     ]);
     const temperature = temperatureResult.status === "fulfilled"
@@ -590,7 +615,9 @@ Deno.serve(async (request) => {
       : { latest: null, delta24h: null };
     const wind = windResult.status === "fulfilled" ? windResult.value.value : null;
     const tides = tideResult.status === "fulfilled" ? tideResult.value.value : [];
-    const weather = weatherResult.status === "fulfilled" ? weatherResult.value.value : null;
+    const weatherForecast = weatherResult.status === "fulfilled"
+      ? weatherResult.value.value
+      : { current: null, timeline: [] };
     if (weatherResult.status === "rejected") {
       console.warn(
         "weather forecast unavailable",
@@ -628,7 +655,8 @@ Deno.serve(async (request) => {
       windSpeedMs: wind?.speed ?? null,
       windDirection: wind?.direction ?? null,
       tides,
-      weather,
+      weather: weatherForecast.current,
+      weatherTimeline: weatherForecast.timeline,
       fetchedAt: new Date().toISOString(),
       cache: { status: cacheStatus, resources: cacheStates },
     });

@@ -31,6 +31,8 @@ export type WeatherForecast = {
   temperatureC: number | null;
   precipitationProbabilityPercent: number | null;
   humidityPercent: number | null;
+  windSpeedMs: number | null;
+  windDirection: string | null;
 };
 
 export type MarineConditions = {
@@ -42,6 +44,7 @@ export type MarineConditions = {
   windDirection: string | null;
   tides: MarineTide[];
   weather: WeatherForecast | null;
+  weatherTimeline: WeatherForecast[];
   fetchedAt: string;
   cache?: {
     status: "hit" | "miss" | "mixed" | "stale";
@@ -52,7 +55,7 @@ export type MarineConditions = {
 const CACHE_TTL_MS = 30 * 60 * 1_000;
 
 const cacheKey = (latitude: number, longitude: number) =>
-  `marine-conditions:v2:${latitude.toFixed(2)}:${longitude.toFixed(2)}`;
+  `marine-conditions:v3:${latitude.toFixed(2)}:${longitude.toFixed(2)}`;
 
 type CachedConditions = {
   savedAt: number;

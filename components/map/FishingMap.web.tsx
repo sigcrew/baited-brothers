@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pressable, Text, TouchableOpacity, View } from "react-native";
 
-import { FishingBobberMarker } from "./FishingBobberMarker";
+import { MapPointMarker } from "./MapPointMarker";
 import type { FishingMapProps } from "./FishingMap.types";
 import { FIELD_COLORS, monoFont } from "@/src/theme/fieldJournal";
 
@@ -70,7 +70,7 @@ export const FishingMap = ({ points, onSelectPoint, onSelectCoordinate }: Fishin
           transform: [{ translateX: -20 }, { translateY: -20 }],
         }}
       >
-        <FishingBobberMarker kind={point.kind} selected={point.selected} />
+        <MapPointMarker kind={point.kind} selected={point.selected} />
       </TouchableOpacity>
     ))}
     </View>

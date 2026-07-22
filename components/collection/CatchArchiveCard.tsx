@@ -4,6 +4,7 @@ import {
   Image,
   type ImageSourcePropType,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 
@@ -20,6 +21,7 @@ import {
 type CatchArchiveCardProps = {
   item: UserCatch;
   variant: "compact" | "detail";
+  onLocationPress?: () => void;
 };
 
 const CARD_COLORS = {
@@ -242,6 +244,7 @@ const CardPhoto = ({
 export const CatchArchiveCard = ({
   item,
   variant,
+  onLocationPress,
 }: CatchArchiveCardProps) => {
   const compact = variant === "compact";
   const title = item.fish?.name_ko ?? item.fish?.name ?? "어종 미확인";
@@ -477,7 +480,13 @@ export const CatchArchiveCard = ({
                     {date}
                   </Text>
                 </View>
-                <View className="flex-1 flex-row items-center px-3">
+                <TouchableOpacity
+                  accessibilityRole={onLocationPress ? "button" : undefined}
+                  accessibilityLabel={onLocationPress ? `${location} 지도에서 보기` : undefined}
+                  disabled={!onLocationPress}
+                  onPress={onLocationPress}
+                  className="flex-1 flex-row items-center px-3"
+                >
                   <FontAwesome
                     name="map-marker"
                     size={18}
@@ -495,7 +504,10 @@ export const CatchArchiveCard = ({
                   >
                     {location}
                   </Text>
-                </View>
+                  {onLocationPress ? (
+                    <FontAwesome name="long-arrow-right" size={13} color={CARD_COLORS.orange} />
+                  ) : null}
+                </TouchableOpacity>
               </View>
 
               <View

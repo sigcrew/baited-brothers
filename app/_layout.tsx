@@ -14,6 +14,7 @@ import 'react-native-reanimated';
 import { useColorScheme } from '@/components/useColorScheme';
 import { AuthProvider } from '@/src/contexts/AuthContext';
 import { AnalyticsLifecycle } from '@/src/components/AnalyticsLifecycle';
+import { NotificationLifecycle } from '@/src/components/NotificationLifecycle';
 import { BlackHanSans_400Regular } from '@expo-google-fonts/black-han-sans';
 import { Anton_400Regular } from '@expo-google-fonts/anton';
 import { DoHyeon_400Regular } from '@expo-google-fonts/do-hyeon';
@@ -75,6 +76,7 @@ const RootLayoutNav = () => {
       <BottomSheetModalProvider>
         <AuthProvider>
           <AnalyticsLifecycle />
+          <NotificationLifecycle />
           <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
             <Stack>
               <Stack.Screen name="index" options={{ headerShown: false }} />

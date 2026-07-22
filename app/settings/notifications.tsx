@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Switch, Text, View } from "react-native";
 import { SettingsScaffold } from "@/components/settings/SettingsScaffold";
 import {
@@ -7,18 +6,15 @@ import {
   bodyExtraBoldFont,
   bodyFont,
 } from "@/src/theme/fieldJournal";
-
-const STORAGE_KEY = "baited-brothers:notification-preferences";
-
-type Preferences = {
-  tripReminder: boolean;
-  collectionUpdate: boolean;
-};
-
-const defaults: Preferences = {
-  tripReminder: true,
-  collectionUpdate: true,
-};
+import { useFishingTrips } from "@/src/hooks/useFishingTrips";
+import {
+  DEFAULT_NOTIFICATION_PREFERENCES,
+  cancelAllTripReminders,
+  getNotificationPreferences,
+  saveNotificationPreferences,
+  syncTripReminders,
+  type NotificationPreferences,
+} from "@/src/lib/tripNotifications";
 
 const PreferenceRow = ({
   title,
@@ -59,23 +55,29 @@ const PreferenceRow = ({
 );
 
 export default function NotificationSettingsScreen() {
-  const [preferences, setPreferences] = useState(defaults);
+  const [preferences, setPreferences] = useState(DEFAULT_NOTIFICATION_PREFERENCES);
+  const { plannedTrips } = useFishingTrips();
 
   useEffect(() => {
-    AsyncStorage.getItem(STORAGE_KEY).then((stored) => {
-      if (!stored) return;
-      try {
-        setPreferences({ ...defaults, ...JSON.parse(stored) });
-      } catch {
-        setPreferences(defaults);
-      }
-    });
+    void getNotificationPreferences().then(setPreferences);
   }, []);
 
-  const update = (key: keyof Preferences, value: boolean) => {
+  const update = (key: keyof NotificationPreferences, value: boolean) => {
     const next = { ...preferences, [key]: value };
     setPreferences(next);
-    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    void saveNotificationPreferences(next).then(() => {
+      if (key === "tripReminder") {
+        if (value) {
+          void syncTripReminders(plannedTrips.map((trip) => ({
+            id: trip.id,
+            spotName: trip.spot_name,
+            scheduledAt: trip.scheduled_at,
+          })), true);
+        } else {
+          void cancelAllTripReminders();
+        }
+      }
+    });
   };
 
   return (
@@ -101,7 +103,8 @@ export default function NotificationSettingsScreen() {
         style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
       >
         알림 허용 여부는 iPhone 설정에서도 변경할 수 있습니다. 실제 알림 전송은
-        배포 빌드의 알림 권한과 연동됩니다.
+        배포 빌드의 알림 권한과 연동됩니다. 출조 3시간 전에 알림을 보내며,
+        임박한 일정은 15분 전에 알려드립니다.
       </Text>
     </SettingsScaffold>
   );

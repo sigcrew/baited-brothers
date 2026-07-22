@@ -21,6 +21,7 @@ import {
   monoFont,
 } from "@/src/theme/fieldJournal";
 import { trackAnalyticsEvent } from "@/src/lib/analytics";
+import { useRouter } from "expo-router";
 
 type CardsPanelProps = {
   insetsBottom: number;
@@ -57,10 +58,12 @@ const CatchDetailModal = ({
   item,
   visible,
   onClose,
+  onLocationPress,
 }: {
   item: UserCatch | null;
   visible: boolean;
   onClose: () => void;
+  onLocationPress: (item: UserCatch) => void;
 }) => {
   const insets = useSafeAreaInsets();
   const { height: windowHeight } = useWindowDimensions();
@@ -102,13 +105,15 @@ const CatchDetailModal = ({
             showsVerticalScrollIndicator={false}
             style={{ width: "100%" }}
           >
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="조과 카드 닫기"
-              onPress={onClose}
-            >
-              <CatchArchiveCard item={item} variant="detail" />
-            </Pressable>
+            <CatchArchiveCard
+              item={item}
+              variant="detail"
+              onLocationPress={
+                item.location_lat != null && item.location_lng != null
+                  ? () => onLocationPress(item)
+                  : undefined
+              }
+            />
           </ScrollView>
         </View>
       </View>
@@ -127,6 +132,7 @@ export const CardsPanel = ({
   requestedCatchId,
   onRequestedCatchOpened,
 }: CardsPanelProps) => {
+  const router = useRouter();
   const [selected, setSelected] = useState<UserCatch | null>(null);
   const [sortDirection, setSortDirection] = useState<"newest" | "oldest">(
     "newest",
@@ -237,6 +243,13 @@ export const CardsPanel = ({
         item={selected}
         visible={Boolean(selected)}
         onClose={() => setSelected(null)}
+        onLocationPress={(item) => {
+          setSelected(null);
+          router.push({
+            pathname: "/(tabs)/map",
+            params: { focusId: `catch:${item.id}` },
+          });
+        }}
       />
     </>
   );

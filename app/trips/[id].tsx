@@ -18,6 +18,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ArchiveRule } from "@/components/design/ArchiveRule";
 import { TripFormModal } from "@/components/trips/TripFormModal";
 import { CatchEditModal } from "@/components/catches/CatchEditModal";
+import { TripMiniMap } from "@/components/map/TripMiniMap";
 import {
   useFishingTrips,
   type FishingTrip,
@@ -265,6 +266,41 @@ const TripDetailScreen = () => {
           <Text className="mt-5 text-sm leading-6" style={{ color: FIELD_COLORS.ink, fontFamily: bodyFont }}>
             {trip.memo || "이 출조에 남겨둔 메모가 없습니다."}
           </Text>
+          {trip.spot_lat != null && trip.spot_lng != null ? (
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={`${trip.spot_name} 지도에서 보기`}
+              activeOpacity={0.86}
+              onPress={() => router.push({
+                pathname: "/(tabs)/map",
+                params: { focusId: `trip:${trip.id}` },
+              })}
+              className="mt-6 border"
+              style={{ borderColor: FIELD_COLORS.ink }}
+            >
+              <TripMiniMap
+                latitude={Number(trip.spot_lat)}
+                longitude={Number(trip.spot_lng)}
+                name={trip.spot_name}
+              />
+              <View className="flex-row items-center justify-between border-t px-4 py-3" style={{ borderColor: FIELD_COLORS.ink }}>
+                <View>
+                  <Text className="text-[9px] tracking-[1.2px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>
+                    TRIP LOCATION
+                  </Text>
+                  <Text className="mt-1 text-sm" style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>
+                    {trip.spot_name}
+                  </Text>
+                </View>
+                <View className="flex-row items-center">
+                  <Text className="mr-2 text-xs" style={{ color: FIELD_COLORS.teal, fontFamily: bodyExtraBoldFont }}>
+                    지도에서 보기
+                  </Text>
+                  <FontAwesome name="long-arrow-right" size={16} color={FIELD_COLORS.orange} />
+                </View>
+              </View>
+            </TouchableOpacity>
+          ) : null}
         </View>
 
         <View className="px-5 pt-6">

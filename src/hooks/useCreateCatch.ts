@@ -8,6 +8,7 @@ import {
   uploadUserPhotoVariants,
 } from "@/src/lib/userMedia";
 import { trackAnalyticsEvent } from "@/src/lib/analytics";
+import { captureCatchConditions } from "@/src/lib/catchConditions";
 
 type CreateCatchInput = {
   tripId?: string;
@@ -136,6 +137,14 @@ export const useCreateCatch = () => {
         has_size: input.sizeCm != null,
         has_note: Boolean(input.memo?.trim()),
       });
+      if (input.latitude != null && input.longitude != null) {
+        void captureCatchConditions({
+          catchId: insertedCatch.id,
+          userId,
+          latitude: input.latitude,
+          longitude: input.longitude,
+        });
+      }
       return {
         error: null,
         catchId: insertedCatch.id,

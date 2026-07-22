@@ -235,6 +235,7 @@ export type Database = {
       }
       user_catches: {
         Row: {
+          conditions_snapshot: Json | null
           caught_at: string
           candidate_fish_ids: string[]
           capture_method: Database["public"]["Enums"]["capture_method"] | null
@@ -259,6 +260,7 @@ export type Database = {
           verification_status: Database["public"]["Enums"]["catch_verification_status"]
         }
         Insert: {
+          conditions_snapshot?: Json | null
           caught_at?: string
           candidate_fish_ids?: string[]
           capture_method?: Database["public"]["Enums"]["capture_method"] | null
@@ -283,6 +285,7 @@ export type Database = {
           verification_status?: Database["public"]["Enums"]["catch_verification_status"]
         }
         Update: {
+          conditions_snapshot?: Json | null
           caught_at?: string
           candidate_fish_ids?: string[]
           capture_method?: Database["public"]["Enums"]["capture_method"] | null
@@ -344,6 +347,33 @@ export type Database = {
           display_name?: string | null
           id?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      favorite_fishing_spots: {
+        Row: {
+          created_at: string
+          id: string
+          latitude: number
+          longitude: number
+          name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          latitude: number
+          longitude: number
+          name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          latitude?: number
+          longitude?: number
+          name?: string
+          user_id?: string
         }
         Relationships: []
       }
