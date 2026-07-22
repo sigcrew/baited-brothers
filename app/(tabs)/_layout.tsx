@@ -49,6 +49,13 @@ const TabLayout = () => {
         }}
       />
       <Tabs.Screen
+        name="map"
+        options={{
+          title: "지도",
+          tabBarIcon: ({ color, focused }) => <ArchiveTabIcon name="map" color={color} focused={focused} />,
+        }}
+      />
+      <Tabs.Screen
         name="encyclopedia"
         options={{
           title: "수집",

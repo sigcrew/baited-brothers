@@ -92,7 +92,7 @@ export default function NotificationSettingsScreen() {
       />
       <PreferenceRow
         title="수집 기록 알림"
-        description="새 어종과 뱃지를 획득했을 때 알림을 받을 수 있게 설정합니다."
+        description="새 어종과 배지를 획득했을 때 알림을 받을 수 있게 설정합니다."
         value={preferences.collectionUpdate}
         onChange={(value) => update("collectionUpdate", value)}
       />

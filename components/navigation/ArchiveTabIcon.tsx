@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { useWindowDimensions, View } from "react-native";
 import Svg, { Circle, Line, Path, Rect } from "react-native-svg";
 
-type ArchiveTabIconName = "home" | "journal" | "collection" | "profile";
+type ArchiveTabIconName = "home" | "journal" | "map" | "collection" | "profile";
 
 type ArchiveTabIconProps = {
   name: ArchiveTabIconName;
@@ -104,6 +104,25 @@ export const ArchiveTabIcon = ({ name, color, focused }: ArchiveTabIconProps) =>
         />
         <Circle cx="8.4" cy="12.4" r="1.15" fill={color} />
       </Svg>
+      </TabIconFrame>
+    );
+  }
+
+  if (name === "map") {
+    return (
+      <TabIconFrame color={color} focused={focused}>
+        <Svg width={34} height={32} viewBox="0 0 32 28" fill="none">
+          <Path
+            d="M2.8 6.2 11.2 3l9.6 3.2L29.2 3v18.8L20.8 25l-9.6-3.2L2.8 25V6.2Z"
+            stroke={color}
+            strokeWidth={STROKE_WIDTH}
+            strokeLinejoin="miter"
+            fill={focused ? `${color}18` : "none"}
+          />
+          <Line x1="11.2" y1="3" x2="11.2" y2="21.8" stroke={color} strokeWidth={STROKE_WIDTH} />
+          <Line x1="20.8" y1="6.2" x2="20.8" y2="25" stroke={color} strokeWidth={STROKE_WIDTH} />
+          <Circle cx="16" cy="13.2" r="2.3" fill={focused ? color : "none"} stroke={color} strokeWidth="1.8" />
+        </Svg>
       </TabIconFrame>
     );
   }

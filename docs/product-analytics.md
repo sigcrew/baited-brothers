@@ -42,7 +42,7 @@
 | 이벤트 | 발생 시점 | 허용 속성 예시 |
 | --- | --- | --- |
 | `app_opened` | 로그인 상태에서 앱 활성화. 30분 이내 중복 제외 | 없음 |
-| `collection_viewed` | 도감·뱃지·카드 세그먼트 열람 | `segment` |
+| `collection_viewed` | 도감·배지·카드 세그먼트 열람 | `segment` |
 | `fish_detail_viewed` | 어종 상세 열람 | `unlocked`, `catalog_order` |
 | `catch_card_opened` | 조과 카드 확대 | `source` |
 | `ai_analysis_started` | AI 요청 직전 | `catalog_count` |

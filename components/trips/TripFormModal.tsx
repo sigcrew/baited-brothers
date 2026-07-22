@@ -19,6 +19,11 @@ import {
 import { useCallback, useRef } from "react";
 
 import { TripCoverActionSheet } from "@/components/trips/TripCoverActionSheet";
+import { TripDateTimePickerModal } from "@/components/trips/TripDateTimePickerModal";
+import {
+  TripLocationPickerModal,
+  type TripPlace,
+} from "@/components/trips/TripLocationPickerModal";
 import type {
   FishingTrip,
   TripCoverImage,
@@ -35,31 +40,22 @@ import {
 
 const pad = (value: number) => String(value).padStart(2, "0");
 
-const toLocalInputValue = (date: Date) =>
-  `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
-
-const parseLocalInputValue = (value: string): Date | null => {
-  const match = value
-    .trim()
-    .match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}))?$/);
-  if (!match) return null;
-
-  const date = new Date(
-    Number(match[1]),
-    Number(match[2]) - 1,
-    Number(match[3]),
-    Number(match[4] ?? "9"),
-    Number(match[5] ?? "0")
-  );
-  return Number.isNaN(date.getTime()) ? null : date;
-};
-
-const defaultScheduledInput = () => {
+const defaultScheduledDate = () => {
   const date = new Date();
   date.setDate(date.getDate() + 1);
   date.setHours(6, 0, 0, 0);
-  return toLocalInputValue(date);
+  return date;
 };
+
+const formatTripDate = (date: Date) =>
+  `${date.getFullYear()}. ${pad(date.getMonth() + 1)}. ${pad(date.getDate())}.`;
+
+const formatTripTime = (date: Date) =>
+  new Intl.DateTimeFormat("ko-KR", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  }).format(date);
 
 const PhotoActionIcon = () => (
   <Svg width={20} height={20} viewBox="0 0 20 20" fill="none">
@@ -91,6 +87,11 @@ const SubmitArrowIcon = () => (
 type TripFormModalProps = {
   visible: boolean;
   trip?: FishingTrip | null;
+  initialPlace?: {
+    name: string;
+    latitude: number;
+    longitude: number;
+  } | null;
   isSaving: boolean;
   onClose: () => void;
   onSubmit: (input: UpdateTripInput) => Promise<Error | null>;
@@ -101,32 +102,46 @@ const SNAP_POINTS = ["92%"];
 export const TripFormModal = ({
   visible,
   trip,
+  initialPlace,
   isSaving,
   onClose,
   onSubmit,
 }: TripFormModalProps) => {
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const [spotName, setSpotName] = useState("");
-  const [scheduledInput, setScheduledInput] = useState(defaultScheduledInput);
+  const [scheduledAt, setScheduledAt] = useState(defaultScheduledDate);
+  const [dateTimePickerMode, setDateTimePickerMode] = useState<"date" | "time" | null>(null);
   const [memo, setMemo] = useState("");
   const [coverImage, setCoverImage] = useState<TripCoverImage | null>(null);
   const [removeCover, setRemoveCover] = useState(false);
   const [coverActionsVisible, setCoverActionsVisible] = useState(false);
+  const [locationPickerVisible, setLocationPickerVisible] = useState(false);
+  const [selectedPlace, setSelectedPlace] = useState<TripPlace | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!visible) return;
-    setSpotName(trip?.spot_name ?? "");
-    setScheduledInput(
-      trip ? toLocalInputValue(new Date(trip.scheduled_at)) : defaultScheduledInput()
-    );
+    setSpotName(trip?.spot_name ?? initialPlace?.name ?? "");
+    const tripDate = trip ? new Date(trip.scheduled_at) : null;
+    setScheduledAt(tripDate && !Number.isNaN(tripDate.getTime()) ? tripDate : defaultScheduledDate());
     setMemo(trip?.memo ?? "");
     setCoverImage(null);
     setRemoveCover(false);
     setCoverActionsVisible(false);
+    setDateTimePickerMode(null);
+    setLocationPickerVisible(false);
+    setSelectedPlace(
+      trip?.spot_lat != null && trip?.spot_lng != null
+        ? {
+            name: trip.spot_name,
+            latitude: Number(trip.spot_lat),
+            longitude: Number(trip.spot_lng),
+          }
+        : initialPlace ?? null,
+    );
     setFormError(null);
     bottomSheetRef.current?.present();
-  }, [trip, visible]);
+  }, [initialPlace?.latitude, initialPlace?.longitude, initialPlace?.name, trip, visible]);
 
   const renderBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
@@ -146,18 +161,15 @@ export const TripFormModal = ({
   }, []);
 
   const handleSubmit = async () => {
-    const scheduledAt = parseLocalInputValue(scheduledInput);
     if (!spotName.trim()) {
       setFormError("낚시터 이름을 입력해 주세요.");
-      return;
-    }
-    if (!scheduledAt) {
-      setFormError("날짜는 YYYY-MM-DD HH:mm 형식으로 입력해 주세요.");
       return;
     }
 
     const error = await onSubmit({
       spotName,
+      spotLatitude: selectedPlace?.latitude ?? null,
+      spotLongitude: selectedPlace?.longitude ?? null,
       scheduledAt,
       memo,
       coverImage: coverImage ?? undefined,
@@ -246,28 +258,137 @@ export const TripFormModal = ({
             }}
           />
 
-          <Text className="mt-4 text-sm" style={{ color: FIELD_COLORS.ink, fontFamily: bodySemiBoldFont }}>
-            일시 · YYYY-MM-DD HH:mm
-          </Text>
-          <BottomSheetTextInput
-            accessibilityLabel="출조 일시"
-            value={scheduledInput}
-            onChangeText={setScheduledInput}
-            placeholder="2026-07-19 05:30"
-            placeholderTextColor={FIELD_COLORS.muted}
-            autoCapitalize="none"
-            className="mt-2 border px-4 py-3 text-base"
+          <View
+            className="mt-3 border px-4 py-3"
             style={{
-              borderColor: FIELD_COLORS.rule,
-              borderWidth: 1,
-              color: FIELD_COLORS.ink,
-              fontFamily: monoFont,
-              fontSize: 16,
-              marginTop: 8,
-              paddingHorizontal: 16,
-              paddingVertical: 12,
+              borderColor: selectedPlace ? FIELD_COLORS.teal : FIELD_COLORS.rule,
+              backgroundColor: selectedPlace ? "#EDF7F5" : FIELD_COLORS.foam,
             }}
-          />
+          >
+            <View className="flex-row items-center">
+              <View
+                className="h-8 w-8 items-center justify-center"
+                style={{ backgroundColor: selectedPlace ? FIELD_COLORS.teal : FIELD_COLORS.locked }}
+              >
+                <FontAwesome name="map-pin" size={15} color={selectedPlace ? "#FFFFFF" : FIELD_COLORS.muted} />
+              </View>
+              <View className="ml-3 min-w-0 flex-1">
+                <Text className="text-[12px]" style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>
+                  {selectedPlace ? "지도 위치 연결됨" : "지도 위치가 연결되지 않았습니다"}
+                </Text>
+                <Text numberOfLines={1} className="mt-0.5 text-[10px]" style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}>
+                  {selectedPlace
+                    ? `${selectedPlace.latitude.toFixed(5)}, ${selectedPlace.longitude.toFixed(5)}`
+                    : "연결하면 지도 탭에 이 출조가 표시됩니다."}
+                </Text>
+              </View>
+            </View>
+            <View className="mt-3 flex-row">
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel={selectedPlace ? "출조 지도 위치 변경" : "출조 지도 위치 연결"}
+                onPress={() => setLocationPickerVisible(true)}
+                className="flex-1 items-center border py-2.5"
+                style={{ borderColor: FIELD_COLORS.teal, backgroundColor: "#FFFFFF" }}
+              >
+                <Text className="text-[12px]" style={{ color: FIELD_COLORS.teal, fontFamily: bodyExtraBoldFont }}>
+                  {selectedPlace ? "지도 위치 변경" : "지도에서 장소 연결"}
+                </Text>
+              </TouchableOpacity>
+              {selectedPlace ? (
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  accessibilityLabel="출조 지도 위치 연결 해제"
+                  onPress={() => setSelectedPlace(null)}
+                  className="ml-2 items-center justify-center border px-4"
+                  style={{ borderColor: FIELD_COLORS.rule }}
+                >
+                  <Text className="text-[12px]" style={{ color: FIELD_COLORS.muted, fontFamily: bodySemiBoldFont }}>
+                    연결 해제
+                  </Text>
+                </TouchableOpacity>
+              ) : null}
+            </View>
+          </View>
+
+          <Text className="mt-4 text-sm" style={{ color: FIELD_COLORS.ink, fontFamily: bodySemiBoldFont }}>
+            출조 일시
+          </Text>
+          <View className="mt-2 flex-row">
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={`출조 날짜 ${formatTripDate(scheduledAt)} 선택`}
+              onPress={() => setDateTimePickerMode("date")}
+              className="h-[54px] min-w-0 flex-[1.2] flex-row items-center border px-3"
+              style={{ borderColor: FIELD_COLORS.rule }}
+            >
+              <FontAwesome name="calendar" size={15} color={FIELD_COLORS.teal} />
+              <Text numberOfLines={1} className="ml-2 text-[14px]" style={{ color: FIELD_COLORS.ink, fontFamily: bodySemiBoldFont }}>
+                {formatTripDate(scheduledAt)}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={`출조 시간 ${formatTripTime(scheduledAt)} 선택`}
+              onPress={() => setDateTimePickerMode("time")}
+              className="ml-2 h-[54px] min-w-0 flex-1 flex-row items-center border px-3"
+              style={{ borderColor: FIELD_COLORS.rule }}
+            >
+              <FontAwesome name="clock-o" size={16} color={FIELD_COLORS.orange} />
+              <Text numberOfLines={1} className="ml-2 text-[14px]" style={{ color: FIELD_COLORS.ink, fontFamily: bodySemiBoldFont }}>
+                {formatTripTime(scheduledAt)}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View className="mt-2 flex-row">
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel="출조 날짜 오늘로 설정"
+              onPress={() => {
+                const next = new Date(scheduledAt);
+                const today = new Date();
+                next.setFullYear(today.getFullYear(), today.getMonth(), today.getDate());
+                setScheduledAt(next);
+              }}
+              className="border px-3 py-2"
+              style={{ borderColor: FIELD_COLORS.rule }}
+            >
+              <Text className="text-[11px]" style={{ color: FIELD_COLORS.ink, fontFamily: bodySemiBoldFont }}>오늘</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel="출조 일시 내일 새벽 5시로 설정"
+              onPress={() => {
+                const next = new Date();
+                next.setDate(next.getDate() + 1);
+                next.setHours(5, 0, 0, 0);
+                setScheduledAt(next);
+              }}
+              className="ml-2 border px-3 py-2"
+              style={{ borderColor: FIELD_COLORS.rule }}
+            >
+              <Text className="text-[11px]" style={{ color: FIELD_COLORS.ink, fontFamily: bodySemiBoldFont }}>내일 새벽</Text>
+            </TouchableOpacity>
+            {[4, 5, 6].map((hour) => (
+              <TouchableOpacity
+                key={hour}
+                accessibilityRole="button"
+                accessibilityLabel={`출조 시간 ${pad(hour)}시로 설정`}
+                onPress={() => {
+                  const next = new Date(scheduledAt);
+                  next.setHours(hour, 0, 0, 0);
+                  setScheduledAt(next);
+                }}
+                className="ml-2 flex-1 items-center border py-2"
+                style={{ borderColor: scheduledAt.getHours() === hour && scheduledAt.getMinutes() === 0 ? FIELD_COLORS.teal : FIELD_COLORS.rule }}
+              >
+                <Text className="text-[11px]" style={{ color: scheduledAt.getHours() === hour && scheduledAt.getMinutes() === 0 ? FIELD_COLORS.teal : FIELD_COLORS.muted, fontFamily: bodySemiBoldFont }}>
+                  {pad(hour)}:00
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
 
           <Text className="mt-4 text-sm" style={{ color: FIELD_COLORS.ink, fontFamily: bodySemiBoldFont }}>
             메모 · 선택
@@ -365,6 +486,29 @@ export const TripFormModal = ({
         onRemove={() => {
           setCoverImage(null);
           setRemoveCover(true);
+        }}
+      />
+
+      <TripLocationPickerModal
+        visible={locationPickerVisible}
+        placeName={spotName}
+        initialPlace={selectedPlace}
+        onClose={() => setLocationPickerVisible(false)}
+        onConfirm={(place) => {
+          setSelectedPlace(place);
+          if (!spotName.trim()) setSpotName(place.name);
+          setLocationPickerVisible(false);
+        }}
+      />
+
+      <TripDateTimePickerModal
+        visible={dateTimePickerMode !== null}
+        mode={dateTimePickerMode ?? "date"}
+        value={scheduledAt}
+        onClose={() => setDateTimePickerMode(null)}
+        onConfirm={(next) => {
+          setScheduledAt(next);
+          setDateTimePickerMode(null);
         }}
       />
     </>

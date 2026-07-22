@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Baited Brothers",
+    "name": "낚시당한 녀석들",
     "slug": "baited-brothers",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -80,7 +80,8 @@
           "photosPermission": "출조 커버와 프로필 사진을 선택하려면 사진 보관함 접근이 필요합니다.",
           "microphonePermission": false
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true

@@ -18,7 +18,7 @@ type CollectionSegment = "encyclopedia" | "badges" | "cards";
 
 const SEGMENTS: { key: CollectionSegment; label: string }[] = [
   { key: "encyclopedia", label: "도감" },
-  { key: "badges", label: "뱃지" },
+  { key: "badges", label: "배지" },
   { key: "cards", label: "카드" },
 ];
 

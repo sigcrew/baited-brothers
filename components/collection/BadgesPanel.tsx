@@ -20,7 +20,7 @@ export const BadgesPanel = ({ insetsBottom, unlockContext, isRefreshing = false,
       numColumns={2}
       contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: insetsBottom + 28 }}
       refreshControl={onRefresh ? <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} tintColor={FIELD_COLORS.teal} /> : undefined}
-      ListHeaderComponent={<View className="border-b py-5" style={{ borderColor: FIELD_COLORS.rule }}><Text className="text-lg font-black" style={{ color: FIELD_COLORS.ink }}>획득한 뱃지 <Text style={{ color: FIELD_COLORS.teal }}>{unlockedCount} / {BADGE_CATALOG.length}</Text></Text><Text className="mt-5 text-[12px] tracking-[1.6px]" style={{ color: FIELD_COLORS.ink, fontFamily: monoFont }}>FIELD MARKS 01</Text></View>}
+      ListHeaderComponent={<View className="border-b py-5" style={{ borderColor: FIELD_COLORS.rule }}><Text className="text-lg font-black" style={{ color: FIELD_COLORS.ink }}>획득한 배지 <Text style={{ color: FIELD_COLORS.teal }}>{unlockedCount} / {BADGE_CATALOG.length}</Text></Text><Text className="mt-5 text-[12px] tracking-[1.6px]" style={{ color: FIELD_COLORS.ink, fontFamily: monoFont }}>FIELD MARKS 01</Text></View>}
       columnWrapperStyle={{ borderBottomWidth: 1, borderBottomColor: FIELD_COLORS.rule }}
       renderItem={({ item, index }) => {
         const unlocked = isBadgeUnlocked(item.id, unlockContext);

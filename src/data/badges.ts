@@ -7,7 +7,7 @@ export type BadgeDefinition = {
   requirement: string;
 };
 
-/** 기본 뱃지 카탈로그 — 해금 여부는 조과/일정 카운트로 판정 */
+/** 기본 배지 카탈로그 — 해금 여부는 조과/일정 카운트로 판정 */
 export const BADGE_CATALOG: BadgeDefinition[] = [
   {
     id: "trip_first",

@@ -1,0 +1,82 @@
+{
+  "configVersion": 0,
+  "apple": {
+    "version": "1.0",
+    "copyright": "2026 SIGCREW",
+    "categories": ["SPORTS", "LIFESTYLE"],
+    "release": {
+      "automaticRelease": true
+    },
+    "info": {
+      "en-US": {
+        "title": "Baited Brothers",
+        "subtitle": "Your fishing field journal",
+        "description": "Keep every fishing trip, catch, and discovery in one field journal. Baited Brothers helps anglers photograph a catch, review AI-suggested species candidates, and make the final identification themselves. Build a 60-species collection, create catch cards, and unlock badges as your fishing history grows.\n\nKey features\n• Record trips with dates, locations, notes, and cover photos\n• Photograph catches and review up to three AI species candidates\n• Confirm the species yourself or search the catalog manually\n• Save catch size, memo, location, and photos\n• Explore a 60-species field guide with bait, fishing tips, and regulation references\n• Collect species illustrations, catch cards, and achievement badges\n• Edit or delete catches and permanently delete your account in the app\n\nAI identification is provided as a candidate recommendation and does not automatically confirm a species. Fishing regulations may change; always check current national and local notices before fishing.",
+        "keywords": ["fishing", "fish", "catch log", "field guide", "angler", "species"],
+        "promoText": "Photograph your catch, confirm the species, and build your own fishing field journal.",
+        "supportUrl": "https://sigcrew.github.io/baited-brothers/privacy/",
+        "privacyPolicyUrl": "https://sigcrew.github.io/baited-brothers/privacy/",
+        "privacyChoicesUrl": "https://sigcrew.github.io/baited-brothers/privacy/",
+        "screenshots": {
+          "APP_IPHONE_67": [
+            "./store-assets/final/01-home.png",
+            "./store-assets/final/02-journal.png",
+            "./store-assets/final/03-collection.png",
+            "./store-assets/final/04-fish-detail.png",
+            "./store-assets/final/05-badge-detail.png",
+            "./store-assets/final/06-catch-card-detail.png"
+          ]
+        }
+      },
+      "ko": {
+        "title": "낚시당한 녀석들",
+        "subtitle": "조과와 도감을 쌓는 낚시 일지",
+        "description": "출조의 순간부터 잡은 물고기와 도감 수집까지 한곳에 기록하세요. 낚시당한 녀석들은 물고기 사진을 분석해 어종 후보를 추천하고, 사용자가 직접 최종 어종을 확정하는 낚시 필드 저널입니다.\n\n주요 기능\n• 날짜·장소·메모·커버 사진을 담은 출조 일지\n• 촬영 사진을 바탕으로 최대 3개의 AI 어종 후보 추천\n• 후보 직접 확정, 후보에 없을 때 도감에서 수동 검색\n• 물고기 크기·메모·위치·사진을 담은 조과 기록\n• 미끼·낚시법·특징·규제 출처를 확인하는 60종 도감\n• 컬러 일러스트, 조과 카드와 배지 수집\n• 조과 수정·삭제 및 앱 내 계정 탈퇴 지원\n\nAI 판별은 어종 후보 추천 기능이며 어종을 자동 확정하지 않습니다. 금어기와 금지체장 등 낚시 규정은 변경될 수 있으므로 출조 전 최신 국가·지자체 고시를 반드시 확인하세요.",
+        "keywords": ["낚시", "조과", "물고기", "도감", "출조", "낚시일지", "어종", "낚시기록"],
+        "promoText": "사진으로 어종 후보를 확인하고 나만의 출조·조과·도감을 완성하세요.",
+        "supportUrl": "https://sigcrew.github.io/baited-brothers/privacy/",
+        "privacyPolicyUrl": "https://sigcrew.github.io/baited-brothers/privacy/",
+        "privacyChoicesUrl": "https://sigcrew.github.io/baited-brothers/privacy/",
+        "screenshots": {
+          "APP_IPHONE_67": [
+            "./store-assets/final/01-home.png",
+            "./store-assets/final/02-journal.png",
+            "./store-assets/final/03-collection.png",
+            "./store-assets/final/04-fish-detail.png",
+            "./store-assets/final/05-badge-detail.png",
+            "./store-assets/final/06-catch-card-detail.png"
+          ]
+        }
+      }
+    },
+    "advisory": {
+      "ageRatingOverride": "NONE",
+      "alcoholTobaccoOrDrugUseOrReferences": "NONE",
+      "contests": "NONE",
+      "gambling": false,
+      "gamblingSimulated": "NONE",
+      "horrorOrFearThemes": "NONE",
+      "kidsAgeBand": null,
+      "koreaAgeRatingOverride": "NONE",
+      "lootBox": false,
+      "matureOrSuggestiveThemes": "NONE",
+      "medicalOrTreatmentInformation": "NONE",
+      "profanityOrCrudeHumor": "NONE",
+      "sexualContentGraphicAndNudity": "NONE",
+      "sexualContentOrNudity": "NONE",
+      "unrestrictedWebAccess": false,
+      "violenceCartoonOrFantasy": "NONE",
+      "violenceRealistic": "NONE",
+      "violenceRealisticProlongedGraphicOrSadistic": "NONE",
+      "advertising": false,
+      "ageAssurance": false,
+      "ageRatingOverrideV2": "NONE",
+      "developerAgeRatingInfoUrl": null,
+      "gunsOrOtherWeapons": "NONE",
+      "healthOrWellnessTopics": false,
+      "messagingAndChat": false,
+      "parentalControls": false,
+      "userGeneratedContent": false
+    }
+  }
+}

@@ -7,11 +7,10 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 
-import { SplashView } from '@/components/SplashView';
 import { useColorScheme } from '@/components/useColorScheme';
 import { AuthProvider } from '@/src/contexts/AuthContext';
 import { AnalyticsLifecycle } from '@/src/components/AnalyticsLifecycle';
@@ -33,9 +32,12 @@ export const unstable_settings = {
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+SplashScreen.setOptions({
+  duration: 300,
+  fade: true,
+});
 
 const RootLayout = () => {
-  const [showSplash, setShowSplash] = useState(true);
   const [loaded, error] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     BlackHanSans: BlackHanSans_400Regular,
@@ -52,25 +54,14 @@ const RootLayout = () => {
     if (error) throw error;
   }, [error]);
 
-  const handleSplashLayout = useCallback(() => {
-    SplashScreen.hideAsync();
-  }, []);
-
-  const handleSplashFinish = useCallback(() => {
-    setShowSplash(false);
-  }, []);
+  useEffect(() => {
+    if (loaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded]);
 
   if (!loaded) {
     return null;
-  }
-
-  if (showSplash) {
-    return (
-      <SplashView
-        onLayout={handleSplashLayout}
-        onFinish={handleSplashFinish}
-      />
-    );
   }
 
   return <RootLayoutNav />;

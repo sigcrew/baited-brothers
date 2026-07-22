@@ -355,6 +355,8 @@ export type Database = {
           id: string
           user_id: string
           spot_name: string
+          spot_lat: number | null
+          spot_lng: number | null
           scheduled_at: string
           memo: string | null
           status: Database["public"]["Enums"]["trip_status"]
@@ -369,6 +371,8 @@ export type Database = {
           id?: string
           user_id: string
           spot_name: string
+          spot_lat?: number | null
+          spot_lng?: number | null
           scheduled_at: string
           memo?: string | null
           status?: Database["public"]["Enums"]["trip_status"]
@@ -383,6 +387,8 @@ export type Database = {
           id?: string
           user_id?: string
           spot_name?: string
+          spot_lat?: number | null
+          spot_lng?: number | null
           scheduled_at?: string
           memo?: string | null
           status?: Database["public"]["Enums"]["trip_status"]

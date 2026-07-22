@@ -16,6 +16,8 @@ export type FishingTrip = Tables<"fishing_trips"> & {
 
 export type CreateTripInput = {
   spotName: string;
+  spotLatitude?: number | null;
+  spotLongitude?: number | null;
   scheduledAt: Date;
   memo?: string;
   coverImage?: TripCoverImage;
@@ -172,6 +174,8 @@ export const useFishingTrips = ({ autoFetch = true }: UseFishingTripsOptions = {
         const payload: TablesInsert<"fishing_trips"> = {
           user_id: userId,
           spot_name: spotName,
+          spot_lat: input.spotLatitude ?? null,
+          spot_lng: input.spotLongitude ?? null,
           scheduled_at: input.scheduledAt.toISOString(),
           memo: input.memo?.trim() ? input.memo.trim() : null,
           status: "planned",
@@ -323,6 +327,8 @@ export const useFishingTrips = ({ autoFetch = true }: UseFishingTripsOptions = {
 
         const payload: TablesUpdate<"fishing_trips"> = {
           spot_name: spotName,
+          spot_lat: input.spotLatitude === undefined ? trip.spot_lat : input.spotLatitude,
+          spot_lng: input.spotLongitude === undefined ? trip.spot_lng : input.spotLongitude,
           scheduled_at: input.scheduledAt.toISOString(),
           memo: input.memo?.trim() ? input.memo.trim() : null,
           ...(input.removeCover
@@ -351,6 +357,7 @@ export const useFishingTrips = ({ autoFetch = true }: UseFishingTripsOptions = {
 
         void trackAnalyticsEvent("trip_updated", {
           has_note: Boolean(input.memo?.trim()),
+          has_location: input.spotLatitude != null && input.spotLongitude != null,
           cover_changed: Boolean(uploadedCover || input.removeCover),
         });
 
