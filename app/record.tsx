@@ -591,6 +591,7 @@ const RecordScreen = () => {
         <View className="w-14" />
       </View>
       <ScrollView
+        showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + 32 }}
       >

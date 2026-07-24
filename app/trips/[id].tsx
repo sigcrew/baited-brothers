@@ -187,6 +187,7 @@ const TripDetailScreen = () => {
     <View className="flex-1" style={{ backgroundColor: FIELD_COLORS.foam }}>
       <Stack.Screen options={{ headerShown: false }} />
       <ScrollView
+        showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
             refreshing={isRefreshing || catchesRefreshing}

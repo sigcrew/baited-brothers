@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the five-image App Store screenshot set from real simulator captures."""
+"""Build the nine-image App Store screenshot set from real simulator captures."""
 
 from pathlib import Path
 
@@ -23,10 +23,13 @@ FOAM = "#F7F4EC"
 SCREENS = [
     ("01-home.png", "01-home.png", "출조부터 조과까지,\n낚시의 모든 순간을", "계획하고, 촬영하고, 한곳에 기록하세요"),
     ("02-journal.png", "02-journal.png", "다음 출조도,\n지난 손맛도 한눈에", "예정·완료·취소 기록을 시간순으로"),
-    ("03-collection.png", "03-collection.png", "잡을수록 채워지는\n나만의 60종 도감", "미발견 실루엣부터 컬러 일러스트까지"),
-    ("04-fish-detail.png", "04-fish-detail.png", "금어기·미끼·특징까지\n현장에서 바로 확인", "어종별 필드 가이드를 한 화면에"),
-    ("05-badge-detail.png", "05-badge-detail.png", "출조의 순간이\n특별한 배지가 되다", "기록을 이어가며 새로운 성취를 해금하세요"),
-    ("06-catch-card-detail.png", "06-catch-card-detail.png", "한 번의 손맛을\n한 장의 카드로", "사진·크기·장소·메모를 오래 간직하세요"),
+    ("01-map-overview.png", "03-map-overview.png", "지도 위에 펼쳐지는\n나의 낚시 기록", "출조·조과·즐겨찾기를 한눈에"),
+    ("02-map-weather.png", "04-map-weather.png", "바다 상태를\n출조 전에 확인", "물때·날씨·바람·파고·수온까지"),
+    ("03-map-trips.png", "05-map-trips.png", "출조 기록을\n지도에서 바로", "장소별 기록을 필터로 빠르게 확인하세요"),
+    ("03-collection.png", "06-collection.png", "잡을수록 채워지는\n나만의 60종 도감", "미발견 실루엣부터 컬러 일러스트까지"),
+    ("04-fish-detail.png", "07-fish-detail.png", "금어기·미끼·특징까지\n현장에서 바로 확인", "어종별 필드 가이드를 한 화면에"),
+    ("05-badge-detail.png", "08-badge-detail.png", "출조의 순간이\n특별한 배지가 되다", "기록을 이어가며 새로운 성취를 해금하세요"),
+    ("06-catch-card-detail.png", "09-catch-card-detail.png", "한 번의 손맛을\n한 장의 카드로", "사진·크기·장소·메모를 오래 간직하세요"),
 ]
 
 
@@ -67,7 +70,7 @@ def build_one(index: int, source_name: str, output_name: str, title: str, subtit
     draw.text((92, 104), f"FIELD NOTE  ·  0{index}", font=kicker, fill=TEAL, spacing=8)
     draw.rounded_rectangle((1138, 96, 1228, 186), radius=45, fill=ORANGE)
     draw.text((1183, 140), f"{index}", font=kicker, fill="white", anchor="mm")
-    if index == 4:
+    if source_name == "04-fish-detail.png":
         # Black Han Sans has no visible middle-dot glyph. Draw the separators
         # geometrically so they remain centered and legible at store scale.
         x = 88

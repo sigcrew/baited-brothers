@@ -739,7 +739,10 @@ export default function MapScreen() {
             handleStyle={{ paddingBottom: 6, paddingTop: 10 }}
             snapPoints={INFO_SHEET_SNAP_POINTS}
           >
-            <BottomSheetScrollView contentContainerStyle={{ paddingBottom: 20, paddingHorizontal: 16 }}>
+            <BottomSheetScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: 20, paddingHorizontal: 16 }}
+            >
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center">
                 {selected.kind === "catch" || selected.kind === "trip" ? (

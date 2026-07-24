@@ -64,6 +64,7 @@ const SignupScreen = () => {
       className="flex-1 bg-white"
     >
       <ScrollView
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1, justifyContent: "center", padding: 32 }}
         keyboardShouldPersistTaps="handled"
       >

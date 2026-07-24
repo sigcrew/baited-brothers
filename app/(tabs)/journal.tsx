@@ -251,6 +251,7 @@ const JournalScreen = () => {
   return (
     <View className="flex-1" style={{ paddingTop: insets.top, backgroundColor: FIELD_COLORS.foam }}>
       <FlatList
+        showsVerticalScrollIndicator={false}
         data={trips}
         keyExtractor={(trip) => trip.id}
         renderItem={({ item: trip }) => (

@@ -31,6 +31,7 @@ export default function PrivacyScreen() {
 
   return (
     <ScrollView
+      showsVerticalScrollIndicator={false}
       className="flex-1"
       style={{ backgroundColor: FIELD_COLORS.foam }}
       contentContainerStyle={{

@@ -60,7 +60,7 @@ const ProfileScreen = () => {
     { label: "조과 카드", value: catches.length, segment: "cards" },
   ] as const;
 
-  return <ScrollView className="flex-1" style={{ paddingTop: insets.top, backgroundColor: FIELD_COLORS.foam }} contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}>
+  return <ScrollView showsVerticalScrollIndicator={false} className="flex-1" style={{ paddingTop: insets.top, backgroundColor: FIELD_COLORS.foam }} contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}>
     <ArchiveTabHeader
       title="프로필"
       backgroundColor={FIELD_COLORS.foam}

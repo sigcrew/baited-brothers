@@ -9,6 +9,11 @@ dist/
 *.key
 *.mobileprovision
 credentials.json
+credentials/android/
+*service-account*.json
+google-play*.json
+*.aab
+*.apk
 *.orig.*
 web-build/
 tmp/

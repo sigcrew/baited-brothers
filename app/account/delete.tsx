@@ -45,6 +45,7 @@ export default function DeleteAccountScreen() {
 
   return (
     <ScrollView
+      showsVerticalScrollIndicator={false}
       className="flex-1 px-6"
       style={{ backgroundColor: FIELD_COLORS.foam, paddingTop: insets.top + 12 }}
       contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}

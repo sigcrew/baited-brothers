@@ -144,6 +144,7 @@ const LockedFishDetail = ({
     </View>
 
     <ScrollView
+      showsVerticalScrollIndicator={false}
       contentContainerStyle={{
         flexGrow: 1,
         paddingHorizontal: 20,
@@ -365,6 +366,7 @@ const FishDetailScreen = () => {
     <View className="flex-1" style={{ backgroundColor: FIELD_COLORS.foam }}>
       <Stack.Screen options={{ headerShown: false }} />
       <ScrollView
+        showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor={FIELD_COLORS.teal} />}
         contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
       >
