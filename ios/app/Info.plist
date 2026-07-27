@@ -51,16 +51,10 @@
     </dict>
     <key>NSCameraUsageDescription</key>
     <string>물고기 조과를 현장에서 촬영하려면 카메라 접근이 필요합니다.</string>
-    <key>NSFaceIDUsageDescription</key>
-    <string>Allow $(PRODUCT_NAME) to access your Face ID biometric data.</string>
-    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>Allow $(PRODUCT_NAME) to access your location</string>
-    <key>NSLocationAlwaysUsageDescription</key>
-    <string>Allow $(PRODUCT_NAME) to access your location</string>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>조과를 인증하려면 촬영 순간의 위치가 필요합니다.</string>
-    <key>NSMicrophoneUsageDescription</key>
-    <string>Allow $(PRODUCT_NAME) to access your microphone</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>사용자가 선택한 조과 사진을 사진 앱에 저장하려면 사진 추가 권한이 필요합니다.</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>출조 커버와 프로필 사진을 선택하려면 사진 보관함 접근이 필요합니다.</string>
     <key>NSUserActivityTypes</key>

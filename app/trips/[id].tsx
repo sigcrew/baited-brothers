@@ -13,6 +13,8 @@ import {
   View,
 } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { File, Paths } from "expo-file-system";
+import * as MediaLibrary from "expo-media-library";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ArchiveRule } from "@/components/design/ArchiveRule";
@@ -58,6 +60,9 @@ const TripDetailScreen = () => {
   const [editVisible, setEditVisible] = useState(false);
   const [editingCatch, setEditingCatch] = useState<UserCatch | null>(null);
   const [isSavingCatch, setIsSavingCatch] = useState(false);
+  const [savingPhotoCatchId, setSavingPhotoCatchId] = useState<string | null>(
+    null,
+  );
   const {
     trips,
     isLoading,
@@ -176,6 +181,61 @@ const TripDetailScreen = () => {
       undefined,
       true,
     );
+
+  const saveCatchPhoto = async (item: UserCatch) => {
+    if (!item.image_url) {
+      Alert.alert("사진 없음", "사진이 있는 조과만 사진 앱에 저장할 수 있습니다.");
+      return;
+    }
+
+    setSavingPhotoCatchId(item.id);
+    let downloadedPhoto: File | null = null;
+
+    try {
+      const isAvailable = await MediaLibrary.isAvailableAsync();
+      if (!isAvailable) {
+        throw new Error("이 기기에서는 사진 앱 저장을 사용할 수 없습니다.");
+      }
+
+      let permission = await MediaLibrary.getPermissionsAsync(true, ["photo"]);
+      if (!permission.granted) {
+        permission = await MediaLibrary.requestPermissionsAsync(true, ["photo"]);
+      }
+      if (!permission.granted) {
+        Alert.alert(
+          "사진 저장 권한 필요",
+          "iPhone 설정에서 사진 추가 권한을 허용한 뒤 다시 시도해 주세요.",
+        );
+        return;
+      }
+
+      let localUri = item.image_url;
+      if (!localUri.startsWith("file://")) {
+        const destination = new File(
+          Paths.cache,
+          `catch-${item.id}-${Date.now()}.jpg`,
+        );
+        await File.downloadFileAsync(localUri, destination, {
+          idempotent: true,
+        });
+        downloadedPhoto = destination;
+        localUri = destination.uri;
+      }
+
+      await MediaLibrary.saveToLibraryAsync(localUri);
+      Alert.alert("사진 저장 완료", "조과 사진을 사진 앱에 저장했습니다.");
+    } catch (error) {
+      Alert.alert(
+        "사진 저장 실패",
+        error instanceof Error
+          ? error.message
+          : "사진을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.",
+      );
+    } finally {
+      if (downloadedPhoto?.exists) downloadedPhoto.delete();
+      setSavingPhotoCatchId(null);
+    }
+  };
 
   const goRecord = () =>
     router.push({
@@ -463,29 +523,73 @@ const TripDetailScreen = () => {
                         </Text>
                       </View>
                     ) : null}
-                    <View className="mt-3 flex-row justify-end">
-                      <TouchableOpacity
-                        onPress={() => setEditingCatch(item)}
-                        className="px-3 py-2"
-                      >
-                        <Text
-                          className="text-xs"
-                          style={{ color: FIELD_COLORS.teal, fontFamily: bodySemiBoldFont }}
+                    <View className="mt-3 flex-row items-center justify-between">
+                      {item.image_url && Platform.OS !== "web" ? (
+                        <TouchableOpacity
+                          accessibilityRole="button"
+                          accessibilityLabel={`${item.fish?.name_ko ?? item.fish?.name ?? "조과"} 사진을 사진 앱에 저장`}
+                          onPress={() => void saveCatchPhoto(item)}
+                          disabled={savingPhotoCatchId !== null}
+                          className="flex-row items-center px-3 py-2"
+                          style={{
+                            opacity:
+                              savingPhotoCatchId !== null &&
+                              savingPhotoCatchId !== item.id
+                                ? 0.45
+                                : 1,
+                          }}
                         >
-                          수정
-                        </Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        onPress={() => confirmCatchDelete(item)}
-                        className="ml-2 px-3 py-2"
-                      >
-                        <Text
-                          className="text-xs"
-                          style={{ color: FIELD_COLORS.red, fontFamily: bodySemiBoldFont }}
+                          {savingPhotoCatchId === item.id ? (
+                            <ActivityIndicator
+                              size="small"
+                              color={FIELD_COLORS.teal}
+                            />
+                          ) : (
+                            <FontAwesome
+                              name="download"
+                              size={16}
+                              color={FIELD_COLORS.teal}
+                            />
+                          )}
+                          <Text
+                            className="ml-2 text-xs"
+                            style={{
+                              color: FIELD_COLORS.teal,
+                              fontFamily: bodySemiBoldFont,
+                            }}
+                          >
+                            {savingPhotoCatchId === item.id
+                              ? "저장 중"
+                              : "사진 저장"}
+                          </Text>
+                        </TouchableOpacity>
+                      ) : (
+                        <View />
+                      )}
+                      <View className="flex-row">
+                        <TouchableOpacity
+                          onPress={() => setEditingCatch(item)}
+                          className="px-3 py-2"
                         >
-                          삭제
-                        </Text>
-                      </TouchableOpacity>
+                          <Text
+                            className="text-xs"
+                            style={{ color: FIELD_COLORS.teal, fontFamily: bodySemiBoldFont }}
+                          >
+                            수정
+                          </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => confirmCatchDelete(item)}
+                          className="ml-2 px-3 py-2"
+                        >
+                          <Text
+                            className="text-xs"
+                            style={{ color: FIELD_COLORS.red, fontFamily: bodySemiBoldFont }}
+                          >
+                            삭제
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
                     </View>
                   </View>
                 );
