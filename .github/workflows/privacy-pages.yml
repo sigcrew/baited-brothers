@@ -1,4 +1,4 @@
-name: Deploy privacy policy
+name: Deploy public pages
 
 on:
   push:
@@ -6,6 +6,7 @@ on:
     paths:
       - "docs/index.html"
       - "docs/privacy/**"
+      - "docs/support/**"
       - ".github/workflows/privacy-pages.yml"
   workflow_dispatch:
 
