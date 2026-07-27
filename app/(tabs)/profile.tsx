@@ -15,7 +15,6 @@ import {
 } from "@/src/data/badges";
 import { FIELD_COLORS, bodySemiBoldFont, monoFont } from "@/src/theme/fieldJournal";
 
-const HARBOR_IMAGE = require("@/assets/images/design/daecheon-harbor.png");
 const PROFILE_IMAGE = require("@/assets/images/adaptive-icon-baited.png");
 
 const ProfileRow = ({ icon, label, color = FIELD_COLORS.ink, onPress }: { icon: React.ComponentProps<typeof FontAwesome>["name"]; label: string; color?: string; onPress?: () => void }) => (
@@ -115,14 +114,6 @@ const ProfileScreen = () => {
       <ProfileRow icon="shield" label="개인정보 처리방침" onPress={() => router.push("/privacy")} />
       {session ? <ProfileRow icon="user-times" label="계정 탈퇴" color={FIELD_COLORS.red} onPress={() => router.push("/account/delete")} /> : null}
       {session ? <ProfileRow icon="sign-out" label="로그아웃" color={FIELD_COLORS.orange} onPress={handleSignOut} /> : <ProfileRow icon="sign-in" label="로그인" color={FIELD_COLORS.teal} onPress={handleGoLogin} />}
-      <Text className="mt-8 text-[11px] tracking-[1.5px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>LAST FIELD NOTE · 2026.07.06 · 대천항</Text>
-      <View className="mt-3 overflow-hidden rounded-lg">
-        <Image
-          source={HARBOR_IMAGE}
-          resizeMode="cover"
-          style={{ width: "100%", height: 128 }}
-        />
-      </View>
     </View>
   </ScrollView>;
 };
