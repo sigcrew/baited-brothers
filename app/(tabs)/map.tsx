@@ -12,7 +12,6 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 
-import { ArchiveTabHeader } from "@/components/design/ArchiveTabHeader";
 import { FieldAlertModal } from "@/components/design/FieldAlertModal";
 import { FishingBobberMarker } from "@/components/map/FishingBobberMarker";
 import { FishingMap } from "@/components/map/FishingMap";
@@ -590,47 +589,124 @@ export default function MapScreen() {
   const isInitialLoading = catchesLoading || tripsLoading;
 
   return (
-    <View className="flex-1" style={{ paddingTop: insets.top, backgroundColor: FIELD_COLORS.foam }}>
-      <ArchiveTabHeader
-        title="나의 바다"
-        backgroundColor={FIELD_COLORS.foam}
-        rightSlot={(
+    <View className="flex-1" style={{ backgroundColor: FIELD_COLORS.foam }}>
+      <View className="absolute inset-0">
+        <FishingMap
+          points={points}
+          focusPointId={focusPointId}
+          focusLatitudeDelta={focusLatitudeDelta}
+          onSelectPoint={selectPoint}
+          onSelectCluster={selectCluster}
+          onSelectCoordinate={selectCoordinate}
+        />
+      </View>
+
+      <View
+        pointerEvents="box-none"
+        className="absolute inset-x-0 top-0"
+        style={{ paddingTop: insets.top + 10 }}
+      >
+        <View className="mx-4 flex-row items-center" style={{ gap: 10 }}>
+          <View
+            className="min-w-0 flex-1 flex-row items-center rounded-full border bg-white px-4"
+            style={{
+              borderColor: FIELD_COLORS.rule,
+              height: 46,
+              shadowColor: FIELD_COLORS.ink,
+              shadowOffset: { width: 0, height: 3 },
+              shadowOpacity: 0.14,
+              shadowRadius: 8,
+              elevation: 4,
+            }}
+          >
+            <FontAwesome name="map-marker" size={16} color={FIELD_COLORS.teal} />
+            <View className="ml-2 min-w-0 flex-1">
+              <Text
+                numberOfLines={1}
+                className="text-[13px]"
+                style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}
+              >
+                {placeName || (isInitialLoading ? "기록 위치를 불러오는 중" : "나의 바다")}
+              </Text>
+              <Text
+                numberOfLines={1}
+                className="text-[8px] tracking-[1px]"
+                style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}
+              >
+                PRIVATE FISHING MAP
+              </Text>
+            </View>
+          </View>
+
           <TouchableOpacity
             accessibilityRole="button"
             accessibilityLabel="현재 위치로 이동"
             onPress={locateMe}
             disabled={isLocating}
-            className="h-11 w-11 items-center justify-center border"
-            style={{ borderColor: FIELD_COLORS.rule }}
+            className="h-[46px] w-[46px] items-center justify-center rounded-full border bg-white"
+            style={{
+              borderColor: FIELD_COLORS.rule,
+              shadowColor: FIELD_COLORS.ink,
+              shadowOffset: { width: 0, height: 3 },
+              shadowOpacity: 0.14,
+              shadowRadius: 8,
+              elevation: 4,
+            }}
           >
             {isLocating
               ? <ActivityIndicator size="small" color={FIELD_COLORS.teal} />
               : <FontAwesome name="crosshairs" size={20} color={FIELD_COLORS.ink} />}
           </TouchableOpacity>
-        )}
-      />
+        </View>
 
-      <View className="flex-row items-center px-5 py-3" style={{ backgroundColor: FIELD_COLORS.foam }}>
-        <FontAwesome name="map-marker" size={16} color={FIELD_COLORS.teal} />
-        <Text className="ml-2 flex-1 text-sm" style={{ color: FIELD_COLORS.ink, fontFamily: bodySemiBoldFont }}>
-          {placeName || (isInitialLoading ? "기록 위치를 불러오는 중" : "지도를 눌러 바다와 해안 장소를 선택하세요")}
-        </Text>
-        <Text className="text-[9px] tracking-[1px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>
-          PRIVATE
-        </Text>
-      </View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          className="mt-2"
+          contentContainerStyle={{ gap: 8, paddingHorizontal: 16 }}
+        >
+          {MAP_FILTERS.map((filter) => {
+            const active = activeFilter === filter.key;
+            return (
+              <TouchableOpacity
+                key={filter.key}
+                accessibilityRole="button"
+                accessibilityState={{ selected: active }}
+                accessibilityLabel={`${filter.label} 지도 필터 ${filterCounts[filter.key]}곳`}
+                onPress={() => setActiveFilter(filter.key)}
+                className="flex-row items-center rounded-full border px-3 py-2"
+                style={{
+                  borderColor: active ? FIELD_COLORS.teal : FIELD_COLORS.rule,
+                  backgroundColor: active ? FIELD_COLORS.teal : "rgba(255,255,255,0.96)",
+                  shadowColor: FIELD_COLORS.ink,
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 5,
+                  elevation: 3,
+                }}
+              >
+                <Text className="text-[11px]" style={{ color: active ? "#FFFFFF" : FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>
+                  {filter.label}
+                </Text>
+                <Text className="ml-1.5 text-[9px]" style={{ color: active ? "#FFFFFF" : FIELD_COLORS.muted, fontFamily: monoFont }}>
+                  {filterCounts[filter.key]}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
 
-      {favoriteSpots.length > 0 || favoritesLoading ? (
-        <View className="border-t px-5 py-2" style={{ borderColor: FIELD_COLORS.rule, backgroundColor: FIELD_COLORS.foam }}>
-          <View className="mb-1.5 flex-row items-center">
-            <FontAwesome name="star" size={11} color={FIELD_COLORS.orange} />
-            <Text className="ml-1.5 text-[9px] tracking-[1px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>
-              FAVORITE COASTS
-            </Text>
-          </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+        {favoriteSpots.length > 0 || favoritesLoading ? (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            className="mt-2"
+            contentContainerStyle={{ gap: 7, paddingHorizontal: 16 }}
+          >
             {favoritesLoading && favoriteSpots.length === 0 ? (
-              <ActivityIndicator size="small" color={FIELD_COLORS.teal} />
+              <View className="rounded-full bg-white px-4 py-2">
+                <ActivityIndicator size="small" color={FIELD_COLORS.teal} />
+              </View>
             ) : favoriteSpots.map((spot) => (
               <TouchableOpacity
                 key={spot.id}
@@ -650,74 +726,41 @@ export default function MapScreen() {
                   setSheetMode("info");
                   setClusterRecordIds(null);
                 }}
-                className="border px-3 py-1.5"
+                className="flex-row items-center rounded-full border px-3 py-1.5"
                 style={{
                   borderColor: selectedId === `favorite:${spot.id}` ? FIELD_COLORS.orange : FIELD_COLORS.rule,
-                  backgroundColor: "#FFFFFF",
+                  backgroundColor: "rgba(255,255,255,0.96)",
                 }}
               >
-                <Text className="text-[11px]" style={{ color: FIELD_COLORS.ink, fontFamily: bodySemiBoldFont }}>
+                <FontAwesome name="star" size={10} color={FIELD_COLORS.orange} />
+                <Text className="ml-1.5 text-[10px]" style={{ color: FIELD_COLORS.ink, fontFamily: bodySemiBoldFont }}>
                   {spot.name}
                 </Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
-        </View>
-      ) : null}
-
-      <View className="border-t px-5 py-2" style={{ borderColor: FIELD_COLORS.rule, backgroundColor: "#FFFFFF" }}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
-          {MAP_FILTERS.map((filter) => {
-            const active = activeFilter === filter.key;
-            return (
-              <TouchableOpacity
-                key={filter.key}
-                accessibilityRole="button"
-                accessibilityState={{ selected: active }}
-                accessibilityLabel={`${filter.label} 지도 필터 ${filterCounts[filter.key]}곳`}
-                onPress={() => setActiveFilter(filter.key)}
-                className="flex-row items-center border px-3 py-2"
-                style={{
-                  borderColor: active ? FIELD_COLORS.teal : FIELD_COLORS.rule,
-                  backgroundColor: active ? FIELD_COLORS.teal : "#FFFFFF",
-                }}
-              >
-                <Text className="text-[11px]" style={{ color: active ? "#FFFFFF" : FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>
-                  {filter.label}
-                </Text>
-                <View className="ml-2 min-w-5 items-center px-1 py-0.5" style={{ backgroundColor: active ? "#FFFFFF" : FIELD_COLORS.locked }}>
-                  <Text className="text-[9px]" style={{ color: active ? FIELD_COLORS.teal : FIELD_COLORS.muted, fontFamily: monoFont }}>
-                    {filterCounts[filter.key]}곳
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
+        ) : null}
       </View>
 
-      <View className="relative flex-1">
-        <FishingMap
-          points={points}
-          focusPointId={focusPointId}
-          focusLatitudeDelta={focusLatitudeDelta}
-          onSelectPoint={selectPoint}
-          onSelectCluster={selectCluster}
-          onSelectCoordinate={selectCoordinate}
-        />
-
-        {!isInitialLoading && entries.length === 0 ? (
-          <View pointerEvents="none" className="absolute inset-x-5 top-6 border bg-white px-5 py-5" style={{ borderColor: FIELD_COLORS.ink }}>
+      {!isInitialLoading && entries.length === 0 ? (
+        <View
+          pointerEvents="none"
+          className="absolute inset-x-5 rounded-2xl border bg-white px-5 py-4"
+          style={{
+            borderColor: FIELD_COLORS.rule,
+            top: insets.top + (favoriteSpots.length > 0 || favoritesLoading ? 154 : 112),
+          }}
+        >
             <Text className="text-xl" style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>
               아직 지도에 표시할 기록이 없습니다
             </Text>
             <Text className="mt-2 text-sm leading-6" style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}>
               지도에서 바다를 누르거나 현재 위치 버튼을 누르면 인근 수온과 물때를 확인할 수 있습니다.
             </Text>
-          </View>
-        ) : null}
+        </View>
+      ) : null}
 
-        {selected ? (
+      {selected ? (
           <BottomSheet
             ref={infoSheetRef}
             index={1}
@@ -741,7 +784,10 @@ export default function MapScreen() {
           >
             <BottomSheetScrollView
               showsVerticalScrollIndicator={false}
-              contentContainerStyle={{ paddingBottom: 20, paddingHorizontal: 16 }}
+              contentContainerStyle={{
+                paddingBottom: insets.bottom + 84,
+                paddingHorizontal: 16,
+              }}
             >
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center">
@@ -1061,8 +1107,7 @@ export default function MapScreen() {
             )}
             </BottomSheetScrollView>
           </BottomSheet>
-        ) : null}
-      </View>
+      ) : null}
 
       <TripFormModal
         visible={formVisible}

@@ -52,6 +52,15 @@ const TabLayout = () => {
         name="map"
         options={{
           title: "지도",
+          tabBarStyle: {
+            position: "absolute",
+            backgroundColor: "rgba(255, 255, 255, 0.94)",
+            borderTopColor: FIELD_COLORS.rule,
+            borderTopWidth: 1,
+            height: 84,
+            paddingTop: 8,
+            paddingBottom: 8,
+          },
           tabBarIcon: ({ color, focused }) => <ArchiveTabIcon name="map" color={color} focused={focused} />,
         }}
       />
