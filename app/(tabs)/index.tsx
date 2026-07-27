@@ -9,10 +9,12 @@ import {
   ActivityIndicator,
   RefreshControl,
   Alert,
+  useWindowDimensions,
 } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import Svg, { Text as SvgText } from "react-native-svg";
 import {
   useFishingTrips,
   type UpdateTripInput,
@@ -33,6 +35,45 @@ import {
 } from "@/src/theme/fieldJournal";
 
 const DEFAULT_HERO_IMAGE = require("@/assets/images/design/first-trip-cover-v1.png");
+/** 히어로 타이포 기준 폭 (큰 기기에서 현재 룩이 맞는 너비) */
+const HERO_TYPE_BASE_WIDTH = 430;
+const HERO_HORIZONTAL_PADDING = 56; // px-7 * 2
+
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, value));
+
+/** Anton 숫자는 RN Text ascent 클리핑이 있어 SVG + 상단 여유로 그림 */
+const AntonDateNumber = ({
+  value,
+  color,
+  fontSize,
+  height,
+}: {
+  value: string;
+  color: string;
+  fontSize: number;
+  height: number;
+}) => {
+  const width = Math.ceil(fontSize * 0.58 * Math.max(value.length, 1) + 10);
+  // 글자는 박스보다 작게, baseline은 아래로 → 윗부분이 절대 잘리지 않게
+  const renderSize = fontSize * 0.86;
+  const topPad = Math.max(10, height - renderSize * 1.02);
+  const baseline = topPad + renderSize * 0.92;
+  return (
+    <Svg width={width} height={height}>
+      <SvgText
+        fill={color}
+        fontSize={renderSize}
+        fontFamily={dateNumberFont}
+        fontWeight="400"
+        x={2}
+        y={baseline}
+      >
+        {value}
+      </SvgText>
+    </Svg>
+  );
+};
 
 const formatTripDate = (iso: string) => {
   const date = new Date(iso);
@@ -48,6 +89,21 @@ const formatTripDate = (iso: string) => {
 const HomeScreen = () => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { width: windowWidth } = useWindowDimensions();
+  const heroTypeScale = clamp(
+    (windowWidth - HERO_HORIZONTAL_PADDING) / (HERO_TYPE_BASE_WIDTH - HERO_HORIZONTAL_PADDING),
+    0.72,
+    1,
+  );
+  const heroDateNumberSize = Math.round(82 * heroTypeScale);
+  const heroDateUnitSize = Math.round(39 * heroTypeScale);
+  const heroDateWeekdaySize = Math.round(47 * heroTypeScale);
+  // SVG 숫자 박스와 동일 높이 (부모보다 튀어나오면 ScrollView가 상단을 자름)
+  const heroDateLineHeight = Math.round(heroDateNumberSize * 1.55);
+  const heroTitleSize = Math.round(44 * heroTypeScale);
+  const heroTitleLineHeight = Math.round(54 * heroTypeScale);
+  const heroSpotSize = Math.round(25 * heroTypeScale);
+  const heroSpotLineHeight = Math.round(34 * heroTypeScale);
   const [addVisible, setAddVisible] = useState(false);
   const [coverActionsVisible, setCoverActionsVisible] = useState(false);
   const {
@@ -143,28 +199,106 @@ const HomeScreen = () => {
               </Text>
             )}
           />
-          <View className="px-7 pt-10">
+          <View className="px-7 pt-12">
             {isLoading ? (
               <View className="h-28 items-start justify-center">
                 <ActivityIndicator color={heroTextColor} />
               </View>
             ) : nextTrip ? (
               <>
-                <View className="min-h-[96px] flex-row items-end">
-                  <Text style={{ color: heroTextColor, fontFamily: dateNumberFont, fontSize: 82, lineHeight: 96, overflow: "visible", paddingTop: 4 }}>{dateMonth}</Text>
-                  <Text style={{ color: heroTextColor, fontFamily: dateKoreanFont, fontSize: 39, lineHeight: 64 }}>월 </Text>
-                  <Text style={{ color: heroTextColor, fontFamily: dateNumberFont, fontSize: 82, lineHeight: 96, overflow: "visible", paddingTop: 4 }}>{dateDay}</Text>
-                  <Text style={{ color: heroTextColor, fontFamily: dateKoreanFont, fontSize: 39, lineHeight: 64 }}>일, </Text>
-                  <Text style={{ color: heroTextColor, fontFamily: dateKoreanFont, fontSize: 47, lineHeight: 68 }}>{dateWeekday}</Text>
+                <View
+                  style={{
+                    height: heroDateLineHeight,
+                    flexDirection: "row",
+                    alignItems: "flex-end",
+                    overflow: "visible",
+                    marginTop: 4,
+                  }}
+                >
+                  <AntonDateNumber
+                    value={dateMonth}
+                    color={heroTextColor}
+                    fontSize={heroDateNumberSize}
+                    height={heroDateLineHeight}
+                  />
+                  <Text
+                    allowFontScaling={false}
+                    style={{
+                      color: heroTextColor,
+                      fontFamily: dateKoreanFont,
+                      fontSize: heroDateUnitSize,
+                      lineHeight: Math.round(heroDateUnitSize * 1.55),
+                      marginBottom: Math.round(8 * heroTypeScale),
+                    }}
+                  >
+                    월{" "}
+                  </Text>
+                  <AntonDateNumber
+                    value={dateDay}
+                    color={heroTextColor}
+                    fontSize={heroDateNumberSize}
+                    height={heroDateLineHeight}
+                  />
+                  <Text
+                    allowFontScaling={false}
+                    style={{
+                      color: heroTextColor,
+                      fontFamily: dateKoreanFont,
+                      fontSize: heroDateUnitSize,
+                      lineHeight: Math.round(heroDateUnitSize * 1.55),
+                      marginBottom: Math.round(6 * heroTypeScale),
+                    }}
+                  >
+                    일,{" "}
+                  </Text>
+                  <Text
+                    allowFontScaling={false}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    minimumFontScale={0.75}
+                    style={{
+                      flexShrink: 1,
+                      color: heroTextColor,
+                      fontFamily: dateKoreanFont,
+                      fontSize: heroDateWeekdaySize,
+                      lineHeight: Math.round(heroDateWeekdaySize * 1.4),
+                      marginBottom: Math.round(4 * heroTypeScale),
+                    }}
+                  >
+                    {dateWeekday}
+                  </Text>
                 </View>
-                <Text className="mt-1 text-[25px] leading-[34px]" style={{ color: heroTextColor, fontFamily: displayFont }}>다음 출조는 {nextTrip.spot_name}입니다.</Text>
+                <Text
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.65}
+                  allowFontScaling={false}
+                  className="mt-1"
+                  style={{
+                    color: heroTextColor,
+                    fontFamily: displayFont,
+                    fontSize: heroSpotSize,
+                    lineHeight: heroSpotLineHeight,
+                  }}
+                >
+                  다음 출조는 {nextTrip.spot_name}입니다.
+                </Text>
                 <Text className="mt-4 text-[15px] tracking-[1.6px]" style={{ color: heroTextColor, fontFamily: bodySemiBoldFont }}>새벽 5:30 · 우럭 목표</Text>
               </>
             ) : hasTripHistory ? (
               <View className="pt-3">
                 <Text
-                  className="max-w-[580px] text-[44px] leading-[54px] tracking-[-1.5px]"
-                  style={{ color: heroTextColor, fontFamily: displayFont }}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.72}
+                  allowFontScaling={false}
+                  className="max-w-[580px] tracking-[-1.5px]"
+                  style={{
+                    color: heroTextColor,
+                    fontFamily: displayFont,
+                    fontSize: heroTitleSize,
+                    lineHeight: heroTitleLineHeight,
+                  }}
                 >
                   다음 출조를 계획해볼까요
                 </Text>
@@ -194,7 +328,21 @@ const HomeScreen = () => {
               </View>
             ) : (
               <View className="pt-3">
-                <Text className="max-w-[580px] text-[44px] leading-[54px] tracking-[-1.5px]" style={{ color: heroTextColor, fontFamily: displayFont }}>첫 출조를 기다리는 중</Text>
+                <Text
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.72}
+                  allowFontScaling={false}
+                  className="max-w-[580px] tracking-[-1.5px]"
+                  style={{
+                    color: heroTextColor,
+                    fontFamily: displayFont,
+                    fontSize: heroTitleSize,
+                    lineHeight: heroTitleLineHeight,
+                  }}
+                >
+                  첫 출조를 기다리는 중
+                </Text>
                 <Text className="mt-4 text-lg tracking-[-0.3px]" style={{ color: heroTextColor, fontFamily: bodySemiBoldFont }}>어디로 떠날지 기록해보세요</Text>
                 <TouchableOpacity
                   accessibilityRole="button"
