@@ -59,6 +59,36 @@ const AI_PHOTO_CONSENT_KEY = "ai-photo-consent-v1";
 const PRIVACY_POLICY_URL =
   "https://sigcrew.github.io/baited-brothers/privacy/";
 
+const askToAttachLocation = () =>
+  new Promise<boolean>((resolve) => {
+    let resolved = false;
+    const finish = (value: boolean) => {
+      if (resolved) return;
+      resolved = true;
+      resolve(value);
+    };
+
+    Alert.alert(
+      "촬영 위치를 인증할까요?",
+      "위치를 허용하면 조과를 지도와 도감 해금에 반영합니다. 위치 없이도 사진 분석과 조과 기록은 계속할 수 있습니다.",
+      [
+        {
+          text: "위치 없이 계속",
+          style: "cancel",
+          onPress: () => finish(false),
+        },
+        {
+          text: "위치 허용",
+          onPress: () => finish(true),
+        },
+      ],
+      {
+        cancelable: true,
+        onDismiss: () => finish(false),
+      },
+    );
+  });
+
 const RecordScreen = () => {
   const router = useRouter();
   const params = useLocalSearchParams<{
@@ -271,15 +301,22 @@ const RecordScreen = () => {
     if (!cameraRef.current || isCapturing) return;
     setIsCapturing(true);
     try {
-      const locationPermission = await Location.requestForegroundPermissionsAsync();
-      if (!locationPermission.granted) {
-        Alert.alert("위치 권한 필요", "도감 해금에는 촬영 순간의 위치가 필요합니다.");
-        return;
+      let locationPermission = await Location.getForegroundPermissionsAsync();
+      if (!locationPermission.granted && locationPermission.canAskAgain) {
+        const wantsLocation = await askToAttachLocation();
+        if (wantsLocation) {
+          locationPermission =
+            await Location.requestForegroundPermissionsAsync();
+        }
       }
 
       const [photo, position] = await Promise.all([
         cameraRef.current.takePictureAsync({ quality: 0.9 }),
-        Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High }),
+        locationPermission.granted
+          ? Location.getCurrentPositionAsync({
+              accuracy: Location.Accuracy.High,
+            }).catch(() => null)
+          : Promise.resolve(null),
       ]);
       if (!photo?.uri) {
         throw new Error("AI 판정을 위한 사진 데이터를 만들지 못했습니다.");
@@ -303,9 +340,11 @@ const RecordScreen = () => {
         height: optimized.height,
         base64: optimized.base64,
         mimeType: optimized.mimeType,
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-        locationCapturedAt: new Date(position.timestamp).toISOString(),
+        latitude: position?.coords.latitude ?? null,
+        longitude: position?.coords.longitude ?? null,
+        locationCapturedAt: position
+          ? new Date(position.timestamp).toISOString()
+          : null,
         source: "camera",
       };
       await analyzeCapture(nextCapture);
@@ -546,7 +585,7 @@ const RecordScreen = () => {
           <TouchableOpacity onPress={() => router.back()} className="rounded-lg bg-black/50 px-4 py-2">
             <Text className="font-medium text-white">닫기</Text>
           </TouchableOpacity>
-          <View className="rounded-lg bg-black/50 px-3 py-2"><Text className="text-sm text-white">{tripName ? `${tripName} · 현장 기록` : "사진 + GPS 인증"}</Text></View>
+          <View className="rounded-lg bg-black/50 px-3 py-2"><Text className="text-sm text-white">{tripName ? `${tripName} · 현장 기록` : "사진 기록 · GPS 선택"}</Text></View>
         </View>
         <View className="absolute bottom-0 left-0 right-0 items-center bg-black/40 pb-8 pt-5" style={{ paddingBottom: insets.bottom + 24 }}>
           <Text className="mb-4 text-sm text-white">물고기 전체가 잘 보이게 촬영해 주세요</Text>
@@ -600,7 +639,9 @@ const RecordScreen = () => {
               <Text className="text-xs text-teal-800">
                 {capture.source === "dev_upload"
                   ? "DEV ONLY · 파일 업로드 · 실제 저장"
-                  : "GPS 확보 완료 · 현장 촬영"}
+                  : capture.latitude != null && capture.longitude != null
+                    ? "GPS 확보 완료 · 인증 조과"
+                    : "위치 미인증 · 지도와 도감 해금에서 제외"}
               </Text>
               <TouchableOpacity
                 onPress={

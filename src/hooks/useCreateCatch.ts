@@ -9,6 +9,7 @@ import {
 } from "@/src/lib/userMedia";
 import { trackAnalyticsEvent } from "@/src/lib/analytics";
 import { captureCatchConditions } from "@/src/lib/catchConditions";
+import { getCatchVerificationStatus } from "@/src/lib/catchVerification";
 
 type CreateCatchInput = {
   tripId?: string;
@@ -66,7 +67,10 @@ export const useCreateCatch = () => {
       const discoveredFishIds = new Set(
         (discoveryRows ?? []).map((row) => row.fish_id),
       );
-      const isFirstDiscovery = !discoveredFishIds.has(input.fishId);
+      const verificationStatus = getCatchVerificationStatus(input);
+      const isVerified = verificationStatus === "verified";
+      const isFirstDiscovery =
+        isVerified && !discoveredFishIds.has(input.fishId);
 
       const uploaded = await withTimeout(
         uploadUserPhotoVariants({
@@ -100,7 +104,7 @@ export const useCreateCatch = () => {
         capture_method: input.captureMethod ?? "live_camera",
         id_method: input.idMethod ?? "fallback_catalog",
         candidate_fish_ids: input.candidateFishIds ?? [],
-        verification_status: "verified",
+        verification_status: verificationStatus,
         verification_reason: input.verificationReason?.trim() || null,
         client_request_id: input.clientRequestId,
       };
@@ -132,6 +136,7 @@ export const useCreateCatch = () => {
       void trackAnalyticsEvent("catch_created", {
         id_method: payload.id_method ?? "unknown",
         capture_method: payload.capture_method ?? "unknown",
+        verified: isVerified,
         first_discovery: isFirstDiscovery,
         has_trip: Boolean(input.tripId),
         has_size: input.sizeCm != null,

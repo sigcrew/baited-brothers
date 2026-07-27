@@ -56,7 +56,12 @@
           "backgroundColor": "#F5F5F5"
         }
       ],
-      "expo-secure-store",
+      [
+        "expo-secure-store",
+        {
+          "faceIDPermission": false
+        }
+      ],
       "expo-apple-authentication",
       [
         "expo-web-browser",
@@ -68,6 +73,7 @@
         "expo-camera",
         {
           "cameraPermission": "물고기 조과를 현장에서 촬영하려면 카메라 접근이 필요합니다.",
+          "microphonePermission": false,
           "recordAudioAndroid": false,
           "barcodeScannerEnabled": false
         }
@@ -75,7 +81,9 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "조과를 인증하려면 촬영 순간의 위치가 필요합니다."
+          "locationWhenInUsePermission": "조과를 인증하려면 촬영 순간의 위치가 필요합니다.",
+          "locationAlwaysPermission": false,
+          "locationAlwaysAndWhenInUsePermission": false
         }
       ],
       [

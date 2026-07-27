@@ -56,14 +56,14 @@ export default function PrivacyScreen() {
         className="mt-2 text-[10px] tracking-[1.2px]"
         style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}
       >
-        EFFECTIVE · 2026.07.21
+        EFFECTIVE · 2026.07.27
       </Text>
       <Section title="수집하는 정보">
         계정 이메일과 로그인 제공자 정보, 사용자가 기록한 출조·조과·메모,
-        촬영 사진, 조과 인증을 위한 촬영 시점의 위치 정보, 앱 버전·운영체제와
-        기능 이용 기록(AI 처리 결과, 도감·카드 열람, 출조·조과 변경)을
-        처리합니다. 이용 기록에는 사진, 좌표, 메모, 이메일을 중복 저장하지
-        않습니다.
+        촬영 사진, 사용자가 위치 인증을 선택한 경우 촬영 시점의 위치 정보,
+        앱 버전·운영체제와 기능 이용 기록(AI 처리 결과, 도감·카드 열람,
+        출조·조과 변경)을 처리합니다. 이용 기록에는 사진, 좌표, 메모, 이메일을
+        중복 저장하지 않습니다.
       </Section>
       <Section title="이용 목적">
         로그인과 계정 관리, 출조 및 조과 기록 보관, 도감 해금, 사진 기반 어종
@@ -75,6 +75,8 @@ export default function PrivacyScreen() {
         추천과 이용 기록 저장에도 Supabase를 사용합니다. AI 추천 시 사진과 도감
         후보 정보가 Anthropic API로 전송될 수 있습니다.
         Apple·Google 로그인을 선택하면 해당 제공자의 인증 절차가 적용됩니다.
+        외부 처리자가 서비스 제공 과정에서 처리하는 개인정보에는 본 방침과 적용
+        법령이 요구하는 수준과 동등한 개인정보 보호 조치를 적용하도록 요구합니다.
       </Section>
       <Section title="보관 및 삭제">
         계정이 유지되는 동안 출조·조과와 업로드 사진을 보관합니다. 원본 기능 이용
