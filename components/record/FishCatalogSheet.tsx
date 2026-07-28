@@ -39,9 +39,13 @@ export const FishCatalogSheet = ({
   const [query, setQuery] = useState("");
 
   useEffect(() => {
-    if (!visible) return;
-    setQuery("");
-    bottomSheetRef.current?.present();
+    if (visible) {
+      setQuery("");
+      bottomSheetRef.current?.present();
+      return;
+    }
+
+    bottomSheetRef.current?.dismiss();
   }, [visible]);
 
   const filteredFishes = useMemo(() => {
@@ -68,8 +72,6 @@ export const FishCatalogSheet = ({
   const dismiss = useCallback(() => {
     bottomSheetRef.current?.dismiss();
   }, []);
-
-  if (!visible) return null;
 
   return (
     <BottomSheetModal
