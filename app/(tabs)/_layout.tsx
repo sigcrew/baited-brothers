@@ -1,5 +1,6 @@
 import { Redirect } from "expo-router";
 import { Tabs } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ArchiveTabIcon } from "@/components/navigation/ArchiveTabIcon";
 import { useAuth } from "@/src/contexts/AuthContext";
@@ -7,6 +8,9 @@ import { FIELD_COLORS, bodySemiBoldFont } from "@/src/theme/fieldJournal";
 
 const TabLayout = () => {
   const { session } = useAuth();
+  const insets = useSafeAreaInsets();
+  const tabBarHeight = 84 + insets.bottom;
+  const tabBarPaddingBottom = 8 + insets.bottom;
 
   if (!__DEV__ && !session) {
     return <Redirect href="/(auth)/login" />;
@@ -22,9 +26,9 @@ const TabLayout = () => {
           backgroundColor: FIELD_COLORS.paper,
           borderTopColor: FIELD_COLORS.rule,
           borderTopWidth: 1,
-          height: 84,
+          height: tabBarHeight,
           paddingTop: 8,
-          paddingBottom: 8,
+          paddingBottom: tabBarPaddingBottom,
         },
         tabBarIconStyle: { marginTop: 1, marginBottom: 6 },
         tabBarLabelStyle: {
@@ -57,9 +61,9 @@ const TabLayout = () => {
             backgroundColor: "rgba(255, 255, 255, 0.94)",
             borderTopColor: FIELD_COLORS.rule,
             borderTopWidth: 1,
-            height: 84,
+            height: tabBarHeight,
             paddingTop: 8,
-            paddingBottom: 8,
+            paddingBottom: tabBarPaddingBottom,
           },
           tabBarIcon: ({ color, focused }) => <ArchiveTabIcon name="map" color={color} focused={focused} />,
         }}
