@@ -1,8 +1,15 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import type { Session } from "@supabase/supabase-js";
 import Constants from "expo-constants";
 import * as WebBrowser from "expo-web-browser";
 import { supabase } from "@/src/lib/supabase";
+import { parseGoogleAuthCallback } from "@/src/lib/googleAuthCallback";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -19,6 +26,9 @@ type AuthContextType = {
     authorizationCode: string,
   ) => Promise<{ error: Error | null }>;
   signInWithGoogle: () => Promise<{ error: Error | null }>;
+  completeGoogleSignIn: (
+    callbackUrlOrFragment: string,
+  ) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   deleteAccount: () => Promise<{
     appleRevocation: AppleRevocationStatus;
@@ -39,6 +49,7 @@ type DeleteAccountResult = {
 const APPLE_NATIVE_CLIENT_ID = "com.sigcrew.baitedbrothers";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+let pendingGoogleCompletion: Promise<{ error: Error | null }> | null = null;
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
@@ -128,7 +139,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       options: {
         redirectTo: redirectUrl,
         skipBrowserRedirect: true,
-        queryParams: { prompt: "consent" },
+        queryParams: { prompt: "select_account" },
       },
     });
 
@@ -147,24 +158,38 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return { error: new Error("Google 로그인이 취소되었습니다.") };
     }
 
-    const hashStart = result.url.indexOf("#");
-    const params = new URLSearchParams(
-      hashStart >= 0 ? result.url.slice(hashStart + 1) : ""
-    );
-    const accessToken = params.get("access_token");
-    const refreshToken = params.get("refresh_token");
-
-    if (!accessToken || !refreshToken) {
-      return { error: new Error("로그인 세션을 가져올 수 없습니다.") };
-    }
-
-    const { error: sessionError } = await supabase.auth.setSession({
-      access_token: accessToken,
-      refresh_token: refreshToken,
-    });
-
-    return { error: sessionError ?? null };
+    return completeGoogleSignIn(result.url);
   };
+
+  const completeGoogleSignIn = useCallback(
+    (callbackUrlOrFragment: string) => {
+      if (pendingGoogleCompletion) return pendingGoogleCompletion;
+
+      pendingGoogleCompletion = (async () => {
+        const {
+          data: { session: existingSession },
+        } = await supabase.auth.getSession();
+        if (existingSession) return { error: null };
+
+        const { accessToken, refreshToken, error } = parseGoogleAuthCallback(
+          callbackUrlOrFragment,
+        );
+        if (error) return { error };
+
+        const { error: sessionError } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+
+        return { error: sessionError ?? null };
+      })().finally(() => {
+        pendingGoogleCompletion = null;
+      });
+
+      return pendingGoogleCompletion;
+    },
+    [],
+  );
 
   const value: AuthContextType = {
     session,
@@ -173,6 +198,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     signUp,
     signInWithApple,
     signInWithGoogle,
+    completeGoogleSignIn,
     signOut,
     deleteAccount,
   };
