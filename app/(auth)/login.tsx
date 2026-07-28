@@ -158,7 +158,15 @@ const LoginScreen = () => {
             >
               <TextInput
                 className="h-full text-[15px]"
-                style={{ color: FIELD_COLORS.ink, fontFamily: bodyFont, outlineStyle: "none" } as never}
+                style={{
+                  color: FIELD_COLORS.ink,
+                  fontFamily: bodyFont,
+                  includeFontPadding: false,
+                  lineHeight: 20,
+                  outlineStyle: "none",
+                  paddingVertical: 0,
+                  textAlignVertical: "center",
+                } as never}
                 placeholder="이메일 주소"
                 placeholderTextColor="#93A2A5"
                 value={email}
@@ -185,7 +193,15 @@ const LoginScreen = () => {
             >
               <TextInput
                 className="h-full flex-1 text-[15px]"
-                style={{ color: FIELD_COLORS.ink, fontFamily: bodyFont, outlineStyle: "none" } as never}
+                style={{
+                  color: FIELD_COLORS.ink,
+                  fontFamily: bodyFont,
+                  includeFontPadding: false,
+                  lineHeight: 20,
+                  outlineStyle: "none",
+                  paddingVertical: 0,
+                  textAlignVertical: "center",
+                } as never}
                 placeholder="비밀번호 입력"
                 placeholderTextColor="#93A2A5"
                 value={password}
