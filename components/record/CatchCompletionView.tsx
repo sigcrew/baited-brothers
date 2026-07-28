@@ -11,6 +11,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { getField60Illustration } from "@/src/data/field60Illustrations";
 import type { Fish } from "@/src/hooks/useFishes";
 import {
+  getVerificationLabel,
+  type CatchVerificationStatus,
+} from "@/src/lib/catchRewards";
+import {
   FIELD_COLORS,
   bodyExtraBoldFont,
   bodyFont,
@@ -24,10 +28,33 @@ type CatchCompletionViewProps = {
   isDevelopmentTest: boolean;
   isFileUpload: boolean;
   discoveredCount: number;
+  verificationStatus: CatchVerificationStatus;
+  verificationReason: string | null;
   sizeCm?: number;
   onViewRecord: () => void;
   onViewEncyclopedia: () => void;
   onGoHome: () => void;
+};
+
+const reasonMessage = (reason: string | null) => {
+  switch (reason) {
+    case "outside_service_area":
+      return "대한민국 서비스 범위 밖에서 촬영된 사진입니다.";
+    case "outside_coastal_zone":
+      return "해안·근해 인증 범위 밖에서 촬영된 사진입니다.";
+    case "location_accuracy_low":
+      return "촬영 당시 위치 정확도가 인증 기준을 충족하지 못했습니다.";
+    case "location_timestamp_stale":
+      return "촬영 시점과 위치 측정 시점을 함께 확인하지 못했습니다.";
+    case "duplicate_image":
+      return "이미 인증에 사용된 사진과 동일한 사진입니다.";
+    case "capture_timestamp_invalid":
+      return "사진 촬영 시각을 확인하지 못했습니다.";
+    case "location_unavailable":
+      return "사진에 촬영 위치 또는 시각 정보가 없습니다.";
+    default:
+      return "인증 조건을 확인하지 못해 일반 기록으로 보관했습니다.";
+  }
 };
 
 const RAY_ANGLES = Array.from({ length: 16 }, (_, index) => index * 22.5);
@@ -122,6 +149,8 @@ export const CatchCompletionView = ({
   isDevelopmentTest,
   isFileUpload,
   discoveredCount,
+  verificationStatus,
+  verificationReason,
   sizeCm,
   onViewRecord,
   onViewEncyclopedia,
@@ -134,6 +163,12 @@ export const CatchCompletionView = ({
   );
   const scientificName = fish.name.split(/\s+/).slice(0, 2).join(" ");
   const discoveredCountLabel = String(discoveredCount).padStart(2, "0");
+  const verificationLabel = getVerificationLabel(verificationStatus);
+  const isGeneralRecord =
+    verificationStatus === "general_record" ||
+    verificationStatus === "unverified";
+  const isMetadataVerified = verificationStatus === "metadata_verified";
+  const isPending = verificationStatus === "pending";
 
   return (
     <View
@@ -217,6 +252,36 @@ export const CatchCompletionView = ({
           </Text>
         </View>
 
+        <View
+          className="mt-4 border-l-4 bg-white px-4 py-3"
+          style={{
+            borderLeftColor: isGeneralRecord
+              ? FIELD_COLORS.orange
+              : FIELD_COLORS.teal,
+          }}
+        >
+          <Text
+            style={{
+              color: FIELD_COLORS.ink,
+              fontFamily: bodyExtraBoldFont,
+            }}
+          >
+            {verificationLabel}
+          </Text>
+          <Text
+            className="mt-1 text-xs leading-5"
+            style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
+          >
+            {isMetadataVerified
+              ? "사진의 촬영 위치가 연안으로 확인되었습니다. 도감·배지·개인 최대어에는 반영되며 랭킹에서는 제외됩니다."
+              : isPending
+                ? "서버에서 사진 위치와 중복 여부를 확인하고 있습니다."
+                : isGeneralRecord
+                  ? reasonMessage(verificationReason)
+                  : "촬영 당시 위치가 연안으로 확인되어 모든 인증 지표에 반영됩니다."}
+          </Text>
+        </View>
+
         {isFirstDiscovery ? (
           <View className="mt-4">
             <View className="flex-row items-center">
@@ -288,7 +353,7 @@ export const CatchCompletionView = ({
                 {isDevelopmentTest
                   ? "개발용 판별 결과가 확정되었습니다."
                   : isFileUpload
-                    ? "업로드한 사진이 실제 조과로 기록되었습니다."
+                    ? "사진 보관함에서 선택한 사진이 기록되었습니다."
                     : "사진과 위치 정보가 기록되었습니다."}
               </Text>
             </View>

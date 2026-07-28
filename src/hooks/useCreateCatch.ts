@@ -9,7 +9,10 @@ import {
 } from "@/src/lib/userMedia";
 import { trackAnalyticsEvent } from "@/src/lib/analytics";
 import { captureCatchConditions } from "@/src/lib/catchConditions";
-import { getCatchVerificationStatus } from "@/src/lib/catchVerification";
+import {
+  countsForCollectionRewards,
+  type CatchVerificationStatus,
+} from "@/src/lib/catchRewards";
 
 type CreateCatchInput = {
   tripId?: string;
@@ -20,13 +23,14 @@ type CreateCatchInput = {
   imageHeight: number;
   latitude?: number;
   longitude?: number;
+  capturedAt?: string;
+  locationAccuracyM?: number;
   locationCapturedAt?: string;
   captureMethod?: Database["public"]["Enums"]["capture_method"];
   sizeCm?: number;
   memo?: string;
   candidateFishIds?: string[];
   idMethod?: "closed_set_candidates" | "fallback_catalog";
-  verificationReason?: string;
   clientRequestId: string;
 };
 
@@ -35,6 +39,33 @@ type CreateCatchResult = {
   catchId: string | null;
   isFirstDiscovery: boolean;
   discoveredCount: number;
+  verificationStatus: CatchVerificationStatus;
+  verificationReason: string | null;
+};
+
+type VerifyCatchResponse = {
+  status: CatchVerificationStatus;
+  reason: string | null;
+};
+
+const verifySavedCatch = async (
+  catchId: string,
+): Promise<VerifyCatchResponse> => {
+  try {
+    const { data, error } = await withTimeout(
+      supabase.functions.invoke<VerifyCatchResponse>("verify-catch", {
+        body: { catchId },
+      }),
+      45_000,
+      "조과 인증 확인 시간이 초과되었습니다.",
+    );
+    if (error || !data?.status) {
+      return { status: "pending", reason: null };
+    }
+    return { status: data.status, reason: data.reason ?? null };
+  } catch {
+    return { status: "pending", reason: null };
+  }
 };
 
 export const useCreateCatch = () => {
@@ -51,27 +82,35 @@ export const useCreateCatch = () => {
         catchId: null,
         isFirstDiscovery: false,
         discoveredCount: 0,
+        verificationStatus: "general_record",
+        verificationReason: "authentication_required",
       };
     }
 
     setIsSaving(true);
     let uploadedPaths: string[] = [];
+    let saveStage: "discovery" | "photo_upload" | "database_insert" =
+      "discovery";
+    void trackAnalyticsEvent("catch_save_started", {
+      capture_method: input.captureMethod ?? "live_camera",
+      has_trip: Boolean(input.tripId),
+    });
 
     try {
       const { data: discoveryRows, error: discoveryError } = await supabase
         .from("user_catches")
         .select("fish_id")
         .eq("user_id", userId)
-        .eq("verification_status", "verified");
+        .in("verification_status", [
+          "verified",
+          "field_verified",
+          "metadata_verified",
+        ]);
       if (discoveryError) throw discoveryError;
       const discoveredFishIds = new Set(
         (discoveryRows ?? []).map((row) => row.fish_id),
       );
-      const verificationStatus = getCatchVerificationStatus(input);
-      const isVerified = verificationStatus === "verified";
-      const isFirstDiscovery =
-        isVerified && !discoveredFishIds.has(input.fishId);
-
+      saveStage = "photo_upload";
       const uploaded = await withTimeout(
         uploadUserPhotoVariants({
           userId,
@@ -95,20 +134,23 @@ export const useCreateCatch = () => {
         image_url: null,
         image_path: uploaded.imagePath,
         thumbnail_path: uploaded.thumbnailPath,
-        caught_at: new Date().toISOString(),
+        caught_at: input.capturedAt ?? new Date().toISOString(),
+        captured_at: input.capturedAt ?? null,
         location_lat: input.latitude ?? null,
         location_lng: input.longitude ?? null,
+        location_accuracy_m: input.locationAccuracyM ?? null,
         location_captured_at: input.locationCapturedAt ?? null,
         size_cm: input.sizeCm ?? null,
         memo: input.memo?.trim() || null,
         capture_method: input.captureMethod ?? "live_camera",
         id_method: input.idMethod ?? "fallback_catalog",
         candidate_fish_ids: input.candidateFishIds ?? [],
-        verification_status: verificationStatus,
-        verification_reason: input.verificationReason?.trim() || null,
+        verification_status: "pending",
+        verification_reason: null,
         client_request_id: input.clientRequestId,
       };
 
+      saveStage = "database_insert";
       const { data: insertedCatch, error: insertError } = await supabase
         .from("user_catches")
         .insert(payload)
@@ -118,21 +160,44 @@ export const useCreateCatch = () => {
         await removeUserMedia(uploadedPaths);
         const { data: existingCatch } = await supabase
           .from("user_catches")
-          .select("id, fish_id")
+          .select("id, fish_id, verification_status, verification_reason")
           .eq("user_id", userId)
           .eq("client_request_id", input.clientRequestId)
           .maybeSingle();
+        const existingVerification =
+          existingCatch?.id && existingCatch.verification_status === "pending"
+            ? await verifySavedCatch(existingCatch.id)
+            : {
+                status: existingCatch?.verification_status ?? "pending",
+                reason: existingCatch?.verification_reason ?? null,
+              };
+        void trackAnalyticsEvent("catch_save_succeeded", {
+          capture_method: payload.capture_method ?? "unknown",
+          idempotent_retry: true,
+          has_trip: Boolean(input.tripId),
+        });
         return {
           error: null,
           catchId: existingCatch?.id ?? null,
           isFirstDiscovery: false,
           discoveredCount: discoveredFishIds.size,
+          verificationStatus: existingVerification.status,
+          verificationReason: existingVerification.reason,
         };
       }
       if (insertError) {
         await removeUserMedia(uploadedPaths);
         throw insertError;
       }
+
+      const {
+        status: verificationStatus,
+        reason: verificationReason,
+      } = await verifySavedCatch(insertedCatch.id);
+      const isVerified = countsForCollectionRewards(verificationStatus);
+      const isFirstDiscovery =
+        isVerified && !discoveredFishIds.has(input.fishId);
+
       void trackAnalyticsEvent("catch_created", {
         id_method: payload.id_method ?? "unknown",
         capture_method: payload.capture_method ?? "unknown",
@@ -141,6 +206,12 @@ export const useCreateCatch = () => {
         has_trip: Boolean(input.tripId),
         has_size: input.sizeCm != null,
         has_note: Boolean(input.memo?.trim()),
+      });
+      void trackAnalyticsEvent("catch_save_succeeded", {
+        capture_method: payload.capture_method ?? "unknown",
+        verified: isVerified,
+        first_discovery: isFirstDiscovery,
+        has_trip: Boolean(input.tripId),
       });
       if (input.latitude != null && input.longitude != null) {
         void captureCatchConditions({
@@ -156,13 +227,30 @@ export const useCreateCatch = () => {
         isFirstDiscovery,
         discoveredCount:
           discoveredFishIds.size + (isFirstDiscovery ? 1 : 0),
+        verificationStatus,
+        verificationReason,
       };
     } catch (error) {
+      const failureKind =
+        error instanceof Error && error.message.includes("초과")
+          ? "timeout"
+          : saveStage;
+      void trackAnalyticsEvent("catch_save_failed", {
+        failure_kind: failureKind,
+        stage: saveStage,
+      });
+      if (saveStage === "photo_upload") {
+        void trackAnalyticsEvent("photo_upload_failed", {
+          failure_kind: failureKind,
+        });
+      }
       return {
         error: new Error(toUserMessage(error, "조과 저장에 실패했습니다.")),
         catchId: null,
         isFirstDiscovery: false,
         discoveredCount: 0,
+        verificationStatus: "general_record",
+        verificationReason: "save_failed",
       };
     } finally {
       setIsSaving(false);

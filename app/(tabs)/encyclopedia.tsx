@@ -79,6 +79,8 @@ const CollectionScreen = () => {
     if (!previewMode) return catches;
     return allFishes.slice(0, 4).map((fish, index) => ({
       id: `preview-${fish.id}`,
+      captured_at: new Date(2026, 6 - index, 6 + index).toISOString(),
+      collection_eligible: true,
       user_id: "preview",
       fish_id: fish.id,
       trip_id: null,
@@ -98,6 +100,7 @@ const CollectionScreen = () => {
         "해 뜨기 전 방파제에서 기록. 바닥층을 천천히 탐색했다.",
         "잔잔한 물때에 연속 입질. 다음 출조에도 같은 채비를 준비할 것.",
       ][index],
+      ranking_eligible: true,
       created_at: null,
       updated_at: null,
       candidate_fish_ids: [],
@@ -105,8 +108,13 @@ const CollectionScreen = () => {
       client_request_id: null,
       conditions_snapshot: null,
       id_method: "fallback_catalog",
+      image_hash: null,
+      location_accuracy_m: 15,
       verification_status: "verified",
       verification_reason: null,
+      verification_version: null,
+      verified_at: null,
+      uploaded_at: new Date(2026, 6 - index, 6 + index).toISOString(),
     }));
   }, [allFishes, catches, previewMode]);
   const unlockedCount = displayUnlockedFishIds.size;

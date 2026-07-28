@@ -208,7 +208,7 @@ const getSpeciesMilestoneDate = (
 ) => {
   const species = new Set<string>();
   for (const item of catches) {
-    if (item.verification_status !== "verified") continue;
+    if (!countsForCollectionRewards(item.verification_status)) continue;
     species.add(item.fish_id);
     if (species.size >= target) return item.caught_at;
   }
@@ -250,6 +250,9 @@ export const createBadgeUnlockContext = (
   const sortedCatches = [...catches].sort((a, b) =>
     a.caught_at.localeCompare(b.caught_at)
   );
+  const rewardCatches = sortedCatches.filter((item) =>
+    countsForCollectionRewards(item.verification_status)
+  );
   const doneTrips = trips
     .filter((trip) => trip.status === "done")
     .sort((a, b) =>
@@ -258,12 +261,11 @@ export const createBadgeUnlockContext = (
       )
     );
   const verifiedSpecies = new Set(
-    sortedCatches
-      .filter((item) => item.verification_status === "verified")
+    rewardCatches
       .map((item) => item.fish_id)
   );
   const tripsWithCatches = new Set(
-    sortedCatches.flatMap((item) => item.trip_id ? [item.trip_id] : [])
+    rewardCatches.flatMap((item) => item.trip_id ? [item.trip_id] : [])
   );
   const completeNotes = doneTrips.filter((trip) =>
     Boolean(
@@ -288,14 +290,14 @@ export const createBadgeUnlockContext = (
       .map((trip) => trip.spot_name.trim().toLocaleLowerCase())
       .filter(Boolean)
   );
-  const maxCatchSize = sortedCatches.reduce(
+  const maxCatchSize = rewardCatches.reduce(
     (largest, item) => Math.max(largest, item.size_cm ?? 0),
     0
   );
-  const recordCatch = sortedCatches.find((item) => (item.size_cm ?? 0) >= 50);
+  const recordCatch = rewardCatches.find((item) => (item.size_cm ?? 0) >= 50);
 
   return {
-    catchCount: sortedCatches.length,
+    catchCount: rewardCatches.length,
     uniqueSpecies: verifiedSpecies.size,
     completedTrips: doneTrips.length,
     completeFieldNotes: completeNotes.length,
@@ -315,16 +317,16 @@ export const createBadgeUnlockContext = (
       night_trip: nightTrips[0]?.completed_at ?? nightTrips[0]?.scheduled_at,
       field_notes_5: completeNotes[4]?.completed_at ?? completeNotes[4]?.scheduled_at,
       seasons_4: getSeasonMilestoneDate(doneTrips, 4),
-      first_catch: sortedCatches[0]?.caught_at,
-      catches_5: sortedCatches[4]?.caught_at,
-      catches_10: sortedCatches[9]?.caught_at,
-      catches_20: sortedCatches[19]?.caught_at,
+      first_catch: rewardCatches[0]?.caught_at,
+      catches_5: rewardCatches[4]?.caught_at,
+      catches_10: rewardCatches[9]?.caught_at,
+      catches_20: rewardCatches[19]?.caught_at,
       record_catch: recordCatch?.caught_at,
-      species_3: getSpeciesMilestoneDate(sortedCatches, 3),
-      species_10: getSpeciesMilestoneDate(sortedCatches, 10),
-      species_20: getSpeciesMilestoneDate(sortedCatches, 20),
-      species_30: getSpeciesMilestoneDate(sortedCatches, 30),
-      species_60: getSpeciesMilestoneDate(sortedCatches, 60),
+      species_3: getSpeciesMilestoneDate(rewardCatches, 3),
+      species_10: getSpeciesMilestoneDate(rewardCatches, 10),
+      species_20: getSpeciesMilestoneDate(rewardCatches, 20),
+      species_30: getSpeciesMilestoneDate(rewardCatches, 30),
+      species_60: getSpeciesMilestoneDate(rewardCatches, 60),
     },
   };
 };
@@ -428,3 +430,4 @@ export const getBadgeProgress = (
       return { current: 0, target: 1, label: "진행도" };
   }
 };
+import { countsForCollectionRewards } from "@/src/lib/catchRewards";

@@ -10,6 +10,7 @@ import {
 
 import { getField60Illustration } from "@/src/data/field60Illustrations";
 import type { UserCatch } from "@/src/hooks/useUserCatches";
+import { getVerificationLabel } from "@/src/lib/catchRewards";
 import {
   FIELD_COLORS,
   bodyExtraBoldFont,
@@ -262,6 +263,7 @@ export const CatchArchiveCard = ({
   const location = item.location_name?.trim() || "위치 미기록";
   const date = formatCaughtAt(item.caught_at);
   const cardNumber = getCardNumber(item.id);
+  const verificationLabel = getVerificationLabel(item.verification_status);
 
   return (
     <View
@@ -301,6 +303,19 @@ export const CatchArchiveCard = ({
             }}
           >
             FIELD CATCH
+          </Text>
+          <Text
+            style={{
+              color:
+                item.verification_status === "general_record" ||
+                item.verification_status === "unverified"
+                  ? CARD_COLORS.orange
+                  : CARD_COLORS.teal,
+              fontFamily: monoFont,
+              fontSize: compact ? 6 : 10,
+            }}
+          >
+            {verificationLabel}
           </Text>
           <View className="flex-row items-center">
             <Text

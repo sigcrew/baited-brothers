@@ -24,10 +24,12 @@ import {
   useFishRecognition,
   type FishRecognitionCandidate,
 } from "@/src/hooks/useFishRecognition";
+import type { CatchVerificationStatus } from "@/src/lib/catchRewards";
 import { CatchCompletionView } from "@/components/record/CatchCompletionView";
 import { FishCatalogSheet } from "@/components/record/FishCatalogSheet";
 import { getField60Illustration } from "@/src/data/field60Illustrations";
 import { optimizeUserPhoto } from "@/src/lib/optimizeUserPhoto";
+import { extractLibraryPhotoMetadata } from "@/src/lib/photoMetadata";
 import { trackAnalyticsEvent } from "@/src/lib/analytics";
 import { FIELD_COLORS, bodyExtraBoldFont, bodyFont, monoFont } from "@/src/theme/fieldJournal";
 
@@ -39,8 +41,10 @@ type Capture = {
   mimeType: "image/jpeg" | "image/png";
   latitude: number | null;
   longitude: number | null;
+  capturedAt: string | null;
+  locationAccuracyM: number | null;
   locationCapturedAt: string | null;
-  source: "camera" | "dev_upload";
+  source: "camera" | "photo_library";
 };
 
 type CompletionResult = {
@@ -50,10 +54,11 @@ type CompletionResult = {
   isDevelopmentTest: boolean;
   isFileUpload: boolean;
   discoveredCount: number;
+  verificationStatus: CatchVerificationStatus;
+  verificationReason: string | null;
   sizeCm?: number;
 };
 
-const DEV_FILE_TEST_ENABLED = __DEV__;
 const MAX_RECOGNITION_BASE64_LENGTH = 13_500_000;
 const AI_PHOTO_CONSENT_KEY = "ai-photo-consent-v1";
 const PRIVACY_POLICY_URL =
@@ -101,6 +106,8 @@ const RecordScreen = () => {
   const insets = useSafeAreaInsets();
   const cameraRef = useRef<CameraView>(null);
   const saveRequestId = useRef<string | null>(null);
+  const flowTracked = useRef(false);
+  const cameraOpenedTracked = useRef(false);
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const lastCameraPermission = useRef(cameraPermission);
   if (cameraPermission) {
@@ -133,7 +140,7 @@ const RecordScreen = () => {
     error: recognitionError,
   } = useFishRecognition();
   const completionPreviewMode =
-    DEV_FILE_TEST_ENABLED &&
+    __DEV__ &&
     (params.completionPreview === "first" ||
       params.completionPreview === "existing")
       ? params.completionPreview
@@ -150,6 +157,8 @@ const RecordScreen = () => {
           isDevelopmentTest: true,
           isFileUpload: false,
           discoveredCount: completionPreviewMode === "first" ? 3 : 2,
+          verificationStatus: "field_verified" as const,
+          verificationReason: null,
           sizeCm: completionPreviewMode === "existing" ? 32.5 : undefined,
         }
       : null);
@@ -169,6 +178,34 @@ const RecordScreen = () => {
       active = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (aiConsent !== "accepted" || flowTracked.current) return;
+    flowTracked.current = true;
+    void trackAnalyticsEvent("catch_flow_started", {
+      has_trip: Boolean(tripId),
+    });
+  }, [aiConsent, tripId]);
+
+  useEffect(() => {
+    if (
+      aiConsent !== "accepted" ||
+      !effectiveCameraPermission?.granted ||
+      capture ||
+      cameraOpenedTracked.current
+    ) {
+      return;
+    }
+    cameraOpenedTracked.current = true;
+    void trackAnalyticsEvent("camera_opened", {
+      has_trip: Boolean(tripId),
+    });
+  }, [
+    aiConsent,
+    capture,
+    effectiveCameraPermission?.granted,
+    tripId,
+  ]);
 
   const acceptAiPhotoConsent = async () => {
     setAiConsent("accepted");
@@ -213,6 +250,11 @@ const RecordScreen = () => {
     setRecognitionCandidates(result.candidates);
     setRecognitionNote(result.note);
     setNeedsRetake(result.needsRetake);
+    void trackAnalyticsEvent("analysis_result_viewed", {
+      candidate_count: result.candidates.length,
+      needs_retake: result.needsRetake,
+      has_error: Boolean(result.error),
+    });
   };
 
   const retryRecognition = async () => {
@@ -230,8 +272,8 @@ const RecordScreen = () => {
     setCatalogVisible(false);
   };
 
-  const pickDevPhoto = async () => {
-    if (!DEV_FILE_TEST_ENABLED || isRecognizing) return;
+  const pickLibraryPhoto = async () => {
+    if (isRecognizing) return;
     if (fishesLoading) {
       Alert.alert("도감 준비 중", "도감 60종을 불러온 뒤 다시 시도해 주세요.");
       return;
@@ -241,7 +283,8 @@ const RecordScreen = () => {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
         allowsMultipleSelection: false,
-        quality: 0.9,
+        exif: true,
+        quality: 1,
       });
       if (result.canceled) return;
 
@@ -261,6 +304,13 @@ const RecordScreen = () => {
       ) {
         throw new Error("사진이 너무 큽니다. 10MB 이하의 JPG 또는 PNG를 선택해 주세요.");
       }
+      const metadata = await extractLibraryPhotoMetadata(asset);
+      void trackAnalyticsEvent("photo_captured", {
+        source: "photo_library",
+        has_position:
+          metadata.latitude != null && metadata.longitude != null,
+        has_capture_time: Boolean(metadata.capturedAt),
+      });
 
       await analyzeCapture({
         uri: optimized.uri,
@@ -268,14 +318,16 @@ const RecordScreen = () => {
         height: optimized.height,
         base64: optimized.base64,
         mimeType: optimized.mimeType,
-        latitude: null,
-        longitude: null,
+        latitude: metadata.latitude,
+        longitude: metadata.longitude,
+        capturedAt: metadata.capturedAt,
+        locationAccuracyM: null,
         locationCapturedAt: null,
-        source: "dev_upload",
+        source: "photo_library",
       });
     } catch (error) {
       Alert.alert(
-        "파일 판별 실패",
+        "사진 불러오기 실패",
         error instanceof Error ? error.message : "다른 사진으로 다시 시도해 주세요.",
       );
     }
@@ -285,9 +337,17 @@ const RecordScreen = () => {
     if (isRequestingCameraPermission) return;
 
     setIsRequestingCameraPermission(true);
+    void trackAnalyticsEvent("permission_prompted", {
+      permission_kind: "camera",
+    });
     try {
       const nextPermission = await requestCameraPermission();
       lastCameraPermission.current = nextPermission;
+      void trackAnalyticsEvent("permission_result", {
+        permission_kind: "camera",
+        granted: nextPermission.granted,
+        can_ask_again: nextPermission.canAskAgain,
+      });
       if (!nextPermission.granted) {
         setIsRequestingCameraPermission(false);
       }
@@ -304,12 +364,30 @@ const RecordScreen = () => {
       let locationPermission = await Location.getForegroundPermissionsAsync();
       if (!locationPermission.granted && locationPermission.canAskAgain) {
         const wantsLocation = await askToAttachLocation();
+        void trackAnalyticsEvent("location_choice_selected", {
+          choice: wantsLocation ? "request_permission" : "without_position",
+        });
         if (wantsLocation) {
+          void trackAnalyticsEvent("permission_prompted", {
+            permission_kind: "foreground_position",
+          });
           locationPermission =
             await Location.requestForegroundPermissionsAsync();
+          void trackAnalyticsEvent("permission_result", {
+            permission_kind: "foreground_position",
+            granted: locationPermission.granted,
+            can_ask_again: locationPermission.canAskAgain,
+          });
         }
+      } else {
+        void trackAnalyticsEvent("location_choice_selected", {
+          choice: locationPermission.granted
+            ? "previously_granted"
+            : "previously_denied",
+        });
       }
 
+      const capturedAt = new Date().toISOString();
       const [photo, position] = await Promise.all([
         cameraRef.current.takePictureAsync({ quality: 0.9 }),
         locationPermission.granted
@@ -342,11 +420,17 @@ const RecordScreen = () => {
         mimeType: optimized.mimeType,
         latitude: position?.coords.latitude ?? null,
         longitude: position?.coords.longitude ?? null,
+        capturedAt,
+        locationAccuracyM: position?.coords.accuracy ?? null,
         locationCapturedAt: position
           ? new Date(position.timestamp).toISOString()
           : null,
         source: "camera",
       };
+      void trackAnalyticsEvent("photo_captured", {
+        source: "camera",
+        has_position: Boolean(position),
+      });
       await analyzeCapture(nextCapture);
     } catch (error) {
       Alert.alert("촬영 실패", error instanceof Error ? error.message : "다시 시도해 주세요.");
@@ -382,10 +466,12 @@ const RecordScreen = () => {
       imageHeight: capture.height,
       latitude: capture.latitude ?? undefined,
       longitude: capture.longitude ?? undefined,
+      capturedAt: capture.capturedAt ?? undefined,
+      locationAccuracyM: capture.locationAccuracyM ?? undefined,
       locationCapturedAt: capture.locationCapturedAt ?? undefined,
       captureMethod:
-        capture.source === "dev_upload"
-          ? "development_upload"
+        capture.source === "photo_library"
+          ? "photo_library"
           : "live_camera",
       sizeCm: sizeResult.sizeCm,
       memo,
@@ -395,9 +481,6 @@ const RecordScreen = () => {
       idMethod: selectedCandidate
         ? "closed_set_candidates"
         : "fallback_catalog",
-      verificationReason: selectedCandidate
-        ? `${capture.source === "dev_upload" ? "개발용 파일 업로드 · " : ""}AI 후보 추천 후 사용자 확정 · 신뢰도 ${Math.round(selectedCandidate.confidence * 100)}%`
-        : `${capture.source === "dev_upload" ? "개발용 파일 업로드 · " : ""}사용자가 도감에서 직접 어종을 확정함`,
       clientRequestId:
         saveRequestId.current ??
         `${Date.now()}-${Math.random().toString(36).slice(2, 12)}`,
@@ -424,8 +507,10 @@ const RecordScreen = () => {
       catchId: result.catchId,
       isFirstDiscovery: result.isFirstDiscovery,
       isDevelopmentTest: false,
-      isFileUpload: capture.source === "dev_upload",
+      isFileUpload: capture.source === "photo_library",
       discoveredCount: result.discoveredCount,
+      verificationStatus: result.verificationStatus,
+      verificationReason: result.verificationReason,
       sizeCm: sizeResult.sizeCm,
     });
   };
@@ -454,6 +539,8 @@ const RecordScreen = () => {
         isDevelopmentTest={visibleCompletion.isDevelopmentTest}
         isFileUpload={visibleCompletion.isFileUpload}
         discoveredCount={visibleCompletion.discoveredCount}
+        verificationStatus={visibleCompletion.verificationStatus}
+        verificationReason={visibleCompletion.verificationReason}
         sizeCm={visibleCompletion.sizeCm}
         onViewRecord={viewCompletionRecord}
         onViewEncyclopedia={viewCompletionEncyclopedia}
@@ -553,7 +640,8 @@ const RecordScreen = () => {
           카메라 권한이 필요해요
         </Text>
         <Text className="mt-3 text-center text-slate-300">
-          현장에서 직접 촬영한 사진만 도감에 등록할 수 있습니다.
+          카메라를 허용하면 현장 인증 촬영을 할 수 있습니다. 사진 보관함
+          기록은 카메라 권한 없이도 이용할 수 있습니다.
         </Text>
         {isPermissionBusy ? (
           <View className="mt-6 flex-row items-center rounded-xl bg-white px-6 py-3">
@@ -570,6 +658,14 @@ const RecordScreen = () => {
             <Text className="font-semibold text-slate-900">권한 허용</Text>
           </TouchableOpacity>
         )}
+        <TouchableOpacity
+          onPress={pickLibraryPhoto}
+          className="mt-4 border border-white/50 px-6 py-3"
+        >
+          <Text className="font-semibold text-white">
+            사진 보관함에서 선택
+          </Text>
+        </TouchableOpacity>
         <TouchableOpacity onPress={() => router.back()} className="mt-4 py-2">
           <Text className="text-slate-400">돌아가기</Text>
         </TouchableOpacity>
@@ -589,14 +685,14 @@ const RecordScreen = () => {
         </View>
         <View className="absolute bottom-0 left-0 right-0 items-center bg-black/40 pb-8 pt-5" style={{ paddingBottom: insets.bottom + 24 }}>
           <Text className="mb-4 text-sm text-white">물고기 전체가 잘 보이게 촬영해 주세요</Text>
-          {DEV_FILE_TEST_ENABLED ? (
-            <TouchableOpacity
-              onPress={pickDevPhoto}
-              className="mb-4 border border-white/60 bg-black/40 px-5 py-3"
-            >
-              <Text className="font-semibold text-white">개발용 사진 파일 판별</Text>
-            </TouchableOpacity>
-          ) : null}
+          <TouchableOpacity
+            onPress={pickLibraryPhoto}
+            className="mb-4 border border-white/60 bg-black/40 px-5 py-3"
+          >
+            <Text className="font-semibold text-white">
+              사진 보관함에서 선택
+            </Text>
+          </TouchableOpacity>
           <TouchableOpacity
             accessibilityLabel="사진 촬영"
             disabled={isCapturing}
@@ -637,16 +733,20 @@ const RecordScreen = () => {
             <Image source={{ uri: capture.uri }} className="h-56 w-full rounded-xl bg-slate-200" resizeMode="cover" />
             <View className="mt-3 flex-row justify-between">
               <Text className="text-xs text-teal-800">
-                {capture.source === "dev_upload"
-                  ? "DEV ONLY · 파일 업로드 · 실제 저장"
+                {capture.source === "photo_library"
+                  ? capture.latitude != null &&
+                    capture.longitude != null &&
+                    capture.capturedAt
+                    ? "사진 위치 확인됨 · 인증 조과 심사 대상"
+                    : "사진 위치 없음 · 일반 기록으로 저장"
                   : capture.latitude != null && capture.longitude != null
-                    ? "GPS 확보 완료 · 인증 조과"
+                    ? "GPS 확보 완료 · 서버 인증 예정"
                     : "위치 미인증 · 지도와 도감 해금에서 제외"}
               </Text>
               <TouchableOpacity
                 onPress={
-                  capture.source === "dev_upload"
-                    ? pickDevPhoto
+                  capture.source === "photo_library"
+                    ? pickLibraryPhoto
                     : () => {
                         setCapture(null);
                         setSelectedFish(null);
@@ -655,7 +755,9 @@ const RecordScreen = () => {
                 }
               >
                 <Text className="text-sm font-medium text-slate-600">
-                  {capture.source === "dev_upload" ? "다른 파일" : "다시 찍기"}
+                  {capture.source === "photo_library"
+                    ? "다른 사진"
+                    : "다시 찍기"}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -918,7 +1020,7 @@ const RecordScreen = () => {
             )}
             {selectedFish ? (
               <View className="mt-5">
-                {capture.source === "dev_upload" ? (
+                {capture.source === "photo_library" ? (
                   <View
                     className="mb-5 border-l-4 bg-white px-4 py-4"
                     style={{ borderLeftColor: FIELD_COLORS.orange }}
@@ -929,14 +1031,15 @@ const RecordScreen = () => {
                         fontFamily: bodyExtraBoldFont,
                       }}
                     >
-                      개발용 파일 기록
+                      사진 위치 기반 인증
                     </Text>
                     <Text
                       className="mt-1 text-xs leading-5"
                       style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
                     >
-                      선택한 사진은 실제 조과로 저장되고 도감 발견 상태에
-                      반영됩니다. 위치 정보는 저장되지 않습니다.
+                      사진의 촬영 위치가 연안으로 확인되면 도감·배지·개인
+                      최대어에 반영됩니다. 위치가 없거나 확인할 수 없으면
+                      일반 기록으로 저장되며 랭킹에는 반영되지 않습니다.
                     </Text>
                   </View>
                 ) : null}

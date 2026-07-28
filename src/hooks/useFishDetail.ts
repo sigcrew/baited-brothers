@@ -64,7 +64,11 @@ export const useFishDetail = (fishId?: string) => {
           .select("id, caught_at, location_name, size_cm, image_url, image_path, thumbnail_path, trip_id, memo")
           .eq("user_id", userId)
           .eq("fish_id", fishId)
-          .eq("verification_status", "verified")
+          .in("verification_status", [
+            "verified",
+            "field_verified",
+            "metadata_verified",
+          ])
           .order("caught_at", { ascending: false })
       : Promise.resolve({ data: [] as FishCatchRecord[], error: null });
 

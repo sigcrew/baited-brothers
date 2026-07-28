@@ -45,6 +45,87 @@ export type Database = {
         }
         Relationships: []
       }
+      analytics_daily: {
+        Row: {
+          app_version: string
+          build_number: string
+          event_count: number
+          event_name: string
+          metric_date: string
+          platform: string
+          refreshed_at: string
+          user_count: number
+        }
+        Insert: {
+          app_version: string
+          build_number: string
+          event_count: number
+          event_name: string
+          metric_date: string
+          platform: string
+          refreshed_at?: string
+          user_count: number
+        }
+        Update: {
+          app_version?: string
+          build_number?: string
+          event_count?: number
+          event_name?: string
+          metric_date?: string
+          platform?: string
+          refreshed_at?: string
+          user_count?: number
+        }
+        Relationships: []
+      }
+      analytics_monthly: {
+        Row: {
+          metric_name: string
+          metric_value: number
+          month_start: string
+          refreshed_at: string
+        }
+        Insert: {
+          metric_name: string
+          metric_value: number
+          month_start: string
+          refreshed_at?: string
+        }
+        Update: {
+          metric_name?: string
+          metric_value?: number
+          month_start?: string
+          refreshed_at?: string
+        }
+        Relationships: []
+      }
+      analytics_cohort_monthly: {
+        Row: {
+          activity_month: string
+          cohort_month: string
+          cohort_size: number
+          refreshed_at: string
+          retained_users: number
+          retention_rate: number
+        }
+        Insert: {
+          activity_month: string
+          cohort_month: string
+          cohort_size: number
+          refreshed_at?: string
+          retained_users: number
+          retention_rate: number
+        }
+        Update: {
+          activity_month?: string
+          cohort_month?: string
+          cohort_size?: number
+          refreshed_at?: string
+          retained_users?: number
+          retention_rate?: number
+        }
+        Relationships: []
+      }
       fishes: {
         Row: {
           aliases: string[]
@@ -235,6 +316,8 @@ export type Database = {
       }
       user_catches: {
         Row: {
+          captured_at: string | null
+          collection_eligible: boolean
           conditions_snapshot: Json | null
           caught_at: string
           candidate_fish_ids: string[]
@@ -246,20 +329,28 @@ export type Database = {
           image_path: string | null
           image_url: string | null
           id_method: Database["public"]["Enums"]["catch_id_method"] | null
+          image_hash: string | null
           location_lat: number | null
+          location_accuracy_m: number | null
           location_lng: number | null
           location_captured_at: string | null
           location_name: string | null
           memo: string | null
+          ranking_eligible: boolean
           size_cm: number | null
           trip_id: string | null
           thumbnail_path: string | null
           updated_at: string | null
+          uploaded_at: string
           user_id: string
           verification_reason: string | null
           verification_status: Database["public"]["Enums"]["catch_verification_status"]
+          verification_version: number | null
+          verified_at: string | null
         }
         Insert: {
+          captured_at?: string | null
+          collection_eligible?: boolean
           conditions_snapshot?: Json | null
           caught_at?: string
           candidate_fish_ids?: string[]
@@ -271,20 +362,28 @@ export type Database = {
           image_path?: string | null
           image_url?: string | null
           id_method?: Database["public"]["Enums"]["catch_id_method"] | null
+          image_hash?: string | null
           location_lat?: number | null
+          location_accuracy_m?: number | null
           location_lng?: number | null
           location_captured_at?: string | null
           location_name?: string | null
           memo?: string | null
+          ranking_eligible?: boolean
           size_cm?: number | null
           trip_id?: string | null
           thumbnail_path?: string | null
           updated_at?: string | null
+          uploaded_at?: string
           user_id: string
           verification_reason?: string | null
           verification_status?: Database["public"]["Enums"]["catch_verification_status"]
+          verification_version?: number | null
+          verified_at?: string | null
         }
         Update: {
+          captured_at?: string | null
+          collection_eligible?: boolean
           conditions_snapshot?: Json | null
           caught_at?: string
           candidate_fish_ids?: string[]
@@ -296,18 +395,24 @@ export type Database = {
           image_path?: string | null
           image_url?: string | null
           id_method?: Database["public"]["Enums"]["catch_id_method"] | null
+          image_hash?: string | null
           location_lat?: number | null
+          location_accuracy_m?: number | null
           location_lng?: number | null
           location_captured_at?: string | null
           location_name?: string | null
           memo?: string | null
+          ranking_eligible?: boolean
           size_cm?: number | null
           trip_id?: string | null
           thumbnail_path?: string | null
           updated_at?: string | null
+          uploaded_at?: string
           user_id?: string
           verification_reason?: string | null
           verification_status?: Database["public"]["Enums"]["catch_verification_status"]
+          verification_version?: number | null
+          verified_at?: string | null
         }
         Relationships: [
           {
@@ -328,6 +433,7 @@ export type Database = {
       }
       user_profiles: {
         Row: {
+          analytics_excluded: boolean
           avatar_url: string | null
           created_at: string | null
           display_name: string | null
@@ -335,6 +441,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          analytics_excluded?: boolean
           avatar_url?: string | null
           created_at?: string | null
           display_name?: string | null
@@ -342,6 +449,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          analytics_excluded?: boolean
           avatar_url?: string | null
           created_at?: string | null
           display_name?: string | null
@@ -434,9 +542,15 @@ export type Database = {
     Enums: {
       fish_category: "flatfish" | "rockfish" | "seabass" | "mackerel" | "bream" | "mullet" | "cutlassfish" | "eel" | "pufferfish" | "other"
       trip_status: "planned" | "done" | "canceled"
-      capture_method: "live_camera" | "development_upload"
+      capture_method: "live_camera" | "photo_library" | "development_upload"
       catch_id_method: "closed_set_candidates" | "fallback_catalog"
-      catch_verification_status: "verified" | "unverified"
+      catch_verification_status:
+        | "verified"
+        | "unverified"
+        | "pending"
+        | "field_verified"
+        | "metadata_verified"
+        | "general_record"
     }
     CompositeTypes: { [_ in never]: never }
   }

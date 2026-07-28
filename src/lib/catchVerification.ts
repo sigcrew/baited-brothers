@@ -1,21 +1,21 @@
 type CatchVerificationInput = {
-  captureMethod?: "live_camera" | "development_upload";
+  captureMethod?: "live_camera" | "photo_library" | "development_upload";
   latitude?: number;
   longitude?: number;
-  locationCapturedAt?: string;
+  capturedAt?: string;
 };
 
 export const getCatchVerificationStatus = ({
   captureMethod,
   latitude,
   longitude,
-  locationCapturedAt,
-}: CatchVerificationInput): "verified" | "unverified" => {
-  if (captureMethod === "development_upload") return "verified";
-
-  return latitude != null &&
+  capturedAt,
+}: CatchVerificationInput): "pending" | "general_record" => {
+  return (captureMethod === "live_camera" ||
+    captureMethod === "photo_library") &&
+    latitude != null &&
     longitude != null &&
-    locationCapturedAt != null
-    ? "verified"
-    : "unverified";
+    capturedAt != null
+    ? "pending"
+    : "general_record";
 };

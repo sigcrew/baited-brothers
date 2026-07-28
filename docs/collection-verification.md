@@ -6,6 +6,17 @@
 
 관련 문서: [`positioning-monetization.md`](./positioning-monetization.md) · [`design-direction.md`](./design-direction.md) · [`navigation.md`](./navigation.md) · [`map-view.md`](./map-view.md)
 
+## 0. 사진 보관함 인증 정책 수정 (2026-07-28)
+
+아래 “갤러리 없음/해금 불가” 규칙은 다음 정책으로 대체한다.
+
+- 인앱 카메라 + 셔터 GPS 인증: `field_verified`
+- 사진 보관함 원본 위치·촬영 시각 + 서버 연안 판정:
+  `metadata_verified`
+- 위치·시각 없음 또는 서버 판정 실패: `general_record`
+- `metadata_verified`는 도감·배지·개인 최대어에 반영하지만 랭킹에서는 제외
+- 최종 상태는 클라이언트가 아니라 인증된 Supabase 서버 함수가 확정
+
 ---
 
 ## 1. 제품 한 줄

@@ -1,4 +1,7 @@
-import { sanitizeAnalyticsProperties } from "@/src/lib/analyticsPolicy";
+import {
+  ANALYTICS_EVENT_NAMES,
+  sanitizeAnalyticsProperties,
+} from "@/src/lib/analyticsPolicy";
 
 describe("sanitizeAnalyticsProperties", () => {
   it("keeps small non-sensitive measurement properties", () => {
@@ -27,5 +30,21 @@ describe("sanitizeAnalyticsProperties", () => {
         candidate_count: 2,
       }),
     ).toEqual({ candidate_count: 2 });
+  });
+
+  it("keeps the record and photo-save funnels in the strict event allow-list", () => {
+    expect(ANALYTICS_EVENT_NAMES).toEqual(
+      expect.arrayContaining([
+        "catch_flow_started",
+        "photo_captured",
+        "analysis_result_viewed",
+        "catch_save_started",
+        "catch_save_succeeded",
+        "catch_save_failed",
+        "photo_library_save_succeeded",
+        "photo_library_save_failed",
+        "permission_result",
+      ]),
+    );
   });
 });

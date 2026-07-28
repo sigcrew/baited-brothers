@@ -1,15 +1,15 @@
 import { getCatchVerificationStatus } from "@/src/lib/catchVerification";
 
 describe("getCatchVerificationStatus", () => {
-  it("verifies a live camera catch with complete capture location", () => {
+  it("leaves complete live camera evidence pending for the server", () => {
     expect(
       getCatchVerificationStatus({
         captureMethod: "live_camera",
         latitude: 36.2,
         longitude: 126.5,
-        locationCapturedAt: "2026-07-27T00:00:00.000Z",
+        capturedAt: "2026-07-27T00:00:00.000Z",
       }),
-    ).toBe("verified");
+    ).toBe("pending");
   });
 
   it("keeps a location-free live camera catch unverified", () => {
@@ -17,7 +17,7 @@ describe("getCatchVerificationStatus", () => {
       getCatchVerificationStatus({
         captureMethod: "live_camera",
       }),
-    ).toBe("unverified");
+    ).toBe("general_record");
   });
 
   it("does not verify partial location evidence", () => {
@@ -27,14 +27,14 @@ describe("getCatchVerificationStatus", () => {
         latitude: 36.2,
         longitude: 126.5,
       }),
-    ).toBe("unverified");
+    ).toBe("general_record");
   });
 
-  it("preserves the existing development upload verification path", () => {
+  it("never rewards a development upload on the client", () => {
     expect(
       getCatchVerificationStatus({
         captureMethod: "development_upload",
       }),
-    ).toBe("verified");
+    ).toBe("general_record");
   });
 });

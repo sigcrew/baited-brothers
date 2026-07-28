@@ -2,9 +2,24 @@
 
 > Baited Brothers(낚시당한 녀석들)의 조과 판별·기록·수집 보상 정책 제안서
 > 작성일: 2026-07-23
-> 상태: **제품·개발 논의안 — 구현 전**
+> 상태: **v2 구현 반영 중**
 
 관련 문서: [`offline-policy.md`](./offline-policy.md) · [`collection-verification.md`](./collection-verification.md) · [`fishing-trips.md`](./fishing-trips.md) · [`map-view.md`](./map-view.md)
+
+## 0. v2 채택 변경사항 (2026-07-28)
+
+사진 보관함 기록도 원본 자산의 촬영 시각과 GPS를 확보할 수 있으면 서버의
+대한민국 연안 3km 판정과 이미지 중복 검사를 거쳐 `metadata_verified`로
+인정한다.
+
+| 등급 | 도감·카드 | 배지 | 개인 최대어 | 랭킹 |
+|------|-----------|------|-------------|------|
+| `field_verified` | 반영 | 반영 | 반영 | 반영 |
+| `metadata_verified` | 반영 | 반영 | 반영 | **제외** |
+| `general_record` | 제외 | 제외 | 제외 | 제외 |
+
+사진 보관함 위치·시각은 수정 가능하므로 경쟁 요소에는 사용하지 않는다.
+이 절은 아래 v1.1의 “사진첩은 일반 기록” 규칙보다 우선한다.
 
 ---
 
@@ -185,7 +200,7 @@ v1.1에서 다음 조건을 모두 충족하면 현장 인증 대상으로 본�
 
 | 필드 | 예시 | 설명 |
 |------|------|------|
-| `verification_status` | `pending`, `field_verified`, `general_record` | 인증 상태 |
+| `verification_status` | `pending`, `field_verified`, `metadata_verified`, `general_record` | 인증 상태 |
 | `verification_reason` | `outside_coastal_zone` | 일반 기록 또는 실패 사유 |
 | `captured_at` | ISO 8601 | 실제 셔터 시각 |
 | `location_lat` / `location_lng` | 숫자 | 셔터 순간 좌표 |
@@ -234,14 +249,17 @@ legacy_record
 
 ## 10. 수집·통계 반영 규칙
 
-다음 집계는 `verification_status = field_verified`인 조과만 사용한다.
+다음 집계는 `field_verified`와 `metadata_verified` 조과를 사용한다.
 
 - 도감 최초 해금
 - 수집 카드 획득
 - 전체 수집 개수와 완성도
 - 개인 최고어
 - 수집·도전 배지
-- 향후 시즌 챌린지와 랭킹
+- 향후 시즌 챌린지
+
+랭킹은 조작 가능한 사진 보관함 메타데이터를 제외하고
+`verification_status = field_verified`인 조과만 사용한다.
 
 일반 기록은 다음 화면에서 계속 볼 수 있다.
 

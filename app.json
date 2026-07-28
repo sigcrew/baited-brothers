@@ -89,15 +89,16 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "출조 커버와 프로필 사진을 선택하려면 사진 보관함 접근이 필요합니다.",
+          "photosPermission": "조과 사진의 촬영 위치와 시각을 확인하고 출조 커버와 프로필 사진을 선택하려면 사진 보관함 접근이 필요합니다.",
           "microphonePermission": false
         }
       ],
       [
         "expo-media-library",
         {
-          "photosPermission": "출조 커버와 프로필 사진을 선택하려면 사진 보관함 접근이 필요합니다.",
+          "photosPermission": "조과 사진의 촬영 위치와 시각을 확인하고 출조 커버와 프로필 사진을 선택하려면 사진 보관함 접근이 필요합니다.",
           "savePhotosPermission": "사용자가 선택한 조과 사진을 사진 앱에 저장하려면 사진 추가 권한이 필요합니다.",
+          "isAccessMediaLocationEnabled": true,
           "granularPermissions": [
             "photo"
           ]

@@ -37,6 +37,7 @@ import {
   displayFont,
   monoFont,
 } from "@/src/theme/fieldJournal";
+import { trackAnalyticsEvent } from "@/src/lib/analytics";
 
 const DEFAULT_COVER = require("@/assets/images/design/first-trip-cover-v1.png");
 
@@ -199,9 +200,20 @@ const TripDetailScreen = () => {
 
       let permission = await MediaLibrary.getPermissionsAsync(true, ["photo"]);
       if (!permission.granted) {
+        void trackAnalyticsEvent("permission_prompted", {
+          permission_kind: "photo_add",
+        });
         permission = await MediaLibrary.requestPermissionsAsync(true, ["photo"]);
+        void trackAnalyticsEvent("permission_result", {
+          permission_kind: "photo_add",
+          granted: permission.granted,
+          can_ask_again: permission.canAskAgain,
+        });
       }
       if (!permission.granted) {
+        void trackAnalyticsEvent("photo_library_save_failed", {
+          failure_kind: "permission",
+        });
         Alert.alert(
           "사진 저장 권한 필요",
           "iPhone 설정에서 사진 추가 권한을 허용한 뒤 다시 시도해 주세요.",
@@ -223,8 +235,15 @@ const TripDetailScreen = () => {
       }
 
       await MediaLibrary.saveToLibraryAsync(localUri);
+      void trackAnalyticsEvent("photo_library_save_succeeded");
       Alert.alert("사진 저장 완료", "조과 사진을 사진 앱에 저장했습니다.");
     } catch (error) {
+      void trackAnalyticsEvent("photo_library_save_failed", {
+        failure_kind:
+          error instanceof Error && error.message.includes("권한")
+            ? "permission"
+            : "save",
+      });
       Alert.alert(
         "사진 저장 실패",
         error instanceof Error

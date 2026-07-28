@@ -12,6 +12,7 @@
 5. 원본 이벤트는 최대 90일 보관하고 매일 `pg_cron`으로 삭제한다.
 6. 계정 삭제 시 `auth.users` 외래키의 `ON DELETE CASCADE`로 사용자 이벤트도 함께 삭제한다.
 7. 장기 보고서에는 사용자를 식별할 수 없는 일·주·월 단위 집계만 남긴다.
+8. 개발자·App Review·QA 계정은 `user_profiles.analytics_excluded = true`로 지정한다. 이 값은 운영자만 변경할 수 있다.
 
 ## 2. 데이터 구조
 
@@ -37,6 +38,16 @@
 
 클라이언트는 자기 이벤트를 `INSERT`만 할 수 있다. 조회·수정·삭제 권한은 없으며 운영 집계는 Supabase Dashboard 또는 `service_role` 서버 환경에서만 수행한다.
 
+### 장기 집계
+
+| 테이블 | 보관 내용 |
+| --- | --- |
+| `analytics_daily` | 날짜·이벤트·플랫폼·앱 버전별 이벤트 수와 고유 사용자 수 |
+| `analytics_monthly` | 신규 사용자, 의미 활성 사용자, 조과·출조 생성자와 생성 수 |
+| `analytics_cohort_monthly` | 가입 월별 코호트 크기, 월간 재방문 사용자와 재방문율 |
+
+세 집계 테이블에는 사용자 ID가 없고 앱 클라이언트에는 조회 권한도 없다. `private.refresh_analytics_aggregates()`가 매일 02:47에 최근 집계를 갱신한 뒤, 03:17에 90일이 지난 원시 이벤트가 삭제된다.
+
 ## 3. 이벤트 목록
 
 | 이벤트 | 발생 시점 | 허용 속성 예시 |
@@ -45,6 +56,17 @@
 | `collection_viewed` | 도감·배지·카드 세그먼트 열람 | `segment` |
 | `fish_detail_viewed` | 어종 상세 열람 | `unlocked`, `catalog_order` |
 | `catch_card_opened` | 조과 카드 확대 | `source` |
+| `catch_flow_started` | 조과 기록 화면 진입 | `has_trip` |
+| `location_choice_selected` | 위치 첨부 선택 | `choice` |
+| `camera_opened` | 조과 카메라가 사용 가능한 상태가 됨 | `has_trip` |
+| `photo_captured` | 촬영과 사진 최적화 완료 | `has_position` |
+| `analysis_result_viewed` | AI 결과 화면 표시 | `candidate_count`, `needs_retake`, `has_error` |
+| `catch_save_started` | 조과 저장 시작 | `capture_method`, `has_trip` |
+| `catch_save_succeeded` | 조과 저장 완료 | `verified`, `first_discovery`, `has_trip` |
+| `catch_save_failed` | 조과 저장 실패 | `stage`, `failure_kind` |
+| `photo_upload_failed` | 원본·썸네일 업로드 실패 | `failure_kind` |
+| `photo_library_save_succeeded/failed` | 사진 앱 저장 결과 | 실패 시 `failure_kind` |
+| `permission_prompted/result` | 카메라·위치·사진 추가 권한 요청 및 결과 | `permission_kind`, `granted`, `can_ask_again` |
 | `ai_analysis_started` | AI 요청 직전 | `catalog_count` |
 | `ai_analysis_succeeded` | 후보 1개 이상 반환 | `duration_ms`, `candidate_count` |
 | `ai_analysis_rejected` | 비어류·저품질·후보 없음 | `duration_ms`, `needs_retake` |
@@ -153,6 +175,39 @@ select
   coalesce(sum((metadata ->> 'size')::bigint), 0) as total_bytes
 from storage.objects
 where bucket_id = 'user-uploads';
+```
+
+### 운영·심사 계정 제외
+
+아래 변경은 운영자 SQL Editor 또는 안전한 서버 환경에서만 실행한다.
+
+```sql
+update public.user_profiles
+set analytics_excluded = true
+where id = '<제외할 auth.users ID>';
+```
+
+계정을 제외한 뒤 `select private.refresh_analytics_aggregates();`를 운영자 권한으로 실행하면 최근 일·월·코호트 집계에 즉시 반영된다. 원시 이벤트는 보존 기간에 따라 삭제되지만 이후 새 이벤트는 DB 정책에서 거절된다.
+
+### 저장 퍼널
+
+```sql
+select
+  event_name,
+  sum(event_count) as events,
+  max(user_count) as daily_peak_users
+from public.analytics_daily
+where metric_date >= current_date - 30
+  and event_name in (
+    'catch_flow_started',
+    'photo_captured',
+    'analysis_result_viewed',
+    'catch_save_started',
+    'catch_save_succeeded',
+    'catch_save_failed'
+  )
+group by event_name
+order by event_name;
 ```
 
 ## 6. 출시 후 검토 주기

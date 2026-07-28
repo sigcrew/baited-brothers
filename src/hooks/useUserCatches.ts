@@ -7,6 +7,7 @@ import {
   removeUserMedia,
 } from "@/src/lib/userMedia";
 import { trackAnalyticsEvent } from "@/src/lib/analytics";
+import { countsForCollectionRewards } from "@/src/lib/catchRewards";
 
 export type UserCatch = Tables<"user_catches"> & {
   thumbnail_url?: string | null;
@@ -97,7 +98,9 @@ export const useUserCatches = (tripId?: string) => {
   const unlockedFishIds = useMemo(() => {
     const ids = new Set<string>();
     for (const item of catches) {
-      if (item.verification_status === "verified") ids.add(item.fish_id);
+      if (countsForCollectionRewards(item.verification_status)) {
+        ids.add(item.fish_id);
+      }
     }
     return ids;
   }, [catches]);
