@@ -659,6 +659,8 @@ const RecordScreen = () => {
           </TouchableOpacity>
         )}
         <TouchableOpacity
+          accessibilityLabel="사진 보관함에서 물고기 사진 선택"
+          accessibilityRole="button"
           onPress={pickLibraryPhoto}
           className="mt-4 border border-white/50 px-6 py-3"
         >
@@ -686,6 +688,8 @@ const RecordScreen = () => {
         <View className="absolute bottom-0 left-0 right-0 items-center bg-black/40 pb-8 pt-5" style={{ paddingBottom: insets.bottom + 24 }}>
           <Text className="mb-4 text-sm text-white">물고기 전체가 잘 보이게 촬영해 주세요</Text>
           <TouchableOpacity
+            accessibilityLabel="사진 보관함에서 물고기 사진 선택"
+            accessibilityRole="button"
             onPress={pickLibraryPhoto}
             className="mb-4 border border-white/60 bg-black/40 px-5 py-3"
           >
