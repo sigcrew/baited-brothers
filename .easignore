@@ -7,11 +7,15 @@ node_modules/
 dist/
 web-build/
 tmp/
+.tmp/
 qa/
 docs/
 scripts/
 supabase/
 store-assets/
+credentials/
+ios/Pods/
+ios/build/
 *.p8
 *.p12
 *.key
