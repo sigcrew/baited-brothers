@@ -5,6 +5,8 @@
 #   → sigcrew-play-submit 서비스 계정 단기 impersonation
 #
 # Secrets:
+#   EXPO_PUBLIC_SUPABASE_URL
+#   EXPO_PUBLIC_SUPABASE_ANON_KEY
 #   ANDROID_UPLOAD_KEYSTORE_BASE64 — 업로드 keystore (.jks) base64
 #   ANDROID_UPLOAD_KEYSTORE_PASSWORD
 #   ANDROID_UPLOAD_KEY_ALIAS
@@ -33,6 +35,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env:
+      EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+      EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
       ANDROID_UPLOAD_KEYSTORE_BASE64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
       ANDROID_UPLOAD_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_PASSWORD }}
       ANDROID_UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
@@ -45,6 +49,8 @@ jobs:
         run: |
           set -euo pipefail
           for name in \
+            EXPO_PUBLIC_SUPABASE_URL \
+            EXPO_PUBLIC_SUPABASE_ANON_KEY \
             ANDROID_UPLOAD_KEYSTORE_BASE64 \
             ANDROID_UPLOAD_KEYSTORE_PASSWORD \
             ANDROID_UPLOAD_KEY_ALIAS \
