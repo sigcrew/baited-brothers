@@ -1,0 +1,28 @@
+default_platform(:android)
+
+platform :android do
+  desc "Release AAB를 빌드하고 Play Console internal 트랙에 배포"
+  lane :internal do
+    json_key = ENV.fetch("GOOGLE_PLAY_JSON_KEY_PATH")
+
+    gradle(
+      task: "bundle",
+      build_type: "Release",
+      project_dir: ".",
+      print_command: false
+    )
+
+    upload_to_play_store(
+      track: "internal",
+      release_status: "completed",
+      aab: lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH],
+      json_key: json_key,
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      ack_bundle_installation_warning: true
+    )
+  end
+end

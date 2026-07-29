@@ -42,7 +42,8 @@
     "test:apple-client-secret": "node --test scripts/generate-apple-client-secret.test.mjs",
     "test": "jest",
     "test:ci": "jest --runInBand --ci --no-watchman",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "release:android:internal": "bash scripts/release-android-internal.sh"
   },
   "jest": {
     "preset": "jest-expo",

@@ -9,7 +9,11 @@ dist/
 *.key
 *.mobileprovision
 credentials.json
+credentials/play-submit.json
 credentials/android/
+android/keystore.properties
+android/app/upload-keystore.jks
+android/vendor/bundle/
 *service-account*.json
 google-play*.json
 *.aab

@@ -1,0 +1,109 @@
+# 로컬 Gradle AAB + Fastlane → Play 내부 테스트 (EAS Build/Submit 미사용)
+#
+# Secrets:
+#   GOOGLE_PLAY_SERVICE_ACCOUNT_BASE64 — Play API JSON (base64)
+#   ANDROID_UPLOAD_KEYSTORE_BASE64 — 업로드 keystore (.jks) base64
+#   ANDROID_UPLOAD_KEYSTORE_PASSWORD
+#   ANDROID_UPLOAD_KEY_ALIAS
+#   ANDROID_UPLOAD_KEY_PASSWORD
+#
+# 업로드 키는 Play에 이미 올린 EAS keystore와 동일해야 합니다.
+#   eas credentials -p android 로 확인·다운로드
+#
+name: Android internal release
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-internal-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GOOGLE_PLAY_SERVICE_ACCOUNT_BASE64: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_BASE64 }}
+      ANDROID_UPLOAD_KEYSTORE_BASE64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
+      ANDROID_UPLOAD_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_PASSWORD }}
+      ANDROID_UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
+      ANDROID_UPLOAD_KEY_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          for name in \
+            GOOGLE_PLAY_SERVICE_ACCOUNT_BASE64 \
+            ANDROID_UPLOAD_KEYSTORE_BASE64 \
+            ANDROID_UPLOAD_KEYSTORE_PASSWORD \
+            ANDROID_UPLOAD_KEY_ALIAS \
+            ANDROID_UPLOAD_KEY_PASSWORD
+          do
+            if [ -z "${!name:-}" ]; then
+              echo "GitHub secret ${name} 이 없습니다."
+              exit 1
+            fi
+          done
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+
+      - uses: android-actions/setup-android@v3
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          working-directory: android
+
+      - name: Install JS dependencies
+        run: npm ci
+
+      - name: Validate project
+        run: npm run typecheck
+
+      - name: Set unique Play version code
+        shell: bash
+        run: echo "ANDROID_VERSION_CODE=$((10000 + GITHUB_RUN_NUMBER))" >> "$GITHUB_ENV"
+
+      - name: Configure signing and Play API key
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p credentials
+          printf '%s' "${GOOGLE_PLAY_SERVICE_ACCOUNT_BASE64}" | base64 --decode > credentials/play-submit.json
+          printf '%s' "${ANDROID_UPLOAD_KEYSTORE_BASE64}" | base64 --decode > android/app/upload-keystore.jks
+          jq empty credentials/play-submit.json
+          keytool -list \
+            -keystore android/app/upload-keystore.jks \
+            -storepass "${ANDROID_UPLOAD_KEYSTORE_PASSWORD}" \
+            -alias "${ANDROID_UPLOAD_KEY_ALIAS}" > /dev/null
+          printf '%s\n' \
+            "storeFile=app/upload-keystore.jks" \
+            "storePassword=${ANDROID_UPLOAD_KEYSTORE_PASSWORD}" \
+            "keyAlias=${ANDROID_UPLOAD_KEY_ALIAS}" \
+            "keyPassword=${ANDROID_UPLOAD_KEY_PASSWORD}" \
+            > android/keystore.properties
+
+      - name: Build AAB and deploy to Play internal
+        env:
+          GOOGLE_PLAY_JSON_KEY_PATH: ${{ github.workspace }}/credentials/play-submit.json
+        working-directory: android
+        run: bundle exec fastlane internal
