@@ -63,12 +63,7 @@
         }
       ],
       "expo-apple-authentication",
-      [
-        "expo-web-browser",
-        {
-          "experimentalLauncherActivity": true
-        }
-      ],
+      "expo-web-browser",
       [
         "expo-camera",
         {

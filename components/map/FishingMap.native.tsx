@@ -1,5 +1,5 @@
 import MapView, { Marker, type Region } from "react-native-maps";
-import { Text, View } from "react-native";
+import { Platform, Text, View } from "react-native";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { MapPointMarker } from "./MapPointMarker";
@@ -128,7 +128,7 @@ export const FishingMap = ({
       accessibilityLabel="나의 조과 위치 지도"
       accessibilityRole="button"
       initialRegion={initialRegion}
-      mapType="mutedStandard"
+      mapType={Platform.OS === "ios" ? "mutedStandard" : "standard"}
       rotateEnabled={false}
       pitchEnabled={false}
       minZoomLevel={5}

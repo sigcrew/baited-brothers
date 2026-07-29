@@ -245,16 +245,20 @@ export const TripFormModal = ({
             onChangeText={setSpotName}
             placeholder="예: 대천항 방파제"
             placeholderTextColor={FIELD_COLORS.muted}
-            className="mt-2 border px-4 py-3 text-base"
+            className="mt-2 h-[54px] border px-4 text-base"
             style={{
               borderColor: FIELD_COLORS.rule,
               borderWidth: 1,
               color: FIELD_COLORS.ink,
               fontFamily: bodyFont,
               fontSize: 16,
+              height: 54,
+              includeFontPadding: false,
+              lineHeight: 24,
               marginTop: 8,
               paddingHorizontal: 16,
-              paddingVertical: 12,
+              paddingVertical: 0,
+              textAlignVertical: "center",
             }}
           />
 

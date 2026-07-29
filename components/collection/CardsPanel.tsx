@@ -8,8 +8,6 @@ import {
   RefreshControl,
   Modal,
   Pressable,
-  ScrollView,
-  useWindowDimensions,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { UserCatch } from "@/src/hooks/useUserCatches";
@@ -66,7 +64,6 @@ const CatchDetailModal = ({
   onLocationPress: (item: UserCatch) => void;
 }) => {
   const insets = useSafeAreaInsets();
-  const { height: windowHeight } = useWindowDimensions();
   if (!item) return null;
 
   return (
@@ -92,30 +89,27 @@ const CatchDetailModal = ({
             backgroundColor: "rgba(5, 28, 35, 0.68)",
           }}
         />
-        <View
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="조과 카드 닫기"
           accessibilityViewIsModal
+          onPress={onClose}
           style={{
             width: "100%",
             maxWidth: 430,
-            maxHeight: Math.min(windowHeight - insets.top - insets.bottom - 24, 860),
             backgroundColor: FIELD_COLORS.foam,
           }}
         >
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            style={{ width: "100%" }}
-          >
-            <CatchArchiveCard
-              item={item}
-              variant="detail"
-              onLocationPress={
-                item.location_lat != null && item.location_lng != null
-                  ? () => onLocationPress(item)
-                  : undefined
-              }
-            />
-          </ScrollView>
-        </View>
+          <CatchArchiveCard
+            item={item}
+            variant="detail"
+            onLocationPress={
+              item.location_lat != null && item.location_lng != null
+                ? () => onLocationPress(item)
+                : undefined
+            }
+          />
+        </Pressable>
       </View>
     </Modal>
   );
