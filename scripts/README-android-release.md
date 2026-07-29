@@ -15,6 +15,12 @@ npm run release:android:internal
 
 ## 최초 1회 설정
 
+Ruby 3.2 이상과 lockfile에 지정된 Bundler를 준비합니다.
+
+```bash
+gem install bundler -v 2.6.9
+```
+
 다음 파일은 Git에 커밋하지 않으며 개발자 Mac에만 보관합니다.
 
 - `.env`

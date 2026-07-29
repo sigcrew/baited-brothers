@@ -24,6 +24,11 @@ node -e '
   }
 '
 
+if ! (cd android && bundle --version >/dev/null 2>&1); then
+  echo "android/Gemfile.lock에 맞는 Bundler가 없습니다. scripts/README-android-release.md의 최초 설정을 확인하세요."
+  exit 1
+fi
+
 if [ ! -f "android/keystore.properties" ]; then
   echo "android/keystore.properties 가 없습니다. android/keystore.properties.example 를 참고하세요."
   exit 1
