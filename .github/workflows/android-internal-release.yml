@@ -26,7 +26,7 @@ permissions:
 
 concurrency:
   group: android-internal-release
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   release:
@@ -73,7 +73,9 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
-          cache: gradle
+
+      - name: Set up Gradle build cache
+        uses: gradle/actions/setup-gradle@v6
 
       - uses: android-actions/setup-android@v3
 
