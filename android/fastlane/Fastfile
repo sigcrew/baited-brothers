@@ -9,7 +9,10 @@ platform :android do
       task: "bundle",
       build_type: "Release",
       project_dir: ".",
-      print_command: false
+      print_command: false,
+      properties: {
+        "reactNativeArchitectures" => "armeabi-v7a,arm64-v8a"
+      }
     )
 
     upload_to_play_store(
