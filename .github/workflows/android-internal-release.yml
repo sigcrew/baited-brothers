@@ -18,8 +18,6 @@
 name: Android internal release
 
 on:
-  push:
-    branches: ["main"]
   workflow_dispatch:
 
 permissions:
@@ -96,7 +94,7 @@ jobs:
 
       - name: Set unique Play version code
         shell: bash
-        run: echo "ANDROID_VERSION_CODE=$((10000 + GITHUB_RUN_NUMBER))" >> "$GITHUB_ENV"
+        run: echo "ANDROID_VERSION_CODE=$(bash scripts/android-version-code.sh)" >> "$GITHUB_ENV"
 
       - name: Configure signing
         shell: bash
