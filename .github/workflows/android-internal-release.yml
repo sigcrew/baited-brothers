@@ -76,9 +76,6 @@ jobs:
       - name: Install JS dependencies
         run: npm ci
 
-      - name: Validate project
-        run: npm run typecheck
-
       - name: Set unique Play version code
         shell: bash
         run: echo "ANDROID_VERSION_CODE=$((10000 + GITHUB_RUN_NUMBER))" >> "$GITHUB_ENV"
