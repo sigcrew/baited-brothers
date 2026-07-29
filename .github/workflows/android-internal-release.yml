@@ -1,7 +1,10 @@
 # 로컬 Gradle AAB + Fastlane → Play 내부 테스트 (EAS Build/Submit 미사용)
 #
+# Google Play 인증:
+#   GitHub OIDC → Google Cloud Workload Identity Federation
+#   → sigcrew-play-submit 서비스 계정 단기 impersonation
+#
 # Secrets:
-#   GOOGLE_PLAY_SERVICE_ACCOUNT_BASE64 — Play API JSON (base64)
 #   ANDROID_UPLOAD_KEYSTORE_BASE64 — 업로드 keystore (.jks) base64
 #   ANDROID_UPLOAD_KEYSTORE_PASSWORD
 #   ANDROID_UPLOAD_KEY_ALIAS
@@ -19,6 +22,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 concurrency:
   group: android-internal-release
@@ -29,7 +33,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env:
-      GOOGLE_PLAY_SERVICE_ACCOUNT_BASE64: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_BASE64 }}
       ANDROID_UPLOAD_KEYSTORE_BASE64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
       ANDROID_UPLOAD_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_PASSWORD }}
       ANDROID_UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
@@ -42,7 +45,6 @@ jobs:
         run: |
           set -euo pipefail
           for name in \
-            GOOGLE_PLAY_SERVICE_ACCOUNT_BASE64 \
             ANDROID_UPLOAD_KEYSTORE_BASE64 \
             ANDROID_UPLOAD_KEYSTORE_PASSWORD \
             ANDROID_UPLOAD_KEY_ALIAS \
@@ -53,6 +55,14 @@ jobs:
               exit 1
             fi
           done
+
+      - name: Authenticate to Google Play with OIDC
+        id: google-auth
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: projects/437034612769/locations/global/workloadIdentityPools/github-actions/providers/github-baited-main
+          service_account: sigcrew-play-submit@sigcrew-play.iam.gserviceaccount.com
+          create_credentials_file: true
 
       - uses: actions/setup-node@v4
         with:
@@ -80,14 +90,11 @@ jobs:
         shell: bash
         run: echo "ANDROID_VERSION_CODE=$((10000 + GITHUB_RUN_NUMBER))" >> "$GITHUB_ENV"
 
-      - name: Configure signing and Play API key
+      - name: Configure signing
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p credentials
-          printf '%s' "${GOOGLE_PLAY_SERVICE_ACCOUNT_BASE64}" | base64 --decode > credentials/play-submit.json
           printf '%s' "${ANDROID_UPLOAD_KEYSTORE_BASE64}" | base64 --decode > android/app/upload-keystore.jks
-          jq empty credentials/play-submit.json
           keytool -list \
             -keystore android/app/upload-keystore.jks \
             -storepass "${ANDROID_UPLOAD_KEYSTORE_PASSWORD}" \
@@ -101,6 +108,6 @@ jobs:
 
       - name: Build AAB and deploy to Play internal
         env:
-          GOOGLE_PLAY_JSON_KEY_PATH: ${{ github.workspace }}/credentials/play-submit.json
+          GOOGLE_PLAY_JSON_KEY_PATH: ${{ steps.google-auth.outputs.credentials_file_path }}
         working-directory: android
         run: bundle exec fastlane internal

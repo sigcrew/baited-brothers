@@ -11,6 +11,7 @@ dist/
 credentials.json
 credentials/play-submit.json
 credentials/android/
+gha-creds-*.json
 android/keystore.properties
 android/app/upload-keystore.jks
 android/vendor/bundle/
