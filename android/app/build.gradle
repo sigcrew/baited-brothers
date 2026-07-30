@@ -123,6 +123,9 @@ android {
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
+            applicationIdSuffix ".dev"
+            versionNameSuffix "-dev"
+            resValue "string", "app_name", "낚시당한 녀석들 DEV"
         }
         release {
             if (keystorePropertiesFile.exists()) {
