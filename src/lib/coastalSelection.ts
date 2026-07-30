@@ -11,6 +11,12 @@ export type CoastalSelectionResult = {
   coastDistanceKm: number | null;
 };
 
+export type NearestCoastCoordinate = {
+  latitude: number;
+  longitude: number;
+  distanceKm: number;
+};
+
 const MAX_INLAND_DISTANCE_KM = 3;
 
 const polygons = koreaBoundary.features[0].geometry.coordinates as MultiPolygon;
@@ -37,7 +43,7 @@ const isPointInPolygon = (longitude: number, latitude: number, polygon: Polygon)
     !polygon.slice(1).some((hole) => isPointInRing(longitude, latitude, hole)),
   );
 
-const distanceToSegmentKm = (
+const nearestPointOnSegment = (
   longitude: number,
   latitude: number,
   start: Position,
@@ -55,7 +61,11 @@ const distanceToSegmentKm = (
   const ratio = lengthSquared === 0
     ? 0
     : Math.max(0, Math.min(1, -(startX * deltaX + startY * deltaY) / lengthSquared));
-  return Math.hypot(startX + ratio * deltaX, startY + ratio * deltaY);
+  return {
+    distanceKm: Math.hypot(startX + ratio * deltaX, startY + ratio * deltaY),
+    latitude: start[1] + (end[1] - start[1]) * ratio,
+    longitude: start[0] + (end[0] - start[0]) * ratio,
+  };
 };
 
 const distanceToRingKm = (longitude: number, latitude: number, ring: LinearRing) => {
@@ -63,10 +73,71 @@ const distanceToRingKm = (longitude: number, latitude: number, ring: LinearRing)
   for (let index = 1; index < ring.length; index += 1) {
     nearest = Math.min(
       nearest,
-      distanceToSegmentKm(longitude, latitude, ring[index - 1], ring[index]),
+      nearestPointOnSegment(longitude, latitude, ring[index - 1], ring[index]).distanceKm,
     );
   }
   return nearest;
+};
+
+export const findNearestKoreanCoastCoordinate = (
+  latitude: number,
+  longitude: number,
+): NearestCoastCoordinate | null => {
+  let nearest: (NearestCoastCoordinate & { polygon: Polygon }) | null = null;
+
+  for (const polygon of polygons) {
+    const ring = polygon[0];
+    for (let index = 1; index < ring.length; index += 1) {
+      const candidate = nearestPointOnSegment(
+        longitude,
+        latitude,
+        ring[index - 1],
+        ring[index],
+      );
+      if (!nearest || candidate.distanceKm < nearest.distanceKm) {
+        nearest = { ...candidate, polygon };
+      }
+    }
+  }
+
+  if (!nearest) return null;
+
+  const insetKm = 0.5;
+  const latitudeKm = 111.32;
+  const longitudeKm = latitudeKm * Math.cos((nearest.latitude * Math.PI) / 180);
+  const ringCenter = nearest.polygon[0].reduce(
+    (sum, [ringLongitude, ringLatitude]) => ({
+      latitude: sum.latitude + ringLatitude,
+      longitude: sum.longitude + ringLongitude,
+    }),
+    { latitude: 0, longitude: 0 },
+  );
+  const pointCount = nearest.polygon[0].length || 1;
+  const centerLatitude = ringCenter.latitude / pointCount;
+  const centerLongitude = ringCenter.longitude / pointCount;
+  const towardCenterX = (centerLongitude - nearest.longitude) * longitudeKm;
+  const towardCenterY = (centerLatitude - nearest.latitude) * latitudeKm;
+  const towardCenterLength = Math.hypot(towardCenterX, towardCenterY) || 1;
+  const lookupLongitude =
+    nearest.longitude + (towardCenterX / towardCenterLength) * (insetKm / longitudeKm);
+  const lookupLatitude =
+    nearest.latitude + (towardCenterY / towardCenterLength) * (insetKm / latitudeKm);
+
+  if (
+    isPointInPolygon(lookupLongitude, lookupLatitude, nearest.polygon)
+  ) {
+    return {
+      latitude: lookupLatitude,
+      longitude: lookupLongitude,
+      distanceKm: nearest.distanceKm,
+    };
+  }
+
+  return {
+    latitude: nearest.latitude,
+    longitude: nearest.longitude,
+    distanceKm: nearest.distanceKm,
+  };
 };
 
 export const evaluateCoastalSelection = (

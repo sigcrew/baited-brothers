@@ -14,6 +14,8 @@ import { FieldAlertModal } from "@/components/design/FieldAlertModal";
 import { FishingMap } from "@/components/map/FishingMap";
 import type { FishingMapPoint } from "@/components/map/FishingMap.types";
 import { evaluateCoastalSelection } from "@/src/lib/coastalSelection";
+import { ensureForegroundLocationPermission } from "@/src/lib/locationPermission";
+import { reverseGeocodeKoreanPlaceName } from "@/src/lib/reverseGeocoding";
 import {
   FIELD_COLORS,
   bodyExtraBoldFont,
@@ -92,10 +94,18 @@ export const TripLocationPickerModal = ({
     setIsResolving(true);
     let resolvedName = placeName.trim();
     try {
-      const results = await Location.reverseGeocodeAsync(coordinate);
+      const hasPermission = await ensureForegroundLocationPermission();
       if (requestRef.current !== requestId) return;
-      const address = results[0];
-      const countryCode = address?.isoCountryCode?.toUpperCase();
+      if (!hasPermission) {
+        setNotice({
+          title: "위치 권한이 필요합니다",
+          message: "선택한 장소의 지역명을 확인하려면 위치 접근을 허용해 주세요.",
+        });
+        return;
+      }
+      const result = await reverseGeocodeKoreanPlaceName(coordinate);
+      if (requestRef.current !== requestId) return;
+      const countryCode = result.countryCode;
       if (countryCode && countryCode !== "KR") {
         setNotice({
           title: "국내 위치만 선택할 수 있습니다",
@@ -103,9 +113,7 @@ export const TripLocationPickerModal = ({
         });
         return;
       }
-      if (!resolvedName && address) {
-        resolvedName = address.district || address.city || address.subregion || address.region || "";
-      }
+      if (!resolvedName) resolvedName = result.name || "";
     } catch {
       // Offshore coordinates may not have a reverse-geocoding result.
     } finally {
@@ -159,6 +167,14 @@ export const TripLocationPickerModal = ({
     }
     setIsResolving(true);
     try {
+      const hasPermission = await ensureForegroundLocationPermission();
+      if (!hasPermission) {
+        setNotice({
+          title: "위치 권한이 필요합니다",
+          message: "입력한 장소의 위치를 찾으려면 위치 접근을 허용해 주세요.",
+        });
+        return;
+      }
       const results = await Location.geocodeAsync(query);
       if (!results[0]) {
         setNotice({

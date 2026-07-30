@@ -23,6 +23,8 @@ import { useMarineConditions } from "@/src/hooks/useMarineConditions";
 import { useUserCatches } from "@/src/hooks/useUserCatches";
 import { evaluateCoastalSelection } from "@/src/lib/coastalSelection";
 import { countDistinctMapCoordinates } from "@/src/lib/mapClustering";
+import { ensureForegroundLocationPermission } from "@/src/lib/locationPermission";
+import { reverseGeocodeKoreanPlaceName } from "@/src/lib/reverseGeocoding";
 import {
   FIELD_COLORS,
   bodyExtraBoldFont,
@@ -347,14 +349,12 @@ export default function MapScreen() {
     setPlaceName(selected?.name ?? null);
     if (!selected?.shouldReverseGeocode) return;
 
-    void Location.reverseGeocodeAsync({
+    void reverseGeocodeKoreanPlaceName({
       latitude: selected.latitude,
       longitude: selected.longitude,
-    }).then((results) => {
-      if (!active || !results[0]) return;
-      const result = results[0];
-      const resolved = result.district || result.city || result.subregion || result.region || selected.name;
-      setPlaceName(resolved);
+    }).then((result) => {
+      if (!active || !result.name) return;
+      setPlaceName(result.name);
     }).catch(() => undefined);
     return () => { active = false; };
   }, [selected]);
@@ -521,19 +521,37 @@ export default function MapScreen() {
       return;
     }
 
+    try {
+      const hasPermission = await ensureForegroundLocationPermission();
+      if (selectionRequestRef.current !== requestId) return;
+      if (!hasPermission) {
+        showMapAlert(
+          "위치 권한이 필요합니다",
+          "선택한 바다의 지역명을 확인하려면 위치 접근을 허용해 주세요.",
+          "LOCATION NOTICE",
+        );
+        return;
+      }
+    } catch {
+      if (selectionRequestRef.current !== requestId) return;
+      showMapAlert(
+        "지역 이름을 확인하지 못했습니다",
+        "위치 권한 상태를 확인한 뒤 다시 시도해 주세요.",
+        "LOCATION ERROR",
+      );
+      return;
+    }
+
     let resolvedName: string | null = null;
     try {
-      const results = await Location.reverseGeocodeAsync(coordinate);
+      const result = await reverseGeocodeKoreanPlaceName(coordinate);
       if (selectionRequestRef.current !== requestId) return;
-      const address = results[0];
-      const countryCode = address?.isoCountryCode?.toUpperCase();
+      const countryCode = result.countryCode;
       if (countryCode && countryCode !== "KR") {
         showMapAlert("국내 위치만 지원합니다", "대한민국 연안 안쪽의 장소를 선택해 주세요.");
         return;
       }
-      resolvedName = address
-        ? address.district || address.city || address.subregion || address.region || null
-        : null;
+      resolvedName = result.name;
     } catch {
       // Offshore points often have no reverse-geocoding result. The coastline
       // check above remains sufficient for those coordinates.
