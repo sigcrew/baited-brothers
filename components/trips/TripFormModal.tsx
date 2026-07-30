@@ -11,6 +11,7 @@ import Svg, { Circle, Line, Path, Rect } from "react-native-svg";
 import {
   ActivityIndicator,
   Image,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -118,6 +119,7 @@ export const TripFormModal = ({
   const [locationPickerVisible, setLocationPickerVisible] = useState(false);
   const [selectedPlace, setSelectedPlace] = useState<TripPlace | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
+  const [androidInputRevision, setAndroidInputRevision] = useState(0);
 
   useEffect(() => {
     if (!visible) return;
@@ -140,6 +142,7 @@ export const TripFormModal = ({
         : initialPlace ?? null,
     );
     setFormError(null);
+    setAndroidInputRevision((current) => current + 1);
     bottomSheetRef.current?.present();
   }, [initialPlace?.latitude, initialPlace?.longitude, initialPlace?.name, trip, visible]);
 
@@ -239,9 +242,12 @@ export const TripFormModal = ({
           <Text className="mt-5 text-sm" style={{ color: FIELD_COLORS.ink, fontFamily: bodySemiBoldFont }}>
             낚시터
           </Text>
+          {/* Android must own the live text value so Korean IME composition is not overwritten mid-syllable. */}
           <BottomSheetTextInput
+            key={`spot-name-${androidInputRevision}`}
             accessibilityLabel="낚시터"
-            value={spotName}
+            defaultValue={Platform.OS === "android" ? spotName : undefined}
+            value={Platform.OS === "android" ? undefined : spotName}
             onChangeText={setSpotName}
             placeholder="예: 대천항 방파제"
             placeholderTextColor={FIELD_COLORS.muted}
@@ -374,6 +380,8 @@ export const TripFormModal = ({
             >
               <Text className="text-[11px]" style={{ color: FIELD_COLORS.ink, fontFamily: bodySemiBoldFont }}>내일 새벽</Text>
             </TouchableOpacity>
+          </View>
+          <View className="mt-2 flex-row">
             {[4, 5, 6].map((hour) => (
               <TouchableOpacity
                 key={hour}
@@ -384,8 +392,11 @@ export const TripFormModal = ({
                   next.setHours(hour, 0, 0, 0);
                   setScheduledAt(next);
                 }}
-                className="ml-2 flex-1 items-center border py-2"
-                style={{ borderColor: scheduledAt.getHours() === hour && scheduledAt.getMinutes() === 0 ? FIELD_COLORS.teal : FIELD_COLORS.rule }}
+                className="flex-1 items-center border py-2"
+                style={{
+                  borderColor: scheduledAt.getHours() === hour && scheduledAt.getMinutes() === 0 ? FIELD_COLORS.teal : FIELD_COLORS.rule,
+                  marginLeft: hour === 4 ? 0 : 8,
+                }}
               >
                 <Text className="text-[11px]" style={{ color: scheduledAt.getHours() === hour && scheduledAt.getMinutes() === 0 ? FIELD_COLORS.teal : FIELD_COLORS.muted, fontFamily: bodySemiBoldFont }}>
                   {pad(hour)}:00
@@ -397,9 +408,12 @@ export const TripFormModal = ({
           <Text className="mt-4 text-sm" style={{ color: FIELD_COLORS.ink, fontFamily: bodySemiBoldFont }}>
             메모 · 선택
           </Text>
+          {/* Keep multiline Korean composition native-owned on Android for the same reason. */}
           <BottomSheetTextInput
+            key={`memo-${androidInputRevision}`}
             accessibilityLabel="출조 메모"
-            value={memo}
+            defaultValue={Platform.OS === "android" ? memo : undefined}
+            value={Platform.OS === "android" ? undefined : memo}
             onChangeText={setMemo}
             placeholder="물때, 동행, 목표 어종 등"
             placeholderTextColor={FIELD_COLORS.muted}
@@ -500,7 +514,12 @@ export const TripFormModal = ({
         onClose={() => setLocationPickerVisible(false)}
         onConfirm={(place) => {
           setSelectedPlace(place);
-          if (!spotName.trim()) setSpotName(place.name);
+          if (!spotName.trim()) {
+            setSpotName(place.name);
+            if (Platform.OS === "android") {
+              setAndroidInputRevision((current) => current + 1);
+            }
+          }
           setLocationPickerVisible(false);
         }}
       />

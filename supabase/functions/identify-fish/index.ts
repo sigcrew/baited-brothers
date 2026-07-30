@@ -16,6 +16,12 @@ type CatalogFish = {
   similarSpeciesNotes?: string | null;
 };
 
+type IdentificationQuota = {
+  allowed: boolean;
+  remaining: number;
+  reset_at: string | null;
+};
+
 const MODEL = "claude-sonnet-5";
 
 const corsHeaders = {
@@ -395,6 +401,34 @@ Deno.serve(async (req) => {
     return json({ error: "The fish catalog is unavailable." }, 400);
   }
 
+  const { data: quotaRows, error: quotaError } = await supabase.rpc(
+    "consume_ai_identification_quota",
+  );
+  if (quotaError) {
+    console.error("AI identification quota check failed", quotaError);
+    return json(
+      {
+        error: "AI identification is temporarily unavailable.",
+        error_code: "quota_check_failed",
+      },
+      503,
+    );
+  }
+  const quota = (Array.isArray(quotaRows) ? quotaRows[0] : quotaRows) as
+    | IdentificationQuota
+    | null;
+  if (!quota?.allowed) {
+    return json(
+      {
+        error: "AI identification request limit reached.",
+        error_code: "ai_identification_quota_exceeded",
+        remaining: 0,
+        reset_at: quota?.reset_at ?? null,
+      },
+      429,
+    );
+  }
+
   try {
     const groups = [...new Set(catalog.map((fish) => fish.group))].sort();
     const allowedGroups = new Set(groups);
@@ -515,6 +549,10 @@ Deno.serve(async (req) => {
       candidates: needsRetake ? [] : candidates,
       needs_retake: needsRetake,
       note: primaryResult.note ?? gate.note,
+      quota: {
+        remaining: quota.remaining,
+        reset_at: quota.reset_at,
+      },
     });
   } catch (error) {
     console.error("Fish identification failed", error);

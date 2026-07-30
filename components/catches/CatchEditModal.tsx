@@ -10,6 +10,8 @@ import {
   View,
 } from "react-native";
 import type { UserCatch } from "@/src/hooks/useUserCatches";
+import type { Fish } from "@/src/hooks/useFishes";
+import { FishCatalogSheet } from "@/components/record/FishCatalogSheet";
 import {
   FIELD_COLORS,
   bodyExtraBoldFont,
@@ -18,27 +20,42 @@ import {
 
 type Props = {
   item: UserCatch | null;
+  fishes: Fish[];
   isSaving: boolean;
   onClose: () => void;
   onSave: (
     item: UserCatch,
-    input: { sizeCm: number | null; memo: string | null },
+    input: {
+      sizeCm: number | null;
+      memo: string | null;
+      fishId: string | null;
+      customSpeciesName: string | null;
+    },
   ) => Promise<Error | null>;
 };
 
 export const CatchEditModal = ({
   item,
+  fishes,
   isSaving,
   onClose,
   onSave,
 }: Props) => {
   const [size, setSize] = useState("");
   const [memo, setMemo] = useState("");
+  const [selectedFishId, setSelectedFishId] = useState<string | null>(null);
+  const [customSpeciesName, setCustomSpeciesName] = useState<string | null>(
+    null,
+  );
+  const [catalogVisible, setCatalogVisible] = useState(false);
   const [validation, setValidation] = useState<string | null>(null);
 
   useEffect(() => {
     setSize(item?.size_cm ? String(item.size_cm) : "");
     setMemo(item?.memo ?? "");
+    setSelectedFishId(item?.fish_id ?? null);
+    setCustomSpeciesName(item?.custom_species_name ?? null);
+    setCatalogVisible(false);
     setValidation(null);
   }, [item]);
 
@@ -52,18 +69,21 @@ export const CatchEditModal = ({
     const error = await onSave(item, {
       sizeCm: parsed,
       memo: memo.trim() || null,
+      fishId: selectedFishId,
+      customSpeciesName,
     });
     if (error) setValidation(error.message);
   };
 
   return (
-    <Modal
-      visible={Boolean(item)}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
-      <KeyboardAvoidingView
+    <>
+      <Modal
+        visible={Boolean(item)}
+        transparent
+        animationType="fade"
+        onRequestClose={onClose}
+      >
+        <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1 justify-end bg-black/50"
       >
@@ -75,6 +95,41 @@ export const CatchEditModal = ({
           >
             조과 기록 수정
           </Text>
+          <Text
+            className="mt-5 text-sm"
+            style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}
+          >
+            어종
+          </Text>
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="조과 어종 변경"
+            onPress={() => setCatalogVisible(true)}
+            className="mt-2 flex-row items-center justify-between border px-4 py-3"
+            style={{ borderColor: FIELD_COLORS.rule }}
+          >
+            <Text style={{ color: FIELD_COLORS.ink, fontFamily: bodyFont }}>
+              {selectedFishId
+                ? (fishes.find((fish) => fish.id === selectedFishId)?.name_ko ??
+                  fishes.find((fish) => fish.id === selectedFishId)?.name ??
+                  "도감 어종")
+                : customSpeciesName ?? "어종 선택"}
+            </Text>
+            <Text
+              style={{ color: FIELD_COLORS.teal, fontFamily: bodyExtraBoldFont }}
+            >
+              변경
+            </Text>
+          </TouchableOpacity>
+          {(item?.fish_id !== selectedFishId ||
+            item?.custom_species_name !== customSpeciesName) ? (
+            <Text
+              className="mt-2 text-xs leading-5"
+              style={{ color: FIELD_COLORS.orange, fontFamily: bodyFont }}
+            >
+              어종 정정 이력이 남으며 이 기록은 향후 경쟁 지표에서 제외됩니다.
+            </Text>
+          ) : null}
           <Text
             className="mt-5 text-sm"
             style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}
@@ -136,7 +191,22 @@ export const CatchEditModal = ({
             </TouchableOpacity>
           </View>
         </View>
-      </KeyboardAvoidingView>
-    </Modal>
+        </KeyboardAvoidingView>
+      </Modal>
+      <FishCatalogSheet
+        fishes={fishes}
+        isLoading={false}
+        visible={catalogVisible}
+        onClose={() => setCatalogVisible(false)}
+        onSelect={(fish) => {
+          setSelectedFishId(fish.id);
+          setCustomSpeciesName(null);
+        }}
+        onSelectCustom={(name) => {
+          setSelectedFishId(null);
+          setCustomSpeciesName(name);
+        }}
+      />
+    </>
   );
 };

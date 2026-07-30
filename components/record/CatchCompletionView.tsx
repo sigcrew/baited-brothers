@@ -23,7 +23,8 @@ import {
 } from "@/src/theme/fieldJournal";
 
 type CatchCompletionViewProps = {
-  fish: Fish;
+  fish: Fish | null;
+  customSpeciesName?: string | null;
   isFirstDiscovery: boolean;
   isDevelopmentTest: boolean;
   isFileUpload: boolean;
@@ -33,6 +34,7 @@ type CatchCompletionViewProps = {
   sizeCm?: number;
   onViewRecord: () => void;
   onViewEncyclopedia: () => void;
+  onRecordAnother?: () => void;
   onGoHome: () => void;
 };
 
@@ -52,6 +54,8 @@ const reasonMessage = (reason: string | null) => {
       return "사진 촬영 시각을 확인하지 못했습니다.";
     case "location_unavailable":
       return "사진에 촬영 위치 또는 시각 정보가 없습니다.";
+    case "species_outside_catalog":
+      return "도감 60종 밖 어종으로 일반 조과 카드에만 보관했습니다.";
     default:
       return "인증 조건을 확인하지 못해 일반 기록으로 보관했습니다.";
   }
@@ -145,6 +149,7 @@ const CompletionButton = ({
 
 export const CatchCompletionView = ({
   fish,
+  customSpeciesName,
   isFirstDiscovery,
   isDevelopmentTest,
   isFileUpload,
@@ -154,14 +159,17 @@ export const CatchCompletionView = ({
   sizeCm,
   onViewRecord,
   onViewEncyclopedia,
+  onRecordAnother,
   onGoHome,
 }: CatchCompletionViewProps) => {
   const insets = useSafeAreaInsets();
-  const illustration = getField60Illustration(
-    fish.catalog_sort_order,
-    "color",
-  );
-  const scientificName = fish.name.split(/\s+/).slice(0, 2).join(" ");
+  const illustration = fish
+    ? getField60Illustration(fish.catalog_sort_order, "color")
+    : null;
+  const displayName = fish?.name_ko ?? fish?.name ?? customSpeciesName ?? "어종 미확인";
+  const scientificName = fish
+    ? fish.name.split(/\s+/).slice(0, 2).join(" ")
+    : "OUTSIDE FIELD 60";
   const discoveredCountLabel = String(discoveredCount).padStart(2, "0");
   const verificationLabel = getVerificationLabel(verificationStatus);
   const isGeneralRecord =
@@ -230,7 +238,7 @@ export const CatchCompletionView = ({
                 width: isFirstDiscovery ? "115%" : "125%",
                 height: isFirstDiscovery ? "115%" : "125%",
               }}
-              accessibilityLabel={`${fish.name_ko ?? fish.name} 컬러 일러스트`}
+              accessibilityLabel={`${displayName} 컬러 일러스트`}
             />
           ) : (
             <FontAwesome name="image" size={42} color={FIELD_COLORS.muted} />
@@ -242,7 +250,7 @@ export const CatchCompletionView = ({
             className="text-center text-[36px] leading-[42px]"
             style={{ color: FIELD_COLORS.ink, fontFamily: displayFont }}
           >
-            {fish.name_ko ?? fish.name}
+            {displayName}
           </Text>
           <Text
             className="mt-2 text-center text-[10px] uppercase tracking-[1.4px]"
@@ -371,16 +379,38 @@ export const CatchCompletionView = ({
 
         <View className="mt-auto pt-5">
           <CompletionRule />
-          <CompletionButton
-            label="기록 보기"
-            variant="primary"
-            onPress={onViewRecord}
-          />
-          <CompletionButton
-            label="도감 보기"
-            variant="secondary"
-            onPress={onViewEncyclopedia}
-          />
+          {isFirstDiscovery && fish ? (
+            <CompletionButton
+              label="도감 보기"
+              variant="primary"
+              onPress={onViewEncyclopedia}
+            />
+          ) : (
+            <CompletionButton
+              label="카드 보기"
+              variant="primary"
+              onPress={onViewRecord}
+            />
+          )}
+          {onRecordAnother ? (
+            <CompletionButton
+              label="한 마리 더 기록하기"
+              variant="secondary"
+              onPress={onRecordAnother}
+            />
+          ) : isFirstDiscovery ? (
+            <CompletionButton
+              label="카드 보기"
+              variant="secondary"
+              onPress={onViewRecord}
+            />
+          ) : fish ? (
+            <CompletionButton
+              label="도감 보기"
+              variant="secondary"
+              onPress={onViewEncyclopedia}
+            />
+          ) : null}
           <CompletionButton
             label="홈으로"
             variant="text"

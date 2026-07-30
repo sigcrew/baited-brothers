@@ -8,6 +8,7 @@ import { useFishingTrips } from "@/src/hooks/useFishingTrips";
 import { EncyclopediaPanel } from "@/components/collection/EncyclopediaPanel";
 import { BadgesPanel } from "@/components/collection/BadgesPanel";
 import { CardsPanel } from "@/components/collection/CardsPanel";
+import { CatchEditModal } from "@/components/catches/CatchEditModal";
 import { ArchiveTabHeader } from "@/components/design/ArchiveTabHeader";
 import { createBadgeUnlockContext } from "@/src/data/badges";
 import { FIELD_COLORS } from "@/src/theme/fieldJournal";
@@ -35,6 +36,8 @@ const CollectionScreen = () => {
       ? params.segment
       : "encyclopedia",
   );
+  const [editingCatch, setEditingCatch] = useState<UserCatch | null>(null);
+  const [isSavingCatch, setIsSavingCatch] = useState(false);
 
   useEffect(() => {
     if (params.segment === "cards" || params.segment === "badges") {
@@ -65,6 +68,7 @@ const CollectionScreen = () => {
     isRefreshing: catchesRefreshing,
     isLoggedIn,
     refetch: refetchCatches,
+    updateCatch,
   } = useUserCatches();
   const { trips, refetch: refetchTrips } = useFishingTrips();
 
@@ -82,6 +86,7 @@ const CollectionScreen = () => {
       captured_at: new Date(2026, 6 - index, 6 + index).toISOString(),
       collection_eligible: true,
       user_id: "preview",
+      custom_species_name: null,
       fish_id: fish.id,
       trip_id: null,
       fish,
@@ -100,6 +105,8 @@ const CollectionScreen = () => {
         "해 뜨기 전 방파제에서 기록. 바닥층을 천천히 탐색했다.",
         "잔잔한 물때에 연속 입질. 다음 출조에도 같은 채비를 준비할 것.",
       ][index],
+      original_custom_species_name: null,
+      original_fish_id: null,
       ranking_eligible: true,
       created_at: null,
       updated_at: null,
@@ -114,6 +121,7 @@ const CollectionScreen = () => {
       verification_reason: null,
       verification_version: null,
       verified_at: null,
+      species_corrected_at: null,
       uploaded_at: new Date(2026, 6 - index, 6 + index).toISOString(),
     }));
   }, [allFishes, catches, previewMode]);
@@ -155,6 +163,22 @@ const CollectionScreen = () => {
     refetchFishes();
     refetchCatches();
     refetchTrips();
+  };
+
+  const saveCatchEdit = async (
+    item: UserCatch,
+    input: {
+      sizeCm: number | null;
+      memo: string | null;
+      fishId: string | null;
+      customSpeciesName: string | null;
+    },
+  ) => {
+    setIsSavingCatch(true);
+    const { error } = await updateCatch(item.id, input);
+    setIsSavingCatch(false);
+    if (!error) setEditingCatch(null);
+    return error;
   };
 
   return (
@@ -227,8 +251,16 @@ const CollectionScreen = () => {
           onLoginPress={() => router.push("/(auth)/login")}
           requestedCatchId={params.catchId}
           onRequestedCatchOpened={handleRequestedCatchOpened}
+          onEditCatch={setEditingCatch}
         />
       )}
+      <CatchEditModal
+        item={editingCatch}
+        fishes={allFishes}
+        isSaving={isSavingCatch}
+        onClose={() => setEditingCatch(null)}
+        onSave={saveCatchEdit}
+      />
     </View>
   );
 };

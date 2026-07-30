@@ -32,6 +32,12 @@ export default function SettingsScreen() {
         label="개인정보 처리방침"
         onPress={() => router.push("/privacy")}
       />
+      <SettingsLinkRow
+        icon="comment-o"
+        label="문제 신고"
+        value="사진·위치 미수집"
+        onPress={() => router.push("/settings/feedback" as never)}
+      />
       {session ? (
         <SettingsLinkRow
           icon="user-times"

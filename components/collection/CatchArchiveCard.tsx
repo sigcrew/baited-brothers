@@ -224,14 +224,14 @@ const CardPhoto = ({
           resizeMode="cover"
           onError={() => setPhotoFailed(true)}
           style={{ width: "100%", height: "100%" }}
-          accessibilityLabel={`${item.fish?.name_ko ?? item.fish?.name ?? "물고기"} 조과 사진`}
+          accessibilityLabel={`${item.fish?.name_ko ?? item.fish?.name ?? item.custom_species_name ?? "물고기"} 조과 사진`}
         />
       ) : illustration ? (
         <Image
           source={illustration}
           resizeMode="contain"
           style={{ width: "100%", height: "100%" }}
-          accessibilityLabel={`${item.fish?.name_ko ?? item.fish?.name ?? "물고기"} 컬러 일러스트`}
+          accessibilityLabel={`${item.fish?.name_ko ?? item.fish?.name ?? item.custom_species_name ?? "물고기"} 컬러 일러스트`}
         />
       ) : (
         <View className="flex-1 items-center justify-center">
@@ -248,8 +248,12 @@ export const CatchArchiveCard = ({
   onLocationPress,
 }: CatchArchiveCardProps) => {
   const compact = variant === "compact";
-  const title = item.fish?.name_ko ?? item.fish?.name ?? "어종 미확인";
-  const scientificName = (item.fish?.name ?? "SCIENTIFIC NAME UNAVAILABLE")
+  const title =
+    item.fish?.name_ko ??
+    item.fish?.name ??
+    item.custom_species_name ??
+    "어종 미확인";
+  const scientificName = (item.fish?.name ?? "OUTSIDE FIELD 60")
     .split(/\s+/)
     .slice(0, 2)
     .join(" ")
@@ -315,7 +319,9 @@ export const CatchArchiveCard = ({
               fontSize: compact ? 6 : 10,
             }}
           >
-            {verificationLabel}
+            {item.species_corrected_at
+              ? `사용자 정정 · ${verificationLabel}`
+              : verificationLabel}
           </Text>
           <View className="flex-row items-center">
             <Text

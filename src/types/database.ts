@@ -324,7 +324,8 @@ export type Database = {
           capture_method: Database["public"]["Enums"]["capture_method"] | null
           client_request_id: string | null
           created_at: string | null
-          fish_id: string
+          custom_species_name: string | null
+          fish_id: string | null
           id: string
           image_path: string | null
           image_url: string | null
@@ -336,8 +337,11 @@ export type Database = {
           location_captured_at: string | null
           location_name: string | null
           memo: string | null
+          original_custom_species_name: string | null
+          original_fish_id: string | null
           ranking_eligible: boolean
           size_cm: number | null
+          species_corrected_at: string | null
           trip_id: string | null
           thumbnail_path: string | null
           updated_at: string | null
@@ -357,7 +361,8 @@ export type Database = {
           capture_method?: Database["public"]["Enums"]["capture_method"] | null
           client_request_id?: string | null
           created_at?: string | null
-          fish_id: string
+          custom_species_name?: string | null
+          fish_id?: string | null
           id?: string
           image_path?: string | null
           image_url?: string | null
@@ -369,8 +374,11 @@ export type Database = {
           location_captured_at?: string | null
           location_name?: string | null
           memo?: string | null
+          original_custom_species_name?: string | null
+          original_fish_id?: string | null
           ranking_eligible?: boolean
           size_cm?: number | null
+          species_corrected_at?: string | null
           trip_id?: string | null
           thumbnail_path?: string | null
           updated_at?: string | null
@@ -390,7 +398,8 @@ export type Database = {
           capture_method?: Database["public"]["Enums"]["capture_method"] | null
           client_request_id?: string | null
           created_at?: string | null
-          fish_id?: string
+          custom_species_name?: string | null
+          fish_id?: string | null
           id?: string
           image_path?: string | null
           image_url?: string | null
@@ -402,8 +411,11 @@ export type Database = {
           location_captured_at?: string | null
           location_name?: string | null
           memo?: string | null
+          original_custom_species_name?: string | null
+          original_fish_id?: string | null
           ranking_eligible?: boolean
           size_cm?: number | null
+          species_corrected_at?: string | null
           trip_id?: string | null
           thumbnail_path?: string | null
           updated_at?: string | null
@@ -430,6 +442,39 @@ export type Database = {
             referencedColumns: ["id"]
           }
         ]
+      }
+      user_feedback: {
+        Row: {
+          app_version: string
+          build_number: string | null
+          category: string
+          created_at: string
+          id: string
+          message: string
+          platform: string
+          user_id: string
+        }
+        Insert: {
+          app_version: string
+          build_number?: string | null
+          category: string
+          created_at?: string
+          id?: string
+          message: string
+          platform: string
+          user_id: string
+        }
+        Update: {
+          app_version?: string
+          build_number?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          message?: string
+          platform?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_profiles: {
         Row: {
@@ -538,7 +583,16 @@ export type Database = {
       }
     }
     Views: { [_ in never]: never }
-    Functions: { [_ in never]: never }
+    Functions: {
+      consume_ai_identification_quota: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          allowed: boolean
+          remaining: number
+          reset_at: string | null
+        }[]
+      }
+    }
     Enums: {
       fish_category: "flatfish" | "rockfish" | "seabass" | "mackerel" | "bream" | "mullet" | "cutlassfish" | "eel" | "pufferfish" | "other"
       trip_status: "planned" | "done" | "canceled"

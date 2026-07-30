@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
   View,
   Text,
@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import Svg, { Text as SvgText } from "react-native-svg";
 import {
   useFishingTrips,
@@ -21,6 +21,13 @@ import {
 } from "@/src/hooks/useFishingTrips";
 import { useUserCatches } from "@/src/hooks/useUserCatches";
 import { useImageContrast } from "@/src/hooks/useImageContrast";
+import { useAuth } from "@/src/contexts/AuthContext";
+import {
+  listPendingCatches,
+  removePendingCatch,
+  subscribePendingCatchQueue,
+  type PendingCatchJob,
+} from "@/src/lib/pendingCatchQueue";
 import { ArchiveTabHeader } from "@/components/design/ArchiveTabHeader";
 import { TripCoverActionSheet } from "@/components/trips/TripCoverActionSheet";
 import { TripFormModal } from "@/components/trips/TripFormModal";
@@ -86,6 +93,16 @@ const formatTripDate = (iso: string) => {
   });
 };
 
+const pendingCatchStatusLabel = (pending: PendingCatchJob) => {
+  if (pending.status === "needs_confirmation") return "어종 확인 필요";
+  if (pending.status === "pending_upload" || pending.status === "uploading") {
+    return "업로드 대기";
+  }
+  if (pending.status === "failed_retryable") return "다시 시도 필요";
+  if (pending.status === "analyzing") return "AI 분석 중";
+  return "AI 분석 대기";
+};
+
 const HomeScreen = () => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -106,6 +123,8 @@ const HomeScreen = () => {
   const heroSpotLineHeight = Math.round(34 * heroTypeScale);
   const [addVisible, setAddVisible] = useState(false);
   const [coverActionsVisible, setCoverActionsVisible] = useState(false);
+  const [pendingCatches, setPendingCatches] = useState<PendingCatchJob[]>([]);
+  const { session } = useAuth();
   const {
     trips,
     plannedTrips,
@@ -121,6 +140,30 @@ const HomeScreen = () => {
     removeTripCover,
   } = useFishingTrips();
   const { catches } = useUserCatches();
+
+  const refreshPendingCatches = useCallback(async () => {
+    const userId = session?.user.id;
+    if (!userId) {
+      setPendingCatches([]);
+      return;
+    }
+    setPendingCatches(await listPendingCatches(userId));
+  }, [session?.user.id]);
+
+  useFocusEffect(
+    useCallback(() => {
+      void refreshPendingCatches();
+    }, [refreshPendingCatches]),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      const unsubscribe = subscribePendingCatchQueue(() => {
+        void refreshPendingCatches();
+      });
+      return unsubscribe;
+    }, [refreshPendingCatches]),
+  );
 
   const handleCreate = async (input: UpdateTripInput) => {
     const { error: createError } = await createTrip(input);
@@ -149,6 +192,26 @@ const HomeScreen = () => {
     : 0;
   const handleRecord = () => isLoggedIn ? router.push("/record") : router.push("/(auth)/login");
   const handleAddTrip = () => isLoggedIn ? setAddVisible(true) : router.push("/(auth)/login");
+  const discardPendingCatch = (pending: PendingCatchJob) => {
+    const userId = session?.user.id;
+    if (!userId) return;
+    Alert.alert(
+      "미완료 기록 삭제",
+      "기기에 보관된 사진과 촬영 정보를 삭제할까요? 복구할 수 없습니다.",
+      [
+        { text: "취소", style: "cancel" },
+        {
+          text: "삭제",
+          style: "destructive",
+          onPress: () => {
+            void removePendingCatch(userId, pending.localId).then(
+              refreshPendingCatches,
+            );
+          },
+        },
+      ],
+    );
+  };
   const handleChangeCover = () => {
     if (!nextTrip || isSaving) return;
     setCoverActionsVisible(true);
@@ -386,6 +449,63 @@ const HomeScreen = () => {
             <FontAwesome name="long-arrow-right" size={28} color="white" />
           </TouchableOpacity>
         </View>
+        {pendingCatches.length > 0 ? (
+          <View className="mt-3 bg-white px-4 py-5">
+            <View className="flex-row items-end justify-between border-b pb-3" style={{ borderColor: FIELD_COLORS.rule }}>
+              <View>
+                <Text className="text-lg" style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>
+                  미완료 현장 기록
+                </Text>
+                <Text className="mt-1 text-xs" style={{ color: FIELD_COLORS.muted, fontFamily: bodySemiBoldFont }}>
+                  사진은 이 기기에 안전하게 보관되어 있습니다.
+                </Text>
+              </View>
+              <Text className="text-[11px] tracking-[1px]" style={{ color: FIELD_COLORS.orange, fontFamily: monoFont }}>
+                {String(pendingCatches.length).padStart(2, "0")} PENDING
+              </Text>
+            </View>
+            {pendingCatches.slice(0, 3).map((pending) => (
+              <View
+                key={pending.localId}
+                className="flex-row items-center border-b py-4"
+                style={{ borderColor: FIELD_COLORS.rule }}
+              >
+                <View className="min-w-0 flex-1 pr-3">
+                  <Text style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>
+                    {pending.tripName ?? "출조 미연결 기록"}
+                  </Text>
+                  <Text className="mt-1 text-xs" style={{ color: FIELD_COLORS.muted, fontFamily: bodySemiBoldFont }}>
+                    {pendingCatchStatusLabel(pending)}
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  accessibilityLabel="미완료 조과 기록 이어가기"
+                  onPress={() =>
+                    router.push({
+                      pathname: "/record",
+                      params: { pendingId: pending.localId },
+                    })
+                  }
+                  className="px-3 py-2"
+                  style={{ backgroundColor: FIELD_COLORS.teal }}
+                >
+                  <Text className="text-sm text-white" style={{ fontFamily: bodyExtraBoldFont }}>
+                    이어가기
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  accessibilityLabel="미완료 조과 기록 삭제"
+                  onPress={() => discardPendingCatch(pending)}
+                  className="ml-2 px-2 py-2"
+                >
+                  <FontAwesome name="trash-o" size={18} color={FIELD_COLORS.muted} />
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        ) : null}
         <View className="mt-3 bg-white px-4 py-6">
           <View className="flex-row items-center justify-between">
             <Text className="text-xl" style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>다가오는 출조</Text>
@@ -535,7 +655,7 @@ const HomeScreen = () => {
                 <TouchableOpacity
                   key={item.id}
                   accessibilityRole="button"
-                  accessibilityLabel={`${item.fish?.name_ko ?? "어종"} 조과 카드 열기`}
+                  accessibilityLabel={`${item.fish?.name_ko ?? item.custom_species_name ?? "어종"} 조과 카드 열기`}
                   activeOpacity={0.84}
                   onPress={() =>
                     router.push({
@@ -575,7 +695,7 @@ const HomeScreen = () => {
                         fontFamily: bodyExtraBoldFont,
                       }}
                     >
-                      {item.fish?.name_ko ?? "어종"}
+                      {item.fish?.name_ko ?? item.custom_species_name ?? "어종"}
                     </Text>
                   </View>
                 </TouchableOpacity>

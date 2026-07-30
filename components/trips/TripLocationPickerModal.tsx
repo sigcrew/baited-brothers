@@ -199,10 +199,26 @@ export const TripLocationPickerModal = ({
       <View className="flex-1" style={{ backgroundColor: FIELD_COLORS.foam, paddingTop: insets.top }}>
         <View className="flex-row items-center border-b px-5 py-3" style={{ borderColor: FIELD_COLORS.rule }}>
           <View className="min-w-0 flex-1">
-            <Text className="text-[26px] tracking-[-0.8px]" style={{ color: FIELD_COLORS.ink, fontFamily: displayFont }}>
+            <Text
+              className="text-[26px] tracking-[-0.8px]"
+              style={{
+                color: FIELD_COLORS.ink,
+                fontFamily: displayFont,
+                includeFontPadding: false,
+                lineHeight: 34,
+              }}
+            >
               출조 장소 연결
             </Text>
-            <Text className="mt-0.5 text-[9px] tracking-[1.2px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>
+            <Text
+              className="mt-0.5 text-[9px] tracking-[1.2px]"
+              style={{
+                color: FIELD_COLORS.muted,
+                fontFamily: monoFont,
+                includeFontPadding: false,
+                lineHeight: 12,
+              }}
+            >
               TRIP LOCATION · MAP PIN
             </Text>
           </View>

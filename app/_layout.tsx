@@ -16,6 +16,7 @@ import { useColorScheme } from '@/components/useColorScheme';
 import { AuthProvider } from '@/src/contexts/AuthContext';
 import { AnalyticsLifecycle } from '@/src/components/AnalyticsLifecycle';
 import { NotificationLifecycle } from '@/src/components/NotificationLifecycle';
+import { PendingCatchLifecycle } from '@/src/components/PendingCatchLifecycle';
 import { BlackHanSans_400Regular } from '@expo-google-fonts/black-han-sans';
 import { Anton_400Regular } from '@expo-google-fonts/anton';
 import { DoHyeon_400Regular } from '@expo-google-fonts/do-hyeon';
@@ -79,6 +80,7 @@ const RootLayoutNav = () => {
           <AuthProvider>
             <AnalyticsLifecycle />
             <NotificationLifecycle />
+            <PendingCatchLifecycle />
             <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
               <Stack>
                 <Stack.Screen name="index" options={{ headerShown: false }} />
@@ -91,6 +93,10 @@ const RootLayoutNav = () => {
                 />
                 <Stack.Screen name="trips/[id]" options={{ headerShown: false }} />
                 <Stack.Screen name="fishes/[id]" options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="settings/feedback"
+                  options={{ headerShown: false }}
+                />
                 <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
               </Stack>
             </ThemeProvider>

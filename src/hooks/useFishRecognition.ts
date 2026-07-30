@@ -57,7 +57,31 @@ export const useFishRecognition = () => {
           "AI 판별 시간이 초과되었습니다.",
         );
 
-        if (invokeError) throw invokeError;
+        if (invokeError) {
+          const response = (invokeError as { context?: unknown }).context;
+          if (
+            response instanceof Response
+          ) {
+            try {
+              const body = await response.clone().json();
+              if (
+                body?.error_code === "ai_identification_quota_exceeded"
+              ) {
+                throw new Error(
+                  "AI 추천은 24시간에 30회까지 사용할 수 있어요. 도감에서 직접 선택해 기록할 수 있습니다.",
+                );
+              }
+            } catch (error) {
+              if (
+                error instanceof Error &&
+                error.message.includes("24시간에 30회")
+              ) {
+                throw error;
+              }
+            }
+          }
+          throw invokeError;
+        }
 
         const validFishIds = new Set(fishes.map((fish) => fish.id));
         const normalized = normalizeRecognitionResponse(data, validFishIds);

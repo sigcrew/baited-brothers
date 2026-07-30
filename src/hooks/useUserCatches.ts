@@ -98,7 +98,10 @@ export const useUserCatches = (tripId?: string) => {
   const unlockedFishIds = useMemo(() => {
     const ids = new Set<string>();
     for (const item of catches) {
-      if (countsForCollectionRewards(item.verification_status)) {
+      if (
+        item.fish_id &&
+        countsForCollectionRewards(item.verification_status)
+      ) {
         ids.add(item.fish_id);
       }
     }
@@ -107,21 +110,57 @@ export const useUserCatches = (tripId?: string) => {
 
   const updateCatch = async (
     catchId: string,
-    input: { sizeCm?: number | null; memo?: string | null },
+    input: {
+      sizeCm?: number | null;
+      memo?: string | null;
+      fishId?: string | null;
+      customSpeciesName?: string | null;
+    },
   ) => {
     if (!userId) return { error: new Error("로그인이 필요합니다.") };
+    const current = catches.find((item) => item.id === catchId);
+    const customSpeciesName = input.customSpeciesName?.trim() || null;
+    const speciesIncluded =
+      input.fishId !== undefined || input.customSpeciesName !== undefined;
+    if (
+      speciesIncluded &&
+      Boolean(input.fishId) === Boolean(customSpeciesName)
+    ) {
+      return {
+        error: new Error(
+          "도감 어종 또는 도감 밖 어종 이름 중 하나를 선택해 주세요.",
+        ),
+      };
+    }
+    const speciesChanged =
+      speciesIncluded &&
+      (current?.fish_id !== (input.fishId ?? null) ||
+        current?.custom_species_name !== customSpeciesName);
     const { error: updateError } = await supabase
       .from("user_catches")
       .update({
         size_cm: input.sizeCm ?? null,
         memo: input.memo?.trim() || null,
+        ...(speciesIncluded
+          ? {
+              fish_id: input.fishId ?? null,
+              custom_species_name: customSpeciesName,
+            }
+          : {}),
       })
       .eq("id", catchId)
       .eq("user_id", userId);
     if (!updateError) {
+      if (speciesChanged && input.fishId) {
+        await supabase.functions.invoke("verify-catch", {
+          body: { catchId },
+        });
+      }
       void trackAnalyticsEvent("catch_updated", {
         has_size: input.sizeCm != null,
         has_note: Boolean(input.memo?.trim()),
+        species_changed: speciesChanged,
+        outside_catalog: speciesIncluded && !input.fishId,
       });
       await fetchCatches(true);
     }

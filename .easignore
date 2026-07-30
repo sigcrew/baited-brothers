@@ -16,6 +16,12 @@ store-assets/
 credentials/
 ios/Pods/
 ios/build/
+android/.gradle/
+android/app/build/
+android/build/
+*.aab
+*.apk
+*.ipa
 *.p8
 *.p12
 *.key

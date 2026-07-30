@@ -20,6 +20,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFishes, type Fish } from "@/src/hooks/useFishes";
 import { useCreateCatch } from "@/src/hooks/useCreateCatch";
+import { useAuth } from "@/src/contexts/AuthContext";
 import {
   useFishRecognition,
   type FishRecognitionCandidate,
@@ -31,6 +32,13 @@ import { getField60Illustration } from "@/src/data/field60Illustrations";
 import { optimizeUserPhoto } from "@/src/lib/optimizeUserPhoto";
 import { extractLibraryPhotoMetadata } from "@/src/lib/photoMetadata";
 import { trackAnalyticsEvent } from "@/src/lib/analytics";
+import {
+  getPendingCatch,
+  preservePendingCatch,
+  readPendingCatchBase64,
+  removePendingCatch,
+  updatePendingCatch,
+} from "@/src/lib/pendingCatchQueue";
 import { FIELD_COLORS, bodyExtraBoldFont, bodyFont, monoFont } from "@/src/theme/fieldJournal";
 
 type Capture = {
@@ -45,10 +53,15 @@ type Capture = {
   locationAccuracyM: number | null;
   locationCapturedAt: string | null;
   source: "camera" | "photo_library";
+  tripId: string | null;
+  tripName: string | null;
+  pendingCatchId: string;
+  clientRequestId: string;
 };
 
 type CompletionResult = {
-  fish: Fish;
+  fish: Fish | null;
+  customSpeciesName: string | null;
   catchId: string | null;
   isFirstDiscovery: boolean;
   isDevelopmentTest: boolean;
@@ -100,14 +113,20 @@ const RecordScreen = () => {
     tripId?: string;
     tripName?: string;
     completionPreview?: string;
+    consentPreview?: string;
+    pendingId?: string;
   }>();
   const tripId = typeof params.tripId === "string" ? params.tripId : undefined;
   const tripName = typeof params.tripName === "string" ? params.tripName : undefined;
+  const pendingId =
+    typeof params.pendingId === "string" ? params.pendingId : undefined;
   const insets = useSafeAreaInsets();
   const cameraRef = useRef<CameraView>(null);
   const saveRequestId = useRef<string | null>(null);
   const flowTracked = useRef(false);
   const cameraOpenedTracked = useRef(false);
+  const resumedPendingId = useRef<string | null>(null);
+  const { session } = useAuth();
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const lastCameraPermission = useRef(cameraPermission);
   if (cameraPermission) {
@@ -117,6 +136,9 @@ const RecordScreen = () => {
     cameraPermission ?? lastCameraPermission.current;
   const [capture, setCapture] = useState<Capture | null>(null);
   const [selectedFish, setSelectedFish] = useState<Fish | null>(null);
+  const [customSpeciesName, setCustomSpeciesName] = useState<string | null>(
+    null,
+  );
   const [completion, setCompletion] = useState<CompletionResult | null>(null);
   const [size, setSize] = useState("");
   const [memo, setMemo] = useState("");
@@ -128,9 +150,10 @@ const RecordScreen = () => {
   >([]);
   const [recognitionNote, setRecognitionNote] = useState<string | null>(null);
   const [needsRetake, setNeedsRetake] = useState(false);
+  const [recognitionSlow, setRecognitionSlow] = useState(false);
   const [catalogVisible, setCatalogVisible] = useState(false);
   const [aiConsent, setAiConsent] = useState<
-    "loading" | "pending" | "accepted"
+    "loading" | "pending" | "accepted" | "manual"
   >("loading");
   const { fishes, isLoading: fishesLoading } = useFishes(null, "core");
   const { createCatch, isSaving } = useCreateCatch();
@@ -152,6 +175,7 @@ const RecordScreen = () => {
     (completionPreviewMode && previewFish
       ? {
           fish: previewFish,
+          customSpeciesName: null,
           catchId: null,
           isFirstDiscovery: completionPreviewMode === "first",
           isDevelopmentTest: true,
@@ -168,7 +192,15 @@ const RecordScreen = () => {
 
     AsyncStorage.getItem(AI_PHOTO_CONSENT_KEY)
       .then((value) => {
-        if (active) setAiConsent(value === "accepted" ? "accepted" : "pending");
+        if (active) {
+          setAiConsent(
+            __DEV__ && params.consentPreview === "1"
+              ? "pending"
+              : value === "accepted"
+                ? "accepted"
+                : "pending",
+          );
+        }
       })
       .catch(() => {
         if (active) setAiConsent("pending");
@@ -177,19 +209,23 @@ const RecordScreen = () => {
     return () => {
       active = false;
     };
-  }, []);
+  }, [params.consentPreview]);
 
   useEffect(() => {
-    if (aiConsent !== "accepted" || flowTracked.current) return;
+    if (
+      (aiConsent !== "accepted" && aiConsent !== "manual") ||
+      flowTracked.current
+    ) return;
     flowTracked.current = true;
     void trackAnalyticsEvent("catch_flow_started", {
       has_trip: Boolean(tripId),
+      ai_enabled: aiConsent === "accepted",
     });
   }, [aiConsent, tripId]);
 
   useEffect(() => {
     if (
-      aiConsent !== "accepted" ||
+      (aiConsent !== "accepted" && aiConsent !== "manual") ||
       !effectiveCameraPermission?.granted ||
       capture ||
       cameraOpenedTracked.current
@@ -216,6 +252,10 @@ const RecordScreen = () => {
     }
   };
 
+  const beginManualPhotoFlow = () => {
+    setAiConsent("manual");
+  };
+
   const candidateRows = useMemo(
     () =>
       recognitionCandidates
@@ -233,23 +273,54 @@ const RecordScreen = () => {
   );
 
   const analyzeCapture = async (nextCapture: Capture) => {
-    saveRequestId.current = `${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
+    saveRequestId.current = nextCapture.clientRequestId;
     setCapture(nextCapture);
     setSelectedFish(null);
+    setCustomSpeciesName(null);
     setCompletion(null);
     setRecognitionCandidates([]);
     setRecognitionNote(null);
     setNeedsRetake(false);
+    setRecognitionSlow(false);
     setCatalogVisible(false);
+    if (session?.user.id) {
+      await updatePendingCatch(
+        session.user.id,
+        nextCapture.pendingCatchId,
+        {
+          status: "analyzing",
+          lastError: null,
+          nextRetryAt: null,
+        },
+      );
+    }
 
+    const slowTimer = setTimeout(() => setRecognitionSlow(true), 20_000);
     const result = await recognize({
       imageBase64: nextCapture.base64,
       mimeType: nextCapture.mimeType,
       fishes,
     });
+    clearTimeout(slowTimer);
+    setRecognitionSlow(false);
     setRecognitionCandidates(result.candidates);
     setRecognitionNote(result.note);
     setNeedsRetake(result.needsRetake);
+    await updatePendingCatch(
+      session?.user.id ?? "",
+      nextCapture.pendingCatchId,
+      {
+        candidates: result.candidates,
+        candidateFishIds: result.candidates.map(
+          (candidate) => candidate.fishId,
+        ),
+        status: result.error ? "failed_retryable" : "needs_confirmation",
+        lastError: result.error?.message ?? null,
+        nextRetryAt: result.error
+          ? new Date(Date.now() + 15_000).toISOString()
+          : null,
+      },
+    );
     void trackAnalyticsEvent("analysis_result_viewed", {
       candidate_count: result.candidates.length,
       needs_retake: result.needsRetake,
@@ -257,14 +328,169 @@ const RecordScreen = () => {
     });
   };
 
+  const prepareManualCapture = async (nextCapture: Capture) => {
+    saveRequestId.current = nextCapture.clientRequestId;
+    setCapture(nextCapture);
+    setSelectedFish(null);
+    setCustomSpeciesName(null);
+    setCompletion(null);
+    setRecognitionCandidates([]);
+    setRecognitionNote(null);
+    setNeedsRetake(false);
+    setRecognitionSlow(false);
+    setCatalogVisible(true);
+    if (session?.user.id) {
+      await updatePendingCatch(
+        session.user.id,
+        nextCapture.pendingCatchId,
+        {
+          status: "needs_confirmation",
+          lastError: null,
+          nextRetryAt: null,
+        },
+      );
+    }
+  };
+
+  const preserveAndPrepareCapture = async (
+    nextCapture: Omit<Capture, "pendingCatchId" | "clientRequestId">,
+  ) => {
+    const userId = session?.user.id;
+    if (!userId) throw new Error("로그인이 필요합니다.");
+
+    const pending = await preservePendingCatch({
+      userId,
+      tripId: nextCapture.tripId ?? undefined,
+      tripName: nextCapture.tripName ?? undefined,
+      imageUri: nextCapture.uri,
+      imageWidth: nextCapture.width,
+      imageHeight: nextCapture.height,
+      mimeType: nextCapture.mimeType,
+      captureMethod:
+        nextCapture.source === "photo_library"
+          ? "photo_library"
+          : "live_camera",
+      analysisRequested: aiConsent === "accepted",
+      capturedAt: nextCapture.capturedAt ?? undefined,
+      latitude: nextCapture.latitude ?? undefined,
+      longitude: nextCapture.longitude ?? undefined,
+      locationAccuracyM: nextCapture.locationAccuracyM ?? undefined,
+      locationCapturedAt: nextCapture.locationCapturedAt ?? undefined,
+    });
+    const preservedCapture = {
+      ...nextCapture,
+      uri: pending.localImageUri,
+      pendingCatchId: pending.localId,
+      clientRequestId: pending.clientRequestId,
+    };
+    if (aiConsent === "accepted") {
+      await analyzeCapture(preservedCapture);
+    } else {
+      await prepareManualCapture(preservedCapture);
+    }
+  };
+
+  useEffect(() => {
+    const userId = session?.user.id;
+    if (
+      !pendingId ||
+      !userId ||
+      fishesLoading ||
+      resumedPendingId.current === pendingId
+    ) {
+      return;
+    }
+    resumedPendingId.current = pendingId;
+    let active = true;
+
+    const resume = async () => {
+      const pending = await getPendingCatch(userId, pendingId);
+      if (!pending) {
+        if (active) {
+          Alert.alert("복구할 기록 없음", "이미 저장했거나 삭제된 기록입니다.");
+          router.replace("/(tabs)");
+        }
+        return;
+      }
+      const base64 = await readPendingCatchBase64(pending);
+      if (!active) return;
+
+      const restoredCapture: Capture = {
+        uri: pending.localImageUri,
+        width: pending.imageWidth,
+        height: pending.imageHeight,
+        base64,
+        mimeType: pending.mimeType,
+        latitude: pending.latitude,
+        longitude: pending.longitude,
+        capturedAt: pending.capturedAt,
+        locationAccuracyM: pending.locationAccuracyM,
+        locationCapturedAt: pending.locationCapturedAt,
+        source:
+          pending.captureMethod === "photo_library"
+            ? "photo_library"
+            : "camera",
+        tripId: pending.tripId,
+        tripName: pending.tripName,
+        pendingCatchId: pending.localId,
+        clientRequestId: pending.clientRequestId,
+      };
+      saveRequestId.current = pending.clientRequestId;
+      setCapture(restoredCapture);
+      setRecognitionCandidates(pending.candidates);
+      setSize(pending.sizeCm == null ? "" : String(pending.sizeCm));
+      setMemo(pending.memo ?? "");
+      setSelectedFish(
+        pending.selectedFishId
+          ? (fishes.find((fish) => fish.id === pending.selectedFishId) ?? null)
+          : null,
+      );
+      setCustomSpeciesName(pending.customSpeciesName);
+
+      if (
+        pending.status === "pending_analysis" ||
+        (pending.status === "failed_retryable" &&
+          !pending.selectedFishId &&
+          pending.candidates.length === 0)
+      ) {
+        if (pending.analysisRequested) {
+          await analyzeCapture(restoredCapture);
+        } else {
+          await prepareManualCapture(restoredCapture);
+        }
+      }
+    };
+
+    void resume().catch(async (error) => {
+      if (!active) return;
+      const message =
+        error instanceof Error
+          ? error.message
+          : "보관된 조과를 복구하지 못했습니다.";
+      await updatePendingCatch(userId, pendingId, {
+        status: "failed_retryable",
+        lastError: message,
+      });
+      Alert.alert("기록 복구 실패", message);
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [fishes, fishesLoading, pendingId, router, session?.user.id]);
+
   const retryRecognition = async () => {
     if (!capture || isRecognizing) return;
     await analyzeCapture(capture);
   };
 
   const retakePhoto = () => {
+    if (capture && session?.user.id) {
+      void removePendingCatch(session.user.id, capture.pendingCatchId);
+    }
     setCapture(null);
     setSelectedFish(null);
+    setCustomSpeciesName(null);
     setCompletion(null);
     setRecognitionCandidates([]);
     setRecognitionNote(null);
@@ -280,6 +506,7 @@ const RecordScreen = () => {
     }
 
     try {
+      const previousCapture = capture;
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
         allowsMultipleSelection: false,
@@ -312,7 +539,7 @@ const RecordScreen = () => {
         has_capture_time: Boolean(metadata.capturedAt),
       });
 
-      await analyzeCapture({
+      await preserveAndPrepareCapture({
         uri: optimized.uri,
         width: optimized.width,
         height: optimized.height,
@@ -324,7 +551,15 @@ const RecordScreen = () => {
         locationAccuracyM: null,
         locationCapturedAt: null,
         source: "photo_library",
+        tripId: tripId ?? null,
+        tripName: tripName ?? null,
       });
+      if (previousCapture && session?.user.id) {
+        await removePendingCatch(
+          session.user.id,
+          previousCapture.pendingCatchId,
+        );
+      }
     } catch (error) {
       Alert.alert(
         "사진 불러오기 실패",
@@ -412,7 +647,10 @@ const RecordScreen = () => {
         throw new Error("사진을 전송 가능한 크기로 최적화하지 못했습니다.");
       }
 
-      const nextCapture: Capture = {
+      const nextCapture: Omit<
+        Capture,
+        "pendingCatchId" | "clientRequestId"
+      > = {
         uri: optimized.uri,
         width: optimized.width,
         height: optimized.height,
@@ -426,12 +664,14 @@ const RecordScreen = () => {
           ? new Date(position.timestamp).toISOString()
           : null,
         source: "camera",
+        tripId: tripId ?? null,
+        tripName: tripName ?? null,
       };
       void trackAnalyticsEvent("photo_captured", {
         source: "camera",
         has_position: Boolean(position),
       });
-      await analyzeCapture(nextCapture);
+      await preserveAndPrepareCapture(nextCapture);
     } catch (error) {
       Alert.alert("촬영 실패", error instanceof Error ? error.message : "다시 시도해 주세요.");
     } finally {
@@ -450,16 +690,47 @@ const RecordScreen = () => {
   };
 
   const save = async () => {
-    if (!capture || !selectedFish || isSaving) return;
+    if (
+      !capture ||
+      (!selectedFish && !customSpeciesName) ||
+      isSaving
+    ) return;
     const sizeResult = parseOptionalSize();
     if (!sizeResult.isValid) return;
 
     const selectedCandidate = recognitionCandidates.find(
-      (candidate) => candidate.fishId === selectedFish.id,
+      (candidate) => candidate.fishId === selectedFish?.id,
     );
+    const userId = session?.user.id;
+    if (!userId) {
+      Alert.alert("저장 실패", "로그인이 필요합니다.");
+      return;
+    }
+    const currentPending = await getPendingCatch(
+      userId,
+      capture.pendingCatchId,
+    );
+    await updatePendingCatch(userId, capture.pendingCatchId, {
+      selectedFishId: selectedFish?.id ?? null,
+      customSpeciesName,
+      candidateFishIds: recognitionCandidates.map(
+        (candidate) => candidate.fishId,
+      ),
+      candidates: recognitionCandidates,
+      sizeCm: sizeResult.sizeCm ?? null,
+      memo: memo.trim() || null,
+      status: "pending_upload",
+      attemptCount: (currentPending?.attemptCount ?? 0) + 1,
+      lastError: null,
+      nextRetryAt: null,
+    });
+    await updatePendingCatch(userId, capture.pendingCatchId, {
+      status: "uploading",
+    });
     const result = await createCatch({
-      tripId,
-      fishId: selectedFish.id,
+      tripId: capture.tripId ?? undefined,
+      fishId: selectedFish?.id,
+      customSpeciesName: customSpeciesName ?? undefined,
       imageUri: capture.uri,
       mimeType: capture.mimeType,
       imageWidth: capture.width,
@@ -478,18 +749,25 @@ const RecordScreen = () => {
       candidateFishIds: recognitionCandidates.map(
         (candidate) => candidate.fishId,
       ),
-      idMethod: selectedCandidate
-        ? "closed_set_candidates"
-        : "fallback_catalog",
+      idMethod: selectedFish
+        ? selectedCandidate
+          ? "closed_set_candidates"
+          : "fallback_catalog"
+        : undefined,
       clientRequestId:
-        saveRequestId.current ??
-        `${Date.now()}-${Math.random().toString(36).slice(2, 12)}`,
+        saveRequestId.current ?? capture.clientRequestId,
     });
     if (result.error) {
+      await updatePendingCatch(userId, capture.pendingCatchId, {
+        status: "failed_retryable",
+        lastError: result.error.message,
+        nextRetryAt: new Date(Date.now() + 15_000).toISOString(),
+      });
       Alert.alert("저장 실패", result.error.message);
       return;
     }
-    if (selectedCandidate) {
+    await removePendingCatch(userId, capture.pendingCatchId);
+    if (selectedCandidate && selectedFish) {
       void trackAnalyticsEvent("ai_candidate_confirmed", {
         candidate_rank:
           recognitionCandidates.findIndex(
@@ -500,10 +778,12 @@ const RecordScreen = () => {
     } else {
       void trackAnalyticsEvent("manual_species_confirmed", {
         had_ai_candidates: recognitionCandidates.length > 0,
+        outside_catalog: Boolean(customSpeciesName),
       });
     }
     setCompletion({
       fish: selectedFish,
+      customSpeciesName,
       catchId: result.catchId,
       isFirstDiscovery: result.isFirstDiscovery,
       isDevelopmentTest: false,
@@ -516,25 +796,44 @@ const RecordScreen = () => {
   };
 
   const viewCompletionRecord = () => {
-    if (tripId && !visibleCompletion?.isDevelopmentTest) {
-      router.replace({ pathname: "/trips/[id]", params: { id: tripId } });
-      return;
-    }
-    router.replace("/(tabs)/journal");
+    router.replace({
+      pathname: "/(tabs)/encyclopedia",
+      params: {
+        segment: "cards",
+        ...(visibleCompletion?.catchId
+          ? { catchId: visibleCompletion.catchId }
+          : {}),
+      },
+    });
   };
 
   const viewCompletionEncyclopedia = () => {
-    if (!visibleCompletion) return;
+    if (!visibleCompletion?.fish) return;
     router.replace({
       pathname: "/fishes/[id]",
       params: { id: visibleCompletion.fish.id },
     });
   };
 
+  const recordAnotherCatch = () => {
+    setCompletion(null);
+    setCapture(null);
+    setSelectedFish(null);
+    setCustomSpeciesName(null);
+    setRecognitionCandidates([]);
+    setRecognitionNote(null);
+    setNeedsRetake(false);
+    setRecognitionSlow(false);
+    setSize("");
+    setMemo("");
+    saveRequestId.current = null;
+  };
+
   if (visibleCompletion) {
     return (
       <CatchCompletionView
         fish={visibleCompletion.fish}
+        customSpeciesName={visibleCompletion.customSpeciesName}
         isFirstDiscovery={visibleCompletion.isFirstDiscovery}
         isDevelopmentTest={visibleCompletion.isDevelopmentTest}
         isFileUpload={visibleCompletion.isFileUpload}
@@ -544,6 +843,9 @@ const RecordScreen = () => {
         sizeCm={visibleCompletion.sizeCm}
         onViewRecord={viewCompletionRecord}
         onViewEncyclopedia={viewCompletionEncyclopedia}
+        onRecordAnother={
+          capture?.tripId || tripId ? recordAnotherCatch : undefined
+        }
         onGoHome={() => router.replace("/(tabs)")}
       />
     );
@@ -609,6 +911,19 @@ const RecordScreen = () => {
         >
           <Text className="text-base text-white" style={{ fontFamily: bodyExtraBoldFont }}>
             동의하고 카메라 열기
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          accessibilityRole="button"
+          onPress={beginManualPhotoFlow}
+          className="mt-3 items-center border py-4"
+          style={{ borderColor: FIELD_COLORS.teal }}
+        >
+          <Text
+            className="text-base"
+            style={{ color: FIELD_COLORS.teal, fontFamily: bodyExtraBoldFont }}
+          >
+            AI 없이 기록하기
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -751,11 +1066,7 @@ const RecordScreen = () => {
                 onPress={
                   capture.source === "photo_library"
                     ? pickLibraryPhoto
-                    : () => {
-                        setCapture(null);
-                        setSelectedFish(null);
-                        setCompletion(null);
-                      }
+                    : retakePhoto
                 }
               >
                 <Text className="text-sm font-medium text-slate-600">
@@ -775,8 +1086,9 @@ const RecordScreen = () => {
               className="mt-1 text-sm leading-6"
               style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
             >
-              AI가 도감 60종 안에서 후보를 찾습니다. 추천 결과는 참고용이며
-              최종 선택은 직접 확인해 주세요.
+              {aiConsent === "accepted"
+                ? "AI가 도감 60종 안에서 후보를 찾습니다. 추천 결과는 참고용이며 최종 선택은 직접 확인해 주세요."
+                : "사진은 AI로 전송되지 않습니다. 도감에서 직접 어종을 선택해 주세요."}
             </Text>
             <View
               className="mt-4 border-l-4 bg-white px-4 py-3"
@@ -786,11 +1098,12 @@ const RecordScreen = () => {
                 className="text-xs leading-5"
                 style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
               >
-                AI가 어종을 자동으로 확정하거나 기록하지 않습니다. 후보 또는
-                도감 검색에서 어종을 선택한 뒤 직접 기록해 주세요.
+                {aiConsent === "accepted"
+                  ? "AI가 어종을 자동으로 확정하거나 기록하지 않습니다. 후보 또는 도감 검색에서 어종을 선택한 뒤 직접 기록해 주세요."
+                  : "도감 60종 밖이라면 이름을 직접 입력해 일반 기록으로 남길 수 있습니다."}
               </Text>
             </View>
-            {selectedFish ? (
+            {selectedFish || customSpeciesName ? (
               <View
                 className="mt-4 border p-4"
                 style={{ borderColor: FIELD_COLORS.teal, backgroundColor: "#EAF4F1" }}
@@ -801,13 +1114,15 @@ const RecordScreen = () => {
                       className="text-xl"
                       style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}
                     >
-                      {selectedFish.name_ko ?? selectedFish.name}
+                      {selectedFish?.name_ko ??
+                        selectedFish?.name ??
+                        customSpeciesName}
                     </Text>
                     <Text
                       className="mt-1 text-[10px] uppercase tracking-[1px]"
                       style={{ color: FIELD_COLORS.teal, fontFamily: monoFont }}
                     >
-                      {selectedFish.name}
+                      {selectedFish?.name ?? "OUTSIDE FIELD 60"}
                     </Text>
                   </View>
                   <Text
@@ -820,6 +1135,7 @@ const RecordScreen = () => {
                 <TouchableOpacity
                   onPress={() => {
                     setSelectedFish(null);
+                    setCustomSpeciesName(null);
                     setCompletion(null);
                   }}
                   className="mt-4 self-start border-b pb-1"
@@ -850,6 +1166,23 @@ const RecordScreen = () => {
                       >
                         체형·지느러미·무늬를 도감 60종과 대조합니다.
                       </Text>
+                      {recognitionSlow ? (
+                        <TouchableOpacity
+                          accessibilityRole="button"
+                          onPress={() => setCatalogVisible(true)}
+                          className="mt-3 self-start border-b pb-1"
+                          style={{ borderBottomColor: FIELD_COLORS.teal }}
+                        >
+                          <Text
+                            style={{
+                              color: FIELD_COLORS.teal,
+                              fontFamily: bodyExtraBoldFont,
+                            }}
+                          >
+                            기다리지 않고 직접 찾기
+                          </Text>
+                        </TouchableOpacity>
+                      ) : null}
                     </View>
                   </View>
                 ) : null}
@@ -882,6 +1215,7 @@ const RecordScreen = () => {
                           accessibilityLabel={`${index + 1}순위 후보, ${fish.name_ko ?? fish.name}`}
                           onPress={() => {
                             setSelectedFish(fish);
+                            setCustomSpeciesName(null);
                             setCompletion(null);
                           }}
                           className="mt-3 flex-row border bg-white p-3"
@@ -924,22 +1258,23 @@ const RecordScreen = () => {
                             <Text
                               numberOfLines={2}
                               className="mt-2 text-xs leading-5"
-                              style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
+                              style={{ color: FIELD_COLORS.ink, fontFamily: bodyFont }}
                             >
-                              {candidate.reason}
+                              식별 포인트 · {fish.identification_features ?? "형태와 무늬를 도감 설명과 비교해 주세요."}
                             </Text>
+                            {fish.similar_species_notes ? (
+                              <Text
+                                numberOfLines={2}
+                                className="mt-1 text-xs leading-5"
+                                style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
+                              >
+                                유사종 차이 · {fish.similar_species_notes}
+                              </Text>
+                            ) : null}
                           </View>
                         </TouchableOpacity>
                       );
                     })}
-                    {recognitionNote ? (
-                      <Text
-                        className="mt-3 text-xs leading-5"
-                        style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
-                      >
-                        {recognitionNote}
-                      </Text>
-                    ) : null}
                   </View>
                 ) : null}
 
@@ -1022,8 +1357,30 @@ const RecordScreen = () => {
                 ) : null}
               </>
             )}
-            {selectedFish ? (
+            {selectedFish || customSpeciesName ? (
               <View className="mt-5">
+                {customSpeciesName ? (
+                  <View
+                    className="mb-5 border-l-4 bg-white px-4 py-4"
+                    style={{ borderLeftColor: FIELD_COLORS.orange }}
+                  >
+                    <Text
+                      style={{
+                        color: FIELD_COLORS.ink,
+                        fontFamily: bodyExtraBoldFont,
+                      }}
+                    >
+                      도감 밖 일반 기록
+                    </Text>
+                    <Text
+                      className="mt-1 text-xs leading-5"
+                      style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
+                    >
+                      조과 카드에는 저장되지만 도감 해금·배지·개인 최대어·랭킹에는
+                      반영되지 않습니다.
+                    </Text>
+                  </View>
+                ) : null}
                 {capture.source === "photo_library" ? (
                   <View
                     className="mb-5 border-l-4 bg-white px-4 py-4"
@@ -1076,7 +1433,9 @@ const RecordScreen = () => {
                     <ActivityIndicator color="#fff" />
                   ) : (
                     <Text className="text-center font-semibold text-white">
-                      사용자 확인 후 이 어종으로 기록
+                      {customSpeciesName
+                        ? "도감 밖 일반 기록으로 저장"
+                        : "사용자 확인 후 이 어종으로 기록"}
                     </Text>
                   )}
                 </TouchableOpacity>
@@ -1090,6 +1449,12 @@ const RecordScreen = () => {
         onClose={() => setCatalogVisible(false)}
         onSelect={(fish) => {
           setSelectedFish(fish);
+          setCustomSpeciesName(null);
+          setCompletion(null);
+        }}
+        onSelectCustom={(name) => {
+          setSelectedFish(null);
+          setCustomSpeciesName(name);
           setCompletion(null);
         }}
       />

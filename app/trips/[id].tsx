@@ -27,6 +27,7 @@ import {
   type UpdateTripInput,
 } from "@/src/hooks/useFishingTrips";
 import { useUserCatches, type UserCatch } from "@/src/hooks/useUserCatches";
+import { useFishes } from "@/src/hooks/useFishes";
 import {
   FIELD_COLORS,
   bodyExtraBoldFont,
@@ -83,6 +84,7 @@ const TripDetailScreen = () => {
     updateCatch,
     deleteCatch,
   } = useUserCatches(tripId || undefined);
+  const { fishes } = useFishes(null, "core");
   const trip = trips.find((item) => item.id === tripId);
 
   const refresh = async () => {
@@ -164,7 +166,12 @@ const TripDetailScreen = () => {
 
   const saveCatchEdit = async (
     item: UserCatch,
-    input: { sizeCm: number | null; memo: string | null },
+    input: {
+      sizeCm: number | null;
+      memo: string | null;
+      fishId: string | null;
+      customSpeciesName: string | null;
+    },
   ) => {
     setIsSavingCatch(true);
     const { error } = await updateCatch(item.id, input);
@@ -176,7 +183,7 @@ const TripDetailScreen = () => {
   const confirmCatchDelete = (item: UserCatch) =>
     confirmAction(
       "조과 삭제",
-      `${item.fish?.name_ko ?? item.fish?.name ?? "이 조과"} 기록과 사진을 삭제할까요?`,
+      `${item.fish?.name_ko ?? item.fish?.name ?? item.custom_species_name ?? "이 조과"} 기록과 사진을 삭제할까요?`,
       "삭제",
       () => deleteCatch(item),
       undefined,
@@ -501,6 +508,7 @@ const TripDetailScreen = () => {
                         >
                           {item.fish?.name_ko ??
                             item.fish?.name ??
+                            item.custom_species_name ??
                             "어종 미확인"}
                         </Text>
                         <Text
@@ -635,6 +643,7 @@ const TripDetailScreen = () => {
       />
       <CatchEditModal
         item={editingCatch}
+        fishes={fishes}
         isSaving={isSavingCatch}
         onClose={() => setEditingCatch(null)}
         onSave={saveCatchEdit}

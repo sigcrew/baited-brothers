@@ -1,5 +1,11 @@
 import MapView, { Marker, type Region } from "react-native-maps";
-import { Platform, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Platform,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { MapPointMarker } from "./MapPointMarker";
@@ -18,6 +24,8 @@ const KOREA_REGION: Region = {
   latitudeDelta: 4.8,
   longitudeDelta: 4.2,
 };
+
+const MAP_LOAD_TIMEOUT_MS = 12_000;
 
 const isInKoreaScope = (latitude: number, longitude: number) =>
   latitude >= 32.5 && latitude <= 39.0 && longitude >= 124.0 && longitude <= 132.5;
@@ -51,6 +59,8 @@ export const FishingMap = ({
 }: FishingMapProps) => {
   const mapRef = useRef<MapView>(null);
   const lastMarkerPressAtRef = useRef(0);
+  const [mapAttempt, setMapAttempt] = useState(0);
+  const [mapLoadState, setMapLoadState] = useState<"loading" | "ready" | "error">("loading");
   const first = points[0];
   const initialRegion: Region = first && isInKoreaScope(first.latitude, first.longitude)
     ? {
@@ -76,6 +86,14 @@ export const FishingMap = ({
   );
 
   useEffect(() => {
+    setMapLoadState("loading");
+    const timeout = setTimeout(() => {
+      setMapLoadState((current) => current === "loading" ? "error" : current);
+    }, MAP_LOAD_TIMEOUT_MS);
+    return () => clearTimeout(timeout);
+  }, [mapAttempt]);
+
+  useEffect(() => {
     if (!focusPointId) return;
     const point = points.find((item) => item.id === focusPointId);
     if (!point) return;
@@ -89,7 +107,7 @@ export const FishingMap = ({
       latitudeDelta,
       longitudeDelta,
     }, 320);
-  }, [focusLatitudeDelta, focusPointId]);
+  }, [focusLatitudeDelta, focusPointId, mapAttempt]);
 
   const zoomIntoCluster = (cluster: MapPointCluster<(typeof points)[number]>) => {
     const latitudes = cluster.points.map((point) => point.latitude);
@@ -123,28 +141,31 @@ export const FishingMap = ({
   };
 
   return (
-    <MapView
-      ref={mapRef}
-      accessibilityLabel="나의 조과 위치 지도"
-      accessibilityRole="button"
-      initialRegion={initialRegion}
-      mapType={Platform.OS === "ios" ? "mutedStandard" : "standard"}
-      rotateEnabled={false}
-      pitchEnabled={false}
-      minZoomLevel={5}
-      maxZoomLevel={18}
-      showsCompass={false}
-      showsUserLocation={false}
-      onPress={(event) => {
-        if (
-          event.nativeEvent.action === "marker-press" ||
-          Date.now() - lastMarkerPressAtRef.current < 500
-        ) return;
-        onSelectCoordinate(event.nativeEvent.coordinate);
-      }}
-      onRegionChangeComplete={setRegion}
-      style={{ flex: 1 }}
-    >
+    <View className="flex-1" style={{ backgroundColor: FIELD_COLORS.foam }}>
+      <MapView
+        key={`fishing-map-${mapAttempt}`}
+        ref={mapRef}
+        accessibilityLabel="나의 조과 위치 지도"
+        accessibilityRole="button"
+        initialRegion={initialRegion}
+        mapType={Platform.OS === "ios" ? "mutedStandard" : "standard"}
+        rotateEnabled={false}
+        pitchEnabled={false}
+        minZoomLevel={5}
+        maxZoomLevel={18}
+        showsCompass={false}
+        showsUserLocation={false}
+        onMapLoaded={() => setMapLoadState("ready")}
+        onPress={(event) => {
+          if (
+            event.nativeEvent.action === "marker-press" ||
+            Date.now() - lastMarkerPressAtRef.current < 500
+          ) return;
+          onSelectCoordinate(event.nativeEvent.coordinate);
+        }}
+        onRegionChangeComplete={setRegion}
+        style={{ flex: 1 }}
+      >
       {standalonePoints.map((point) => (
         <Marker
           key={`standalone:${point.id}`}
@@ -240,6 +261,57 @@ export const FishingMap = ({
           </Marker>
         );
       })}
-    </MapView>
+      </MapView>
+
+      {mapLoadState === "loading" ? (
+        <View
+          pointerEvents="none"
+          className="absolute inset-0 items-center justify-center"
+          style={{ backgroundColor: "rgba(246,248,246,0.9)" }}
+        >
+          <ActivityIndicator size="small" color={FIELD_COLORS.teal} />
+          <Text
+            className="mt-3 text-[12px]"
+            style={{ color: FIELD_COLORS.muted, fontFamily: bodyExtraBoldFont }}
+          >
+            지도를 불러오는 중입니다
+          </Text>
+        </View>
+      ) : null}
+
+      {mapLoadState === "error" ? (
+        <View
+          className="absolute inset-0 items-center justify-center px-8"
+          style={{ backgroundColor: "rgba(246,248,246,0.96)" }}
+        >
+          <Text
+            className="text-center text-lg"
+            style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}
+          >
+            지도를 불러오지 못했습니다
+          </Text>
+          <Text
+            className="mt-2 text-center text-[12px] leading-5"
+            style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}
+          >
+            네트워크 연결을 확인한 뒤 다시 시도해 주세요.
+          </Text>
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="지도 다시 불러오기"
+            onPress={() => setMapAttempt((current) => current + 1)}
+            className="mt-5 border px-5 py-3"
+            style={{ borderColor: FIELD_COLORS.teal, backgroundColor: "#FFFFFF" }}
+          >
+            <Text
+              className="text-[13px]"
+              style={{ color: FIELD_COLORS.teal, fontFamily: bodyExtraBoldFont }}
+            >
+              다시 시도
+            </Text>
+          </TouchableOpacity>
+        </View>
+      ) : null}
+    </View>
   );
 };

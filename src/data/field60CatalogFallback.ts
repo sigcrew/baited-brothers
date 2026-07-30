@@ -1,4 +1,5 @@
 import type { Fish } from "@/src/hooks/useFishes";
+import { FIELD_60_IDENTIFICATION_GUIDES } from "@/src/data/field60IdentificationGuides";
 
 type CatalogSeed = [
   id: string,
@@ -79,7 +80,9 @@ const categoryFor = (group: string): Fish["category"] => {
 };
 
 export const FIELD_60_FALLBACK_FISHES: Fish[] = SEEDS.map(
-  ([id, name, name_ko, collection_group], index) => ({
+  ([id, name, name_ko, collection_group], index) => {
+    const guide = FIELD_60_IDENTIFICATION_GUIDES[name_ko];
+    return {
     id,
     name,
     name_ko,
@@ -97,11 +100,11 @@ export const FIELD_60_FALLBACK_FISHES: Fish[] = SEEDS.map(
     fishing_methods: [],
     guide_reviewed_at: null,
     guide_source_urls: [],
-    guide_status: "fallback",
+    guide_status: guide ? "draft" : "fallback",
     habitat_environment: null,
     habitat_regions: [],
     handling_cautions: null,
-    identification_features: null,
+    identification_features: guide?.[0] ?? null,
     image_attribution: null,
     image_license: null,
     image_source_url: null,
@@ -113,10 +116,11 @@ export const FIELD_60_FALLBACK_FISHES: Fish[] = SEEDS.map(
     rarity: null,
     recommended_baits: [],
     scientific_synonyms: [],
-    similar_species_notes: null,
+    similar_species_notes: guide?.[1] ?? null,
     source_name: null,
     source_species_id: null,
     toxicity: null,
     updated_at: null,
-  }),
+    };
+  },
 );

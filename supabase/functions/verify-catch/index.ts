@@ -9,6 +9,8 @@ type VerificationStatus =
 type CatchRow = {
   id: string;
   user_id: string;
+  fish_id: string | null;
+  species_corrected_at: string | null;
   capture_method: "live_camera" | "photo_library" | "development_upload" | null;
   image_path: string | null;
   captured_at: string | null;
@@ -46,6 +48,9 @@ const sha256 = async (value: ArrayBuffer) => {
 const decideStatus = (
   row: CatchRow,
 ): { status: VerificationStatus; reason: string | null } => {
+  if (!row.fish_id) {
+    return { status: "general_record", reason: "species_outside_catalog" };
+  }
   if (row.capture_method === "development_upload") {
     return { status: "general_record", reason: "development_upload" };
   }
@@ -143,7 +148,7 @@ Deno.serve(async (request) => {
     const { data, error: catchError } = await adminClient
       .from("user_catches")
       .select(
-        "id, user_id, capture_method, image_path, captured_at, location_lat, location_lng, location_accuracy_m, location_captured_at",
+        "id, user_id, fish_id, species_corrected_at, capture_method, image_path, captured_at, location_lat, location_lng, location_accuracy_m, location_captured_at",
       )
       .eq("id", catchId)
       .eq("user_id", user.id)
@@ -206,15 +211,22 @@ Deno.serve(async (request) => {
     }
     if (updateError) throw updateError;
 
+    const collectionEligible =
+      Boolean(row.fish_id) && decision.status !== "general_record";
+    const rankingEligible =
+      Boolean(row.fish_id) &&
+      row.species_corrected_at == null &&
+      decision.status === "field_verified";
+
     return json({
       catchId: row.id,
       status: decision.status,
       reason: decision.reason,
       rewards: {
-        collection: decision.status !== "general_record",
-        badges: decision.status !== "general_record",
-        personalBest: decision.status !== "general_record",
-        ranking: decision.status === "field_verified",
+        collection: collectionEligible,
+        badges: collectionEligible,
+        personalBest: collectionEligible,
+        ranking: rankingEligible,
       },
     });
   } catch (error) {

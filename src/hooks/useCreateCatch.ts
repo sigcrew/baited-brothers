@@ -16,7 +16,8 @@ import {
 
 type CreateCatchInput = {
   tripId?: string;
-  fishId: string;
+  fishId?: string;
+  customSpeciesName?: string;
   imageUri: string;
   mimeType: "image/jpeg" | "image/png";
   imageWidth: number;
@@ -97,6 +98,10 @@ export const useCreateCatch = () => {
     });
 
     try {
+      const customSpeciesName = input.customSpeciesName?.trim() || null;
+      if (Boolean(input.fishId) === Boolean(customSpeciesName)) {
+        throw new Error("도감 어종 또는 도감 밖 어종 이름 중 하나를 선택해 주세요.");
+      }
       const { data: discoveryRows, error: discoveryError } = await supabase
         .from("user_catches")
         .select("fish_id")
@@ -108,7 +113,9 @@ export const useCreateCatch = () => {
         ]);
       if (discoveryError) throw discoveryError;
       const discoveredFishIds = new Set(
-        (discoveryRows ?? []).map((row) => row.fish_id),
+        (discoveryRows ?? [])
+          .map((row) => row.fish_id)
+          .filter((fishId): fishId is string => Boolean(fishId)),
       );
       saveStage = "photo_upload";
       const uploaded = await withTimeout(
@@ -130,7 +137,8 @@ export const useCreateCatch = () => {
       const payload: TablesInsert<"user_catches"> = {
         user_id: userId,
         trip_id: input.tripId ?? null,
-        fish_id: input.fishId,
+        fish_id: input.fishId ?? null,
+        custom_species_name: customSpeciesName,
         image_url: null,
         image_path: uploaded.imagePath,
         thumbnail_path: uploaded.thumbnailPath,
@@ -143,7 +151,9 @@ export const useCreateCatch = () => {
         size_cm: input.sizeCm ?? null,
         memo: input.memo?.trim() || null,
         capture_method: input.captureMethod ?? "live_camera",
-        id_method: input.idMethod ?? "fallback_catalog",
+        id_method: input.fishId
+          ? input.idMethod ?? "fallback_catalog"
+          : null,
         candidate_fish_ids: input.candidateFishIds ?? [],
         verification_status: "pending",
         verification_reason: null,
@@ -193,13 +203,21 @@ export const useCreateCatch = () => {
       const {
         status: verificationStatus,
         reason: verificationReason,
-      } = await verifySavedCatch(insertedCatch.id);
+      } = input.fishId
+        ? await verifySavedCatch(insertedCatch.id)
+        : {
+            status: "general_record" as const,
+            reason: "species_outside_catalog",
+          };
       const isVerified = countsForCollectionRewards(verificationStatus);
       const isFirstDiscovery =
-        isVerified && !discoveredFishIds.has(input.fishId);
+        Boolean(input.fishId) &&
+        isVerified &&
+        !discoveredFishIds.has(input.fishId!);
 
       void trackAnalyticsEvent("catch_created", {
         id_method: payload.id_method ?? "unknown",
+        species_source: input.fishId ? "field_60" : "outside_catalog",
         capture_method: payload.capture_method ?? "unknown",
         verified: isVerified,
         first_discovery: isFirstDiscovery,

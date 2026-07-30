@@ -30,6 +30,7 @@ type FishCatalogSheetProps = {
   visible: boolean;
   onClose: () => void;
   onSelect: (fish: Fish) => void;
+  onSelectCustom?: (name: string) => void;
 };
 
 export const FishCatalogSheet = ({
@@ -38,6 +39,7 @@ export const FishCatalogSheet = ({
   visible,
   onClose,
   onSelect,
+  onSelectCustom,
 }: FishCatalogSheetProps) => {
   const [query, setQuery] = useState("");
   const insets = useSafeAreaInsets();
@@ -181,6 +183,36 @@ export const FishCatalogSheet = ({
                     다른 이름이나 학명으로 찾아보세요.
                   </Text>
                 </View>
+              }
+              ListFooterComponent={
+                onSelectCustom && query.trim() ? (
+                  <TouchableOpacity
+                    accessibilityRole="button"
+                    accessibilityLabel={`${query.trim()}을 도감 밖 어종으로 기록`}
+                    onPress={() => {
+                      onSelectCustom(query.trim());
+                      onClose();
+                    }}
+                    className="mt-3 border-l-4 bg-white px-4 py-4"
+                    style={{ borderLeftColor: FIELD_COLORS.orange }}
+                  >
+                    <Text
+                      style={{
+                        color: FIELD_COLORS.ink,
+                        fontFamily: bodyExtraBoldFont,
+                      }}
+                    >
+                      ‘{query.trim()}’ 도감 밖 어종으로 기록
+                    </Text>
+                    <Text
+                      className="mt-1 text-xs leading-5"
+                      style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
+                    >
+                      일반 조과 카드에는 남지만 도감 해금과 랭킹에는
+                      반영되지 않습니다.
+                    </Text>
+                  </TouchableOpacity>
+                ) : null
               }
             />
           </View>

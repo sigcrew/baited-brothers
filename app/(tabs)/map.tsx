@@ -64,6 +64,9 @@ const isKoreaCoordinate = (latitude: number, longitude: number) =>
   latitude >= 32.5 && latitude <= 39.0 && longitude >= 124.0 && longitude <= 132.5;
 
 const INFO_SHEET_SNAP_POINTS = ["24%", "42%", "72%"];
+const MAP_HEADER_HEIGHT = 50;
+const MAP_FILTER_ROW_HEIGHT = 36;
+const MAP_FAVORITE_ROW_HEIGHT = 32;
 
 const radians = (value: number) => (value * Math.PI) / 180;
 
@@ -201,12 +204,20 @@ export default function MapScreen() {
         kind: "catch",
         latitude,
         longitude,
-        name: item.location_name?.trim() || item.fish?.name_ko || "조과 기록",
+        name:
+          item.location_name?.trim() ||
+          item.fish?.name_ko ||
+          item.custom_species_name ||
+          "조과 기록",
         shouldReverseGeocode: !item.location_name?.trim(),
-        fishId: item.fish_id,
+        fishId: item.fish_id ?? undefined,
         recordId: item.id,
         recordedAt: item.caught_at,
-        detailName: item.fish?.name_ko || item.fish?.name || "어종 미확인",
+        detailName:
+          item.fish?.name_ko ||
+          item.fish?.name ||
+          item.custom_species_name ||
+          "어종 미확인",
       }];
     });
     const tripEntries = trips.flatMap((trip): MapEntry[] => {
@@ -587,6 +598,15 @@ export default function MapScreen() {
     longitude: selected.longitude,
   } : null;
   const isInitialLoading = catchesLoading || tripsLoading;
+  const hasFavoriteRow = favoriteSpots.length > 0 || favoritesLoading;
+  const emptyStateTop =
+    insets.top +
+    10 +
+    MAP_HEADER_HEIGHT +
+    8 +
+    MAP_FILTER_ROW_HEIGHT +
+    (hasFavoriteRow ? 8 + MAP_FAVORITE_ROW_HEIGHT : 0) +
+    12;
 
   return (
     <View className="flex-1" style={{ backgroundColor: FIELD_COLORS.foam }}>
@@ -611,7 +631,7 @@ export default function MapScreen() {
             className="min-w-0 flex-1 flex-row items-center rounded-full border bg-white px-4"
             style={{
               borderColor: FIELD_COLORS.rule,
-              height: 46,
+              height: MAP_HEADER_HEIGHT,
               shadowColor: FIELD_COLORS.ink,
               shadowOffset: { width: 0, height: 3 },
               shadowOpacity: 0.14,
@@ -624,14 +644,24 @@ export default function MapScreen() {
               <Text
                 numberOfLines={1}
                 className="text-[13px]"
-                style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}
+                style={{
+                  color: FIELD_COLORS.ink,
+                  fontFamily: bodyExtraBoldFont,
+                  includeFontPadding: false,
+                  lineHeight: 18,
+                }}
               >
                 {placeName || (isInitialLoading ? "기록 위치를 불러오는 중" : "나의 바다")}
               </Text>
               <Text
                 numberOfLines={1}
                 className="text-[8px] tracking-[1px]"
-                style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}
+                style={{
+                  color: FIELD_COLORS.muted,
+                  fontFamily: monoFont,
+                  includeFontPadding: false,
+                  lineHeight: 11,
+                }}
               >
                 PRIVATE FISHING MAP
               </Text>
@@ -643,9 +673,11 @@ export default function MapScreen() {
             accessibilityLabel="현재 위치로 이동"
             onPress={locateMe}
             disabled={isLocating}
-            className="h-[46px] w-[46px] items-center justify-center rounded-full border bg-white"
+            className="items-center justify-center rounded-full border bg-white"
             style={{
               borderColor: FIELD_COLORS.rule,
+              height: MAP_HEADER_HEIGHT,
+              width: MAP_HEADER_HEIGHT,
               shadowColor: FIELD_COLORS.ink,
               shadowOffset: { width: 0, height: 3 },
               shadowOpacity: 0.14,
@@ -663,7 +695,7 @@ export default function MapScreen() {
           horizontal
           showsHorizontalScrollIndicator={false}
           className="mt-2"
-          contentContainerStyle={{ gap: 8, paddingHorizontal: 16 }}
+          contentContainerStyle={{ gap: 10, paddingHorizontal: 16 }}
         >
           {MAP_FILTERS.map((filter) => {
             const active = activeFilter === filter.key;
@@ -674,10 +706,11 @@ export default function MapScreen() {
                 accessibilityState={{ selected: active }}
                 accessibilityLabel={`${filter.label} 지도 필터 ${filterCounts[filter.key]}곳`}
                 onPress={() => setActiveFilter(filter.key)}
-                className="flex-row items-center rounded-full border px-3 py-2"
+                className="flex-row items-center rounded-full border px-3.5"
                 style={{
                   borderColor: active ? FIELD_COLORS.teal : FIELD_COLORS.rule,
                   backgroundColor: active ? FIELD_COLORS.teal : "rgba(255,255,255,0.96)",
+                  height: MAP_FILTER_ROW_HEIGHT,
                   shadowColor: FIELD_COLORS.ink,
                   shadowOffset: { width: 0, height: 2 },
                   shadowOpacity: 0.1,
@@ -685,10 +718,33 @@ export default function MapScreen() {
                   elevation: 3,
                 }}
               >
-                <Text className="text-[11px]" style={{ color: active ? "#FFFFFF" : FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>
+                <Text
+                  className="text-[11px]"
+                  style={{
+                    color: active ? "#FFFFFF" : FIELD_COLORS.ink,
+                    fontFamily: bodyExtraBoldFont,
+                    includeFontPadding: false,
+                    lineHeight: 16,
+                  }}
+                >
                   {filter.label}
                 </Text>
-                <Text className="ml-1.5 text-[9px]" style={{ color: active ? "#FFFFFF" : FIELD_COLORS.muted, fontFamily: monoFont }}>
+                <Text
+                  className="text-[9px]"
+                  style={{
+                    backgroundColor: active ? "rgba(255,255,255,0.18)" : FIELD_COLORS.foam,
+                    borderRadius: 10,
+                    color: active ? "#FFFFFF" : FIELD_COLORS.muted,
+                    fontFamily: monoFont,
+                    height: 20,
+                    includeFontPadding: false,
+                    lineHeight: 20,
+                    marginLeft: 8,
+                    minWidth: 20,
+                    paddingHorizontal: 5,
+                    textAlign: "center",
+                  }}
+                >
                   {filterCounts[filter.key]}
                 </Text>
               </TouchableOpacity>
@@ -696,7 +752,7 @@ export default function MapScreen() {
           })}
         </ScrollView>
 
-        {favoriteSpots.length > 0 || favoritesLoading ? (
+        {hasFavoriteRow ? (
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -748,7 +804,7 @@ export default function MapScreen() {
           className="absolute inset-x-5 rounded-2xl border bg-white px-5 py-4"
           style={{
             borderColor: FIELD_COLORS.rule,
-            top: insets.top + (favoriteSpots.length > 0 || favoritesLoading ? 154 : 112),
+            top: emptyStateTop,
           }}
         >
             <Text className="text-xl" style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>

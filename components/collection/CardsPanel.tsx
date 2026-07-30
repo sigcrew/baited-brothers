@@ -31,6 +31,7 @@ type CardsPanelProps = {
   onLoginPress?: () => void;
   requestedCatchId?: string;
   onRequestedCatchOpened?: () => void;
+  onEditCatch?: (item: UserCatch) => void;
 };
 
 const CatchCardTile = ({
@@ -44,7 +45,7 @@ const CatchCardTile = ({
     onPress={onPress}
     activeOpacity={0.84}
     accessibilityRole="button"
-    accessibilityLabel={`${item.fish?.name_ko ?? item.fish?.name ?? "어종"} 조과 카드 열기`}
+    accessibilityLabel={`${item.fish?.name_ko ?? item.fish?.name ?? item.custom_species_name ?? "어종"} 조과 카드 열기`}
     className="mb-5"
     style={{ width: "48%" }}
   >
@@ -57,11 +58,13 @@ const CatchDetailModal = ({
   visible,
   onClose,
   onLocationPress,
+  onEdit,
 }: {
   item: UserCatch | null;
   visible: boolean;
   onClose: () => void;
   onLocationPress: (item: UserCatch) => void;
+  onEdit?: (item: UserCatch) => void;
 }) => {
   const insets = useSafeAreaInsets();
   if (!item) return null;
@@ -110,6 +113,32 @@ const CatchDetailModal = ({
             }
           />
         </Pressable>
+        {onEdit ? (
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="조과 기록 수정"
+            onPress={() => {
+              onClose();
+              onEdit(item);
+            }}
+            className="items-center border-t py-4"
+            style={{
+              width: "100%",
+              maxWidth: 430,
+              borderColor: FIELD_COLORS.rule,
+              backgroundColor: FIELD_COLORS.foam,
+            }}
+          >
+            <Text
+              style={{
+                color: FIELD_COLORS.teal,
+                fontFamily: bodyExtraBoldFont,
+              }}
+            >
+              어종·크기·메모 수정
+            </Text>
+          </TouchableOpacity>
+        ) : null}
       </View>
     </Modal>
   );
@@ -125,6 +154,7 @@ export const CardsPanel = ({
   onLoginPress,
   requestedCatchId,
   onRequestedCatchOpened,
+  onEditCatch,
 }: CardsPanelProps) => {
   const router = useRouter();
   const [selected, setSelected] = useState<UserCatch | null>(null);
@@ -244,6 +274,7 @@ export const CardsPanel = ({
             params: { focusId: `catch:${item.id}` },
           });
         }}
+        onEdit={onEditCatch}
       />
     </>
   );

@@ -186,7 +186,7 @@ export type BadgeUnlockContext = {
 
 type BadgeCatchInput = {
   caught_at: string;
-  fish_id: string;
+  fish_id: string | null;
   size_cm: number | null;
   trip_id: string | null;
   verification_status: string | null;
@@ -208,7 +208,10 @@ const getSpeciesMilestoneDate = (
 ) => {
   const species = new Set<string>();
   for (const item of catches) {
-    if (!countsForCollectionRewards(item.verification_status)) continue;
+    if (
+      !item.fish_id ||
+      !countsForCollectionRewards(item.verification_status)
+    ) continue;
     species.add(item.fish_id);
     if (species.size >= target) return item.caught_at;
   }
