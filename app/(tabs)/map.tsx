@@ -695,7 +695,7 @@ export default function MapScreen() {
           horizontal
           showsHorizontalScrollIndicator={false}
           className="mt-2"
-          contentContainerStyle={{ gap: 10, paddingHorizontal: 16 }}
+          contentContainerStyle={{ gap: 6, paddingHorizontal: 16 }}
         >
           {MAP_FILTERS.map((filter) => {
             const active = activeFilter === filter.key;
