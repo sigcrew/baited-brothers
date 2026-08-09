@@ -1,5 +1,6 @@
 import { Redirect } from "expo-router";
 import { Tabs } from "expo-router";
+import { Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ArchiveTabIcon } from "@/components/navigation/ArchiveTabIcon";
@@ -9,8 +10,11 @@ import { FIELD_COLORS, bodySemiBoldFont } from "@/src/theme/fieldJournal";
 const TabLayout = () => {
   const { session } = useAuth();
   const insets = useSafeAreaInsets();
-  const tabBarHeight = 84 + insets.bottom;
-  const tabBarPaddingBottom = 8 + insets.bottom;
+  const isAndroid = Platform.OS === "android";
+  const tabBarHeight = (isAndroid ? 72 : 64) + insets.bottom;
+  const tabBarPadding = 6;
+  const tabBarPaddingBottom = tabBarPadding + insets.bottom;
+  const tabBarIconMarginBottom = 3;
 
   if (!__DEV__ && !session) {
     return <Redirect href="/(auth)/login" />;
@@ -27,10 +31,10 @@ const TabLayout = () => {
           borderTopColor: FIELD_COLORS.rule,
           borderTopWidth: 1,
           height: tabBarHeight,
-          paddingTop: 8,
+          paddingTop: tabBarPadding,
           paddingBottom: tabBarPaddingBottom,
         },
-        tabBarIconStyle: { marginTop: 1, marginBottom: 6 },
+        tabBarIconStyle: { marginTop: 1, marginBottom: tabBarIconMarginBottom },
         tabBarLabelStyle: {
           fontSize: 12,
           lineHeight: 16,
@@ -62,7 +66,7 @@ const TabLayout = () => {
             borderTopColor: FIELD_COLORS.rule,
             borderTopWidth: 1,
             height: tabBarHeight,
-            paddingTop: 8,
+            paddingTop: tabBarPadding,
             paddingBottom: tabBarPaddingBottom,
           },
           tabBarIcon: ({ color, focused }) => <ArchiveTabIcon name="map" color={color} focused={focused} />,

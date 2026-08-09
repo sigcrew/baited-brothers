@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <style>
+    __FONT_FACE__
+    .brand {
+      font-family: "BaitedStampMono";
+      font-weight: 700;
+      fill: __INK__;
+      text-anchor: middle;
+    }
+    .status {
+      font-family: "BaitedStampKorean";
+      font-weight: 900;
+      fill: __INK__;
+      text-anchor: middle;
+    }
+  </style>
+
+  <circle cx="256" cy="256" r="226" fill="none" stroke="__INK__" stroke-width="18" />
+  <circle cx="256" cy="256" r="202" fill="none" stroke="__INK__" stroke-width="6" />
+
+  <path d="M 143 215 A 120 120 0 0 1 369 215" fill="none" stroke="__INK__" stroke-width="7" stroke-linecap="round" />
+  <path d="M 143 297 A 120 120 0 0 0 369 297" fill="none" stroke="__INK__" stroke-width="7" stroke-linecap="round" />
+
+  <path d="M 82 256 l 13 -9 l 13 9 l -13 9 z" fill="__INK__" />
+  <path d="M 404 256 l 13 -9 l 13 9 l -13 9 z" fill="__INK__" />
+
+  <g class="brand" font-size="34">
+    <text x="122" y="162" transform="rotate(-36 122 162)">B</text>
+    <text x="168" y="118" transform="rotate(-23 168 118)">A</text>
+    <text x="226" y="94" transform="rotate(-8 226 94)">I</text>
+    <text x="286" y="94" transform="rotate(8 286 94)">T</text>
+    <text x="344" y="118" transform="rotate(23 344 118)">E</text>
+    <text x="390" y="162" transform="rotate(36 390 162)">D</text>
+  </g>
+
+  <g class="brand" font-size="30">
+    <text x="120" y="362" transform="rotate(32 120 362)">B</text>
+    <text x="156" y="403" transform="rotate(22 156 403)">R</text>
+    <text x="198" y="430" transform="rotate(13 198 430)">O</text>
+    <text x="236" y="442" transform="rotate(5 236 442)">T</text>
+    <text x="276" y="442" transform="rotate(-5 276 442)">H</text>
+    <text x="314" y="430" transform="rotate(-13 314 430)">E</text>
+    <text x="356" y="403" transform="rotate(-22 356 403)">R</text>
+    <text x="392" y="362" transform="rotate(-32 392 362)">S</text>
+  </g>
+
+  <text class="status" x="256" y="280" font-size="__LABEL_SIZE__">__LABEL__</text>
+</svg>

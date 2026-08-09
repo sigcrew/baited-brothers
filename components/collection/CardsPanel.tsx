@@ -67,6 +67,12 @@ const CatchDetailModal = ({
   onEdit?: (item: UserCatch) => void;
 }) => {
   const insets = useSafeAreaInsets();
+  const [actionMenuVisible, setActionMenuVisible] = useState(false);
+
+  useEffect(() => {
+    if (!visible) setActionMenuVisible(false);
+  }, [visible]);
+
   if (!item) return null;
 
   return (
@@ -76,7 +82,9 @@ const CatchDetailModal = ({
       statusBarTranslucent
       animationType="fade"
       presentationStyle="overFullScreen"
-      onRequestClose={onClose}
+      onRequestClose={
+        actionMenuVisible ? () => setActionMenuVisible(false) : onClose
+      }
     >
       <View
         className="flex-1 items-center justify-center px-4"
@@ -111,33 +119,76 @@ const CatchDetailModal = ({
                 ? () => onLocationPress(item)
                 : undefined
             }
+            onMorePress={
+              onEdit ? () => setActionMenuVisible(true) : undefined
+            }
           />
         </Pressable>
-        {onEdit ? (
-          <TouchableOpacity
-            accessibilityRole="button"
-            accessibilityLabel="조과 기록 수정"
-            onPress={() => {
-              onClose();
-              onEdit(item);
-            }}
-            className="items-center border-t py-4"
-            style={{
-              width: "100%",
-              maxWidth: 430,
-              borderColor: FIELD_COLORS.rule,
-              backgroundColor: FIELD_COLORS.foam,
-            }}
-          >
-            <Text
+        {actionMenuVisible && onEdit ? (
+          <>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="조과 카드 메뉴 닫기"
+              onPress={() => setActionMenuVisible(false)}
               style={{
-                color: FIELD_COLORS.teal,
-                fontFamily: bodyExtraBoldFont,
+                position: "absolute",
+                inset: 0,
+                backgroundColor: "rgba(5, 28, 35, 0.38)",
+              }}
+            />
+            <View
+              className="absolute bottom-0 left-0 right-0 border-t bg-white px-6 pt-3"
+              style={{
+                borderColor: FIELD_COLORS.rule,
+                paddingBottom: Math.max(insets.bottom + 8, 20),
               }}
             >
-              어종·크기·메모 수정
-            </Text>
-          </TouchableOpacity>
+              <View
+                className="mb-3 h-1 w-10 self-center"
+                style={{ backgroundColor: FIELD_COLORS.rule }}
+              />
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="조과 기록 수정"
+                onPress={() => {
+                  setActionMenuVisible(false);
+                  onEdit(item);
+                }}
+                className="h-14 flex-row items-center border px-5"
+                style={{ borderColor: FIELD_COLORS.rule }}
+              >
+                <FontAwesome
+                  name="pencil"
+                  size={17}
+                  color={FIELD_COLORS.teal}
+                />
+                <Text
+                  className="ml-4"
+                  style={{
+                    color: FIELD_COLORS.ink,
+                    fontFamily: bodyExtraBoldFont,
+                  }}
+                >
+                  기록 수정
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="조과 카드 메뉴 취소"
+                onPress={() => setActionMenuVisible(false)}
+                className="mt-3 h-12 items-center justify-center"
+              >
+                <Text
+                  style={{
+                    color: FIELD_COLORS.muted,
+                    fontFamily: bodyExtraBoldFont,
+                  }}
+                >
+                  취소
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </>
         ) : null}
       </View>
     </Modal>
@@ -181,6 +232,12 @@ export const CardsPanel = ({
     void trackAnalyticsEvent("catch_card_opened", { source: "linked" });
     onRequestedCatchOpened?.();
   }, [catches, onRequestedCatchOpened, requestedCatchId]);
+
+  useEffect(() => {
+    if (!selected) return;
+    const updatedCatch = catches.find((item) => item.id === selected.id);
+    if (updatedCatch) setSelected(updatedCatch);
+  }, [catches, selected?.id]);
 
   if (!isLoggedIn) {
     return (

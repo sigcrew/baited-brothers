@@ -3,7 +3,6 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Platform,
   Text,
   TextInput,
@@ -13,6 +12,7 @@ import {
 
 import { SettingsScaffold } from "@/components/settings/SettingsScaffold";
 import { useAuth } from "@/src/contexts/AuthContext";
+import { useFieldNotice } from "@/src/contexts/FieldNoticeContext";
 import { supabase } from "@/src/lib/supabase";
 import {
   FIELD_COLORS,
@@ -34,19 +34,22 @@ export default function FeedbackScreen() {
   const [category, setCategory] =
     useState<(typeof CATEGORIES)[number]["key"]>("identification");
   const [message, setMessage] = useState("");
+  const [messageError, setMessageError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { alert } = useFieldNotice();
 
   const submit = async () => {
     const userId = session?.user.id;
     const normalizedMessage = message.trim();
     if (!userId) {
-      Alert.alert("로그인 필요", "문제 신고는 로그인 후 보낼 수 있습니다.");
+      await alert({ eyebrow: "PRIVATE FEEDBACK · LOGIN", title: "로그인이 필요합니다", message: "문제 신고는 로그인 후 보낼 수 있습니다." });
       return;
     }
     if (!normalizedMessage) {
-      Alert.alert("내용 확인", "겪은 문제를 간단히 적어 주세요.");
+      setMessageError("겪은 문제를 간단히 적어 주세요.");
       return;
     }
+    setMessageError(null);
 
     setIsSubmitting(true);
     const { error } = await supabase.from("user_feedback").insert({
@@ -63,12 +66,11 @@ export default function FeedbackScreen() {
     setIsSubmitting(false);
 
     if (error) {
-      Alert.alert("전송 실패", "잠시 후 다시 시도해 주세요.");
+      await alert({ eyebrow: "PRIVATE FEEDBACK · ERROR", title: "전송하지 못했습니다", message: "잠시 후 다시 시도해 주세요." });
       return;
     }
-    Alert.alert("신고 접수", "보내주신 내용은 제품 개선에만 사용합니다.", [
-      { text: "확인", onPress: () => router.back() },
-    ]);
+    await alert({ eyebrow: "PRIVATE FEEDBACK · RECEIVED", title: "신고를 접수했습니다", message: "보내주신 내용은 제품 개선에만 사용합니다." });
+    router.back();
   };
 
   return (
@@ -122,22 +124,38 @@ export default function FeedbackScreen() {
         >
           문제 내용
         </Text>
-        <TextInput
-          accessibilityLabel="문제 신고 내용"
-          value={message}
-          onChangeText={setMessage}
-          maxLength={500}
-          multiline
-          placeholder="무엇을 하던 중 어떤 문제가 생겼는지 적어 주세요."
-          placeholderTextColor={FIELD_COLORS.muted}
-          className="mt-2 min-h-36 border bg-white px-4 py-3"
-          style={{
-            borderColor: FIELD_COLORS.rule,
-            color: FIELD_COLORS.ink,
-            fontFamily: bodyFont,
-            textAlignVertical: "top",
-          }}
-        />
+        <View
+          className="mt-2 border bg-white px-4 py-3"
+          style={{ borderColor: messageError ? FIELD_COLORS.orange : FIELD_COLORS.rule, minHeight: 144 }}
+        >
+          <TextInput
+            accessibilityLabel="문제 신고 내용"
+            value={message}
+            onChangeText={(value) => {
+              setMessage(value);
+              if (messageError) setMessageError(null);
+            }}
+            maxLength={500}
+            multiline
+            placeholder="무엇을 하던 중 어떤 문제가 생겼는지 적어 주세요."
+            placeholderTextColor={FIELD_COLORS.muted}
+            textAlignVertical="top"
+            style={{
+              minHeight: 120,
+              padding: 0,
+              color: FIELD_COLORS.ink,
+              fontFamily: bodyFont,
+              fontSize: 16,
+              includeFontPadding: false,
+              ...(Platform.OS === "android" ? {} : { lineHeight: 22 }),
+            }}
+          />
+        </View>
+        {messageError ? (
+          <Text accessibilityLiveRegion="polite" className="mt-2 text-xs" style={{ color: FIELD_COLORS.orange, fontFamily: bodyFont }}>
+            {messageError}
+          </Text>
+        ) : null}
         <Text
           className="mt-2 text-right text-xs"
           style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}

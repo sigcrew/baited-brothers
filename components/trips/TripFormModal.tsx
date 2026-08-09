@@ -18,6 +18,7 @@ import {
   View,
 } from "react-native";
 import { useCallback, useRef } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { TripCoverActionSheet } from "@/components/trips/TripCoverActionSheet";
 import { TripDateTimePickerModal } from "@/components/trips/TripDateTimePickerModal";
@@ -109,6 +110,7 @@ export const TripFormModal = ({
   onSubmit,
 }: TripFormModalProps) => {
   const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const insets = useSafeAreaInsets();
   const [spotName, setSpotName] = useState("");
   const [scheduledAt, setScheduledAt] = useState(defaultScheduledDate);
   const [dateTimePickerMode, setDateTimePickerMode] = useState<"date" | "time" | null>(null);
@@ -198,6 +200,7 @@ export const TripFormModal = ({
         accessibilityViewIsModal
         backdropComponent={renderBackdrop}
         backgroundStyle={styles.sheetBackground}
+        bottomInset={insets.bottom}
         enableDynamicSizing={false}
         enablePanDownToClose
         handleIndicatorStyle={styles.handleIndicator}
@@ -269,39 +272,78 @@ export const TripFormModal = ({
           />
 
           <View
-            className="mt-3 border px-4 py-3"
+            className="mt-3 border px-4"
             style={{
               borderColor: selectedPlace ? FIELD_COLORS.teal : FIELD_COLORS.rule,
               backgroundColor: selectedPlace ? "#EDF7F5" : FIELD_COLORS.foam,
+              paddingVertical: 14,
             }}
           >
             <View className="flex-row items-center">
               <View
-                className="h-8 w-8 items-center justify-center"
-                style={{ backgroundColor: selectedPlace ? FIELD_COLORS.teal : FIELD_COLORS.locked }}
+                className="h-9 w-9 items-center justify-center"
+                style={{
+                  backgroundColor: selectedPlace ? FIELD_COLORS.teal : FIELD_COLORS.locked,
+                }}
               >
-                <FontAwesome name="map-pin" size={15} color={selectedPlace ? "#FFFFFF" : FIELD_COLORS.muted} />
+                <FontAwesome
+                  name="map-pin"
+                  size={15}
+                  color={selectedPlace ? "#FFFFFF" : FIELD_COLORS.muted}
+                />
               </View>
               <View className="ml-3 min-w-0 flex-1">
-                <Text className="text-[12px]" style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>
+                <Text
+                  style={{
+                    color: FIELD_COLORS.ink,
+                    fontFamily: bodyExtraBoldFont,
+                    fontSize: 13,
+                    lineHeight: 18,
+                    includeFontPadding: false,
+                  }}
+                >
                   {selectedPlace ? "지도 위치 연결됨" : "지도 위치가 연결되지 않았습니다"}
                 </Text>
-                <Text numberOfLines={1} className="mt-0.5 text-[10px]" style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}>
+                <Text
+                  numberOfLines={1}
+                  style={{
+                    marginTop: 2,
+                    color: FIELD_COLORS.muted,
+                    fontFamily: selectedPlace ? monoFont : bodyFont,
+                    fontSize: 11,
+                    lineHeight: 15,
+                    includeFontPadding: false,
+                  }}
+                >
                   {selectedPlace
                     ? `${selectedPlace.latitude.toFixed(5)}, ${selectedPlace.longitude.toFixed(5)}`
                     : "연결하면 지도 탭에 이 출조가 표시됩니다."}
                 </Text>
               </View>
             </View>
-            <View className="mt-3 flex-row">
+            <View className="mt-3.5 flex-row" style={{ gap: 8 }}>
               <TouchableOpacity
                 accessibilityRole="button"
-                accessibilityLabel={selectedPlace ? "출조 지도 위치 변경" : "출조 지도 위치 연결"}
+                accessibilityLabel={
+                  selectedPlace ? "출조 지도 위치 변경" : "출조 지도 위치 연결"
+                }
                 onPress={() => setLocationPickerVisible(true)}
-                className="flex-1 items-center border py-2.5"
-                style={{ borderColor: FIELD_COLORS.teal, backgroundColor: "#FFFFFF" }}
+                className="flex-1 items-center justify-center border"
+                style={{
+                  borderColor: FIELD_COLORS.teal,
+                  backgroundColor: "#FFFFFF",
+                  height: 42,
+                }}
               >
-                <Text className="text-[12px]" style={{ color: FIELD_COLORS.teal, fontFamily: bodyExtraBoldFont }}>
+                <Text
+                  style={{
+                    color: FIELD_COLORS.teal,
+                    fontFamily: bodyExtraBoldFont,
+                    fontSize: 12,
+                    lineHeight: 16,
+                    includeFontPadding: false,
+                  }}
+                >
                   {selectedPlace ? "지도 위치 변경" : "지도에서 장소 연결"}
                 </Text>
               </TouchableOpacity>
@@ -310,10 +352,22 @@ export const TripFormModal = ({
                   accessibilityRole="button"
                   accessibilityLabel="출조 지도 위치 연결 해제"
                   onPress={() => setSelectedPlace(null)}
-                  className="ml-2 items-center justify-center border px-4"
-                  style={{ borderColor: FIELD_COLORS.rule }}
+                  className="items-center justify-center border px-4"
+                  style={{
+                    borderColor: FIELD_COLORS.rule,
+                    backgroundColor: "#FFFFFF",
+                    height: 42,
+                  }}
                 >
-                  <Text className="text-[12px]" style={{ color: FIELD_COLORS.muted, fontFamily: bodySemiBoldFont }}>
+                  <Text
+                    style={{
+                      color: FIELD_COLORS.muted,
+                      fontFamily: bodySemiBoldFont,
+                      fontSize: 12,
+                      lineHeight: 16,
+                      includeFontPadding: false,
+                    }}
+                  >
                     연결 해제
                   </Text>
                 </TouchableOpacity>
@@ -408,30 +462,37 @@ export const TripFormModal = ({
           <Text className="mt-4 text-sm" style={{ color: FIELD_COLORS.ink, fontFamily: bodySemiBoldFont }}>
             메모 · 선택
           </Text>
-          {/* Keep multiline Korean composition native-owned on Android for the same reason. */}
-          <BottomSheetTextInput
-            key={`memo-${androidInputRevision}`}
-            accessibilityLabel="출조 메모"
-            defaultValue={Platform.OS === "android" ? memo : undefined}
-            value={Platform.OS === "android" ? undefined : memo}
-            onChangeText={setMemo}
-            placeholder="물때, 동행, 목표 어종 등"
-            placeholderTextColor={FIELD_COLORS.muted}
-            multiline
-            textAlignVertical="top"
-            className="mt-2 min-h-[82px] border px-4 py-3 text-base"
+          {/* Android keeps the live memo value native-owned for Korean IME composition. */}
+          <View
+            className="mt-2 border px-4 py-3"
             style={{
               borderColor: FIELD_COLORS.rule,
               borderWidth: 1,
-              color: FIELD_COLORS.ink,
-              fontFamily: bodyFont,
-              fontSize: 16,
               marginTop: 8,
               minHeight: 82,
-              paddingHorizontal: 16,
-              paddingVertical: 12,
             }}
-          />
+          >
+            <BottomSheetTextInput
+              key={`memo-${androidInputRevision}`}
+              accessibilityLabel="출조 메모"
+              defaultValue={Platform.OS === "android" ? memo : undefined}
+              value={Platform.OS === "android" ? undefined : memo}
+              onChangeText={setMemo}
+              placeholder="물때, 동행, 목표 어종 등"
+              placeholderTextColor={FIELD_COLORS.muted}
+              multiline
+              textAlignVertical="top"
+              style={{
+                minHeight: 58,
+                padding: 0,
+                color: FIELD_COLORS.ink,
+                fontFamily: bodyFont,
+                fontSize: 16,
+                includeFontPadding: false,
+                ...(Platform.OS === "android" ? {} : { lineHeight: 22 }),
+              }}
+            />
+          </View>
 
           <Text className="mt-4 text-sm" style={{ color: FIELD_COLORS.ink, fontFamily: bodySemiBoldFont }}>
             홈 커버 · 선택
@@ -514,11 +575,9 @@ export const TripFormModal = ({
         onClose={() => setLocationPickerVisible(false)}
         onConfirm={(place) => {
           setSelectedPlace(place);
-          if (!spotName.trim()) {
-            setSpotName(place.name);
-            if (Platform.OS === "android") {
-              setAndroidInputRevision((current) => current + 1);
-            }
+          setSpotName(place.name);
+          if (Platform.OS === "android") {
+            setAndroidInputRevision((current) => current + 1);
           }
           setLocationPickerVisible(false);
         }}

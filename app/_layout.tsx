@@ -14,6 +14,7 @@ import 'react-native-reanimated';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import { AuthProvider } from '@/src/contexts/AuthContext';
+import { FieldNoticeProvider } from '@/src/contexts/FieldNoticeContext';
 import { AnalyticsLifecycle } from '@/src/components/AnalyticsLifecycle';
 import { NotificationLifecycle } from '@/src/components/NotificationLifecycle';
 import { PendingCatchLifecycle } from '@/src/components/PendingCatchLifecycle';
@@ -77,12 +78,13 @@ const RootLayoutNav = () => {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <BottomSheetModalProvider>
-          <AuthProvider>
-            <AnalyticsLifecycle />
-            <NotificationLifecycle />
-            <PendingCatchLifecycle />
-            <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-              <Stack>
+          <FieldNoticeProvider>
+            <AuthProvider>
+              <AnalyticsLifecycle />
+              <NotificationLifecycle />
+              <PendingCatchLifecycle />
+              <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+                <Stack>
                 <Stack.Screen name="index" options={{ headerShown: false }} />
                 <Stack.Screen name="(auth)" options={{ headerShown: false }} />
                 <Stack.Screen name="google-auth" options={{ headerShown: false }} />
@@ -98,9 +100,10 @@ const RootLayoutNav = () => {
                   options={{ headerShown: false }}
                 />
                 <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-              </Stack>
-            </ThemeProvider>
-          </AuthProvider>
+                </Stack>
+              </ThemeProvider>
+            </AuthProvider>
+          </FieldNoticeProvider>
         </BottomSheetModalProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

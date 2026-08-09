@@ -7,7 +7,6 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  Alert,
   Image,
   ScrollView,
   StyleSheet,
@@ -82,10 +81,11 @@ const LoginScreen = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeField, setActiveField] = useState<FieldName>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const handleLogin = async () => {
     if (!email.trim() || !password) {
-      Alert.alert("입력 오류", "이메일과 비밀번호를 입력해주세요.");
+      setFormError("이메일과 비밀번호를 모두 입력해 주세요.");
       return;
     }
 
@@ -94,9 +94,10 @@ const LoginScreen = () => {
     setIsSubmitting(false);
 
     if (error) {
-      Alert.alert("로그인 실패", error.message);
+      setFormError(error.message);
       return;
     }
+    setFormError(null);
 
     router.replace("/(tabs)");
   };
@@ -170,7 +171,10 @@ const LoginScreen = () => {
                 placeholder="이메일 주소"
                 placeholderTextColor="#93A2A5"
                 value={email}
-                onChangeText={setEmail}
+                onChangeText={(value) => {
+                  setEmail(value);
+                  if (formError) setFormError(null);
+                }}
                 onFocus={() => setActiveField("email")}
                 onBlur={() => setActiveField(null)}
                 autoCapitalize="none"
@@ -205,7 +209,10 @@ const LoginScreen = () => {
                 placeholder="비밀번호 입력"
                 placeholderTextColor="#93A2A5"
                 value={password}
-                onChangeText={setPassword}
+                onChangeText={(value) => {
+                  setPassword(value);
+                  if (formError) setFormError(null);
+                }}
                 onFocus={() => setActiveField("password")}
                 onBlur={() => setActiveField(null)}
                 secureTextEntry={!showPassword}
@@ -229,6 +236,14 @@ const LoginScreen = () => {
               </TouchableOpacity>
             </View>
           </View>
+
+          {formError ? (
+            <View className="mt-4 border-l-4 bg-white px-4 py-3" style={{ borderLeftColor: FIELD_COLORS.orange }}>
+              <Text accessibilityLiveRegion="polite" className="text-[13px] leading-5" style={{ color: FIELD_COLORS.ink, fontFamily: bodyFont }}>
+                {formError}
+              </Text>
+            </View>
+          ) : null}
 
           <TouchableOpacity
             className="mt-7 h-[54px] items-center justify-center rounded-[4px]"

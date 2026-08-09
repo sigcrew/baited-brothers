@@ -1,7 +1,8 @@
 import * as AppleAuthentication from "expo-apple-authentication";
 import { router } from "expo-router";
-import { Alert, Platform } from "react-native";
+import { Platform } from "react-native";
 import { useAuth } from "@/src/contexts/AuthContext";
+import { useFieldNotice } from "@/src/contexts/FieldNoticeContext";
 import { supabase } from "@/src/lib/supabase";
 
 type AppleSignInButtonProps = {
@@ -10,6 +11,7 @@ type AppleSignInButtonProps = {
 
 const AppleSignInButton = ({ fieldJournal = false }: AppleSignInButtonProps) => {
   const { signInWithApple } = useAuth();
+  const { alert } = useFieldNotice();
   if (Platform.OS !== "ios") return null;
 
   const handlePress = async () => {
@@ -58,16 +60,21 @@ const AppleSignInButton = ({ fieldJournal = false }: AppleSignInButtonProps) => 
       ) {
         return;
       }
-      Alert.alert(
-        "Apple 로그인 실패",
-        e instanceof Error ? e.message : "알 수 없는 오류가 발생했습니다."
-      );
+      await alert({
+        eyebrow: "APPLE LOGIN · ERROR",
+        title: "Apple 로그인 실패",
+        message: e instanceof Error ? e.message : "알 수 없는 오류가 발생했습니다.",
+      });
     }
   };
 
   return (
     <AppleAuthentication.AppleAuthenticationButton
-      buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+      buttonType={
+        fieldJournal
+          ? AppleAuthentication.AppleAuthenticationButtonType.CONTINUE
+          : AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN
+      }
       buttonStyle={
         fieldJournal
           ? AppleAuthentication.AppleAuthenticationButtonStyle.WHITE_OUTLINE

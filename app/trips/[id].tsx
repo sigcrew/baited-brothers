@@ -2,7 +2,6 @@ import { useState } from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {
   ActivityIndicator,
-  Alert,
   Image,
   ImageBackground,
   Platform,
@@ -39,6 +38,7 @@ import {
   monoFont,
 } from "@/src/theme/fieldJournal";
 import { trackAnalyticsEvent } from "@/src/lib/analytics";
+import { useFieldNotice } from "@/src/contexts/FieldNoticeContext";
 
 const DEFAULT_COVER = require("@/assets/images/design/first-trip-cover-v1.png");
 
@@ -65,6 +65,7 @@ const TripDetailScreen = () => {
   const [savingPhotoCatchId, setSavingPhotoCatchId] = useState<string | null>(
     null,
   );
+  const { alert, confirm, toast } = useFieldNotice();
   const {
     trips,
     isLoading,
@@ -91,7 +92,7 @@ const TripDetailScreen = () => {
     await Promise.all([refetch(), refetchCatches()]);
   };
 
-  const confirmAction = (
+  const confirmAction = async (
     title: string,
     message: string,
     confirmText: string,
@@ -99,25 +100,21 @@ const TripDetailScreen = () => {
     onSuccess?: () => void,
     destructive = false
   ) => {
-    const runAction = async () => {
-      const { error } = await action();
-      if (error) Alert.alert("오류", error.message);
-      else onSuccess?.();
-    };
-
-    if (Platform.OS === "web") {
-      if (globalThis.confirm(`${title}\n\n${message}`)) void runAction();
+    const confirmed = await confirm({
+      eyebrow: destructive ? "FIELD LOG · CAUTION" : "FIELD LOG · UPDATE",
+      title,
+      message,
+      confirmLabel: confirmText,
+      cancelLabel: "아니오",
+      destructive,
+    });
+    if (!confirmed) return;
+    const { error } = await action();
+    if (error) {
+      await alert({ eyebrow: "FIELD LOG · ERROR", title: "처리하지 못했습니다", message: error.message });
       return;
     }
-
-    Alert.alert(title, message, [
-      { text: "아니오", style: "cancel" },
-      {
-        text: confirmText,
-        style: destructive ? "destructive" : "default",
-        onPress: runAction,
-      },
-    ]);
+    onSuccess?.();
   };
 
   if (isLoading) {
@@ -181,7 +178,7 @@ const TripDetailScreen = () => {
   };
 
   const confirmCatchDelete = (item: UserCatch) =>
-    confirmAction(
+    void confirmAction(
       "조과 삭제",
       `${item.fish?.name_ko ?? item.fish?.name ?? item.custom_species_name ?? "이 조과"} 기록과 사진을 삭제할까요?`,
       "삭제",
@@ -192,7 +189,7 @@ const TripDetailScreen = () => {
 
   const saveCatchPhoto = async (item: UserCatch) => {
     if (!item.image_url) {
-      Alert.alert("사진 없음", "사진이 있는 조과만 사진 앱에 저장할 수 있습니다.");
+      await alert({ eyebrow: "CATCH PHOTO · NOTICE", title: "저장할 사진이 없습니다", message: "사진이 있는 조과만 사진 앱에 저장할 수 있습니다." });
       return;
     }
 
@@ -221,10 +218,11 @@ const TripDetailScreen = () => {
         void trackAnalyticsEvent("photo_library_save_failed", {
           failure_kind: "permission",
         });
-        Alert.alert(
-          "사진 저장 권한 필요",
-          "iPhone 설정에서 사진 추가 권한을 허용한 뒤 다시 시도해 주세요.",
-        );
+        await alert({
+          eyebrow: "CATCH PHOTO · PERMISSION",
+          title: "사진 저장 권한이 필요합니다",
+          message: "기기 설정에서 사진 추가 권한을 허용한 뒤 다시 시도해 주세요.",
+        });
         return;
       }
 
@@ -243,7 +241,7 @@ const TripDetailScreen = () => {
 
       await MediaLibrary.saveToLibraryAsync(localUri);
       void trackAnalyticsEvent("photo_library_save_succeeded");
-      Alert.alert("사진 저장 완료", "조과 사진을 사진 앱에 저장했습니다.");
+      toast({ message: "조과 사진을 사진 앱에 저장했습니다.", tone: "success" });
     } catch (error) {
       void trackAnalyticsEvent("photo_library_save_failed", {
         failure_kind:
@@ -251,12 +249,13 @@ const TripDetailScreen = () => {
             ? "permission"
             : "save",
       });
-      Alert.alert(
-        "사진 저장 실패",
-        error instanceof Error
+      await alert({
+        eyebrow: "CATCH PHOTO · SAVE ERROR",
+        title: "사진 저장 실패",
+        message: error instanceof Error
           ? error.message
           : "사진을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.",
-      );
+      });
     } finally {
       if (downloadedPhoto?.exists) downloadedPhoto.delete();
       setSavingPhotoCatchId(null);
@@ -405,7 +404,7 @@ const TripDetailScreen = () => {
                 <TouchableOpacity
                   accessibilityRole="button"
                   accessibilityLabel="출조 완료"
-                  onPress={() => confirmAction("출조 완료", `${trip.spot_name} 출조를 완료할까요?`, "완료", () => markDone(trip.id))}
+                  onPress={() => void confirmAction("출조 완료", `${trip.spot_name} 출조를 완료할까요?`, "완료", () => markDone(trip.id))}
                   disabled={isSaving}
                   className="flex-1 items-center border-r py-4"
                   style={{ borderColor: FIELD_COLORS.rule }}
@@ -416,7 +415,7 @@ const TripDetailScreen = () => {
                 <TouchableOpacity
                   accessibilityRole="button"
                   accessibilityLabel="출조 취소"
-                  onPress={() => confirmAction("출조 취소", `${trip.spot_name} 출조를 취소할까요?`, "취소하기", () => cancelTrip(trip.id), undefined, true)}
+                  onPress={() => void confirmAction("출조 취소", `${trip.spot_name} 출조를 취소할까요?`, "취소하기", () => cancelTrip(trip.id), undefined, true)}
                   disabled={isSaving}
                   className="flex-1 items-center border-r py-4"
                   style={{ borderColor: FIELD_COLORS.rule }}
@@ -429,7 +428,7 @@ const TripDetailScreen = () => {
             <TouchableOpacity
               accessibilityRole="button"
               accessibilityLabel="출조 삭제"
-              onPress={() => confirmAction("출조 삭제", `${trip.spot_name} 일지를 삭제할까요? 연결된 조과 기록은 보존됩니다.`, "삭제", () => deleteTrip(trip.id), () => router.replace("/(tabs)/journal"), true)}
+              onPress={() => void confirmAction("출조 삭제", `${trip.spot_name} 일지를 삭제할까요? 연결된 조과 기록은 보존됩니다.`, "삭제", () => deleteTrip(trip.id), () => router.replace("/(tabs)/journal"), true)}
               disabled={isSaving}
               className="flex-1 items-center py-4"
             >

@@ -6,6 +6,7 @@ import {
   type BottomSheetBackdropProps,
 } from "@gorhom/bottom-sheet";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   Animated,
   Easing,
@@ -54,6 +55,7 @@ export const BadgeDetailModal = ({
   onClose,
 }: BadgeDetailModalProps) => {
   const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const insets = useSafeAreaInsets();
   const rotation = useRef(new Animated.Value(0)).current;
   const dragStartRotation = useRef(0);
   const isFlippedRef = useRef(false);
@@ -206,6 +208,7 @@ export const BadgeDetailModal = ({
       accessibilityViewIsModal
       backdropComponent={renderBackdrop}
       backgroundStyle={styles.sheetBackground}
+      bottomInset={insets.bottom}
       enableDynamicSizing
       enablePanDownToClose
       handleIndicatorStyle={styles.handleIndicator}

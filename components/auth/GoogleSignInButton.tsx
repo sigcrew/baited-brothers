@@ -5,11 +5,11 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Platform,
-  Alert,
 } from "react-native";
 import { router } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useAuth } from "@/src/contexts/AuthContext";
+import { useFieldNotice } from "@/src/contexts/FieldNoticeContext";
 import {
   FIELD_COLORS,
   bodySemiBoldFont,
@@ -21,14 +21,12 @@ type GoogleSignInButtonProps = {
 
 const GoogleSignInButton = ({ fieldJournal = false }: GoogleSignInButtonProps) => {
   const { signInWithGoogle } = useAuth();
+  const { alert } = useFieldNotice();
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePress = async () => {
     if (Platform.OS === "web") {
-      Alert.alert(
-        "웹 미지원",
-        "Google 로그인은 iOS/Android 앱에서만 사용할 수 있습니다."
-      );
+      await alert({ eyebrow: "GOOGLE LOGIN · NOTICE", title: "웹에서는 지원하지 않습니다", message: "Google 로그인은 iOS/Android 앱에서만 사용할 수 있습니다." });
       return;
     }
 
@@ -38,7 +36,7 @@ const GoogleSignInButton = ({ fieldJournal = false }: GoogleSignInButtonProps) =
 
     if (error) {
       if (error.message?.includes("취소")) return;
-      Alert.alert("Google 로그인 실패", error.message);
+      await alert({ eyebrow: "GOOGLE LOGIN · ERROR", title: "Google 로그인 실패", message: error.message });
       return;
     }
 
@@ -54,7 +52,7 @@ const GoogleSignInButton = ({ fieldJournal = false }: GoogleSignInButtonProps) =
         fieldJournal ? "h-[54px] rounded-[4px]" : "rounded-xl py-3"
       }`}
       style={{
-        borderColor: fieldJournal ? FIELD_COLORS.rule : "#D1D5DB",
+        borderColor: fieldJournal ? FIELD_COLORS.ink : "#D1D5DB",
         opacity: isLoading ? 0.65 : 1,
       }}
       accessibilityRole="button"
@@ -67,9 +65,9 @@ const GoogleSignInButton = ({ fieldJournal = false }: GoogleSignInButtonProps) =
           {fieldJournal ? (
             <FontAwesome
               name="google"
-              size={19}
+              size={18}
               color="#4285F4"
-              style={{ marginRight: 12 }}
+              style={{ marginRight: 10 }}
             />
           ) : (
             <View className="mr-3 h-5 w-5 items-center justify-center rounded-full bg-[#4285F4]">
@@ -77,12 +75,14 @@ const GoogleSignInButton = ({ fieldJournal = false }: GoogleSignInButtonProps) =
             </View>
           )}
           <Text
-            className={fieldJournal ? "text-[15px]" : "font-medium text-gray-700"}
+            className={fieldJournal ? "text-[16px]" : "font-medium text-gray-700"}
             style={
               fieldJournal
                 ? {
                     color: FIELD_COLORS.ink,
                     fontFamily: bodySemiBoldFont,
+                    includeFontPadding: false,
+                    lineHeight: 20,
                   }
                 : undefined
             }

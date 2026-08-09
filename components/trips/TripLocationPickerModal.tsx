@@ -3,8 +3,11 @@ import * as Location from "expo-location";
 import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Keyboard,
   Modal,
+  Platform,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -56,17 +59,21 @@ export const TripLocationPickerModal = ({
 }: TripLocationPickerModalProps) => {
   const insets = useSafeAreaInsets();
   const requestRef = useRef(0);
+  const searchInputRef = useRef<TextInput>(null);
+  const [query, setQuery] = useState(placeName);
   const [selectedPlace, setSelectedPlace] = useState<TripPlace | null>(initialPlace);
   const [isResolving, setIsResolving] = useState(false);
   const [notice, setNotice] = useState<PickerNotice | null>(null);
+  const canSearch = Boolean(query.trim()) && !isResolving;
 
   useEffect(() => {
     if (!visible) return;
     requestRef.current += 1;
+    setQuery(placeName);
     setSelectedPlace(initialPlace);
     setIsResolving(false);
     setNotice(null);
-  }, [initialPlace, visible]);
+  }, [initialPlace, placeName, visible]);
 
   const showInvalidCoordinate = (latitude: number, longitude: number) => {
     if (!isKoreaCoordinate(latitude, longitude)) {
@@ -88,11 +95,12 @@ export const TripLocationPickerModal = ({
   };
 
   const selectCoordinate = async (coordinate: { latitude: number; longitude: number }) => {
+    Keyboard.dismiss();
     if (showInvalidCoordinate(coordinate.latitude, coordinate.longitude)) return;
     const requestId = requestRef.current + 1;
     requestRef.current = requestId;
     setIsResolving(true);
-    let resolvedName = placeName.trim();
+    let resolvedName = query.trim();
     try {
       const hasPermission = await ensureForegroundLocationPermission();
       if (requestRef.current !== requestId) return;
@@ -120,8 +128,10 @@ export const TripLocationPickerModal = ({
       if (requestRef.current === requestId) setIsResolving(false);
     }
     if (requestRef.current !== requestId) return;
+    const nextName = resolvedName || "선택한 낚시터";
+    if (!query.trim()) setQuery(nextName);
     setSelectedPlace({
-      name: resolvedName || "선택한 낚시터",
+      name: nextName,
       latitude: coordinate.latitude,
       longitude: coordinate.longitude,
     });
@@ -129,6 +139,7 @@ export const TripLocationPickerModal = ({
 
   const locateCurrentPosition = async () => {
     if (isResolving) return;
+    Keyboard.dismiss();
     setIsResolving(true);
     try {
       const permission = await Location.requestForegroundPermissionsAsync();
@@ -155,16 +166,12 @@ export const TripLocationPickerModal = ({
   };
 
   const findTypedPlace = async () => {
-    const query = placeName.trim();
-    if (!query || isResolving) {
-      if (!query) {
-        setNotice({
-          title: "낚시터 이름을 먼저 입력해 주세요",
-          message: "입력한 장소의 예상 위치를 찾은 뒤 지도에서 확인할 수 있습니다.",
-        });
-      }
+    const trimmed = query.trim();
+    if (!trimmed || isResolving) {
+      if (!trimmed) searchInputRef.current?.focus();
       return;
     }
+    Keyboard.dismiss();
     setIsResolving(true);
     try {
       const hasPermission = await ensureForegroundLocationPermission();
@@ -175,7 +182,7 @@ export const TripLocationPickerModal = ({
         });
         return;
       }
-      const results = await Location.geocodeAsync(query);
+      const results = await Location.geocodeAsync(trimmed);
       if (!results[0]) {
         setNotice({
           title: "장소를 찾지 못했습니다",
@@ -256,20 +263,58 @@ export const TripLocationPickerModal = ({
             onSelectCoordinate={selectCoordinate}
           />
 
-          <View className="absolute inset-x-4 top-4 flex-row">
-            <TouchableOpacity
-              accessibilityRole="button"
-              accessibilityLabel="입력한 낚시터 이름으로 위치 찾기"
-              onPress={findTypedPlace}
-              disabled={isResolving}
-              className="min-w-0 flex-1 flex-row items-center border bg-white px-4 py-3"
-              style={{ borderColor: FIELD_COLORS.ink }}
+          <View className="absolute inset-x-4 top-4 flex-row items-center">
+            <View
+              className="min-w-0 flex-1 flex-row items-center border bg-white px-3"
+              style={{ borderColor: FIELD_COLORS.ink, height: 48 }}
             >
               <FontAwesome name="search" size={15} color={FIELD_COLORS.teal} />
-              <Text numberOfLines={1} className="ml-2 flex-1 text-[13px]" style={{ color: placeName.trim() ? FIELD_COLORS.ink : FIELD_COLORS.muted, fontFamily: bodySemiBoldFont }}>
-                {placeName.trim() ? `“${placeName.trim()}” 위치 찾기` : "낚시터 이름을 먼저 입력하세요"}
-              </Text>
-            </TouchableOpacity>
+              <TextInput
+                ref={searchInputRef}
+                accessibilityLabel="낚시터 이름 검색"
+                value={query}
+                onChangeText={setQuery}
+                onSubmitEditing={findTypedPlace}
+                returnKeyType="search"
+                placeholder="낚시터 이름 입력 후 검색"
+                placeholderTextColor={FIELD_COLORS.muted}
+                editable={!isResolving}
+                style={{
+                  flex: 1,
+                  marginLeft: 8,
+                  paddingVertical: 0,
+                  color: FIELD_COLORS.ink,
+                  fontFamily: bodySemiBoldFont,
+                  fontSize: 14,
+                  includeFontPadding: false,
+                  ...(Platform.OS === "android" ? {} : { lineHeight: 20 }),
+                }}
+              />
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="입력한 낚시터 이름으로 위치 찾기"
+                onPress={findTypedPlace}
+                disabled={!canSearch}
+                style={{
+                  alignSelf: "stretch",
+                  justifyContent: "center",
+                  paddingHorizontal: 8,
+                }}
+              >
+                <Text
+                  style={{
+                    color: canSearch ? FIELD_COLORS.teal : FIELD_COLORS.muted,
+                    fontFamily: bodyExtraBoldFont,
+                    fontSize: 13,
+                    lineHeight: 18,
+                    includeFontPadding: false,
+                    textAlignVertical: "center",
+                  }}
+                >
+                  검색
+                </Text>
+              </TouchableOpacity>
+            </View>
             <TouchableOpacity
               accessibilityRole="button"
               accessibilityLabel="현재 위치를 출조 장소로 선택"
@@ -286,7 +331,10 @@ export const TripLocationPickerModal = ({
 
           <View
             className="absolute inset-x-0 bottom-0 border-t bg-white px-5 pt-4"
-            style={{ borderColor: FIELD_COLORS.ink, paddingBottom: Math.max(insets.bottom, 14) }}
+            style={{
+              borderColor: FIELD_COLORS.ink,
+              paddingBottom: insets.bottom + 16,
+            }}
           >
             <Text className="text-[9px] tracking-[1.2px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>
               {selectedPlace ? "SELECTED FISHING SPOT" : "TAP THE COAST"}
@@ -307,7 +355,14 @@ export const TripLocationPickerModal = ({
               accessibilityRole="button"
               accessibilityLabel="선택한 출조 장소 연결"
               disabled={!selectedPlace || isResolving}
-              onPress={() => selectedPlace && onConfirm(selectedPlace)}
+              onPress={() => {
+                if (!selectedPlace) return;
+                const nextName = query.trim() || selectedPlace.name;
+                onConfirm({
+                  ...selectedPlace,
+                  name: nextName,
+                });
+              }}
               className="mt-4 h-12 flex-row items-center justify-center"
               style={{ backgroundColor: selectedPlace ? FIELD_COLORS.teal : FIELD_COLORS.locked }}
             >

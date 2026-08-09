@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
-  Alert,
   useWindowDimensions,
 } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -31,6 +30,7 @@ import {
 import { ArchiveTabHeader } from "@/components/design/ArchiveTabHeader";
 import { TripCoverActionSheet } from "@/components/trips/TripCoverActionSheet";
 import { TripFormModal } from "@/components/trips/TripFormModal";
+import { useFieldNotice } from "@/src/contexts/FieldNoticeContext";
 import {
   FIELD_COLORS,
   bodyExtraBoldFont,
@@ -124,6 +124,7 @@ const HomeScreen = () => {
   const [addVisible, setAddVisible] = useState(false);
   const [coverActionsVisible, setCoverActionsVisible] = useState(false);
   const [pendingCatches, setPendingCatches] = useState<PendingCatchJob[]>([]);
+  const { alert, confirm } = useFieldNotice();
   const { session } = useAuth();
   const {
     trips,
@@ -192,25 +193,20 @@ const HomeScreen = () => {
     : 0;
   const handleRecord = () => isLoggedIn ? router.push("/record") : router.push("/(auth)/login");
   const handleAddTrip = () => isLoggedIn ? setAddVisible(true) : router.push("/(auth)/login");
-  const discardPendingCatch = (pending: PendingCatchJob) => {
+  const discardPendingCatch = async (pending: PendingCatchJob) => {
     const userId = session?.user.id;
     if (!userId) return;
-    Alert.alert(
-      "미완료 기록 삭제",
-      "기기에 보관된 사진과 촬영 정보를 삭제할까요? 복구할 수 없습니다.",
-      [
-        { text: "취소", style: "cancel" },
-        {
-          text: "삭제",
-          style: "destructive",
-          onPress: () => {
-            void removePendingCatch(userId, pending.localId).then(
-              refreshPendingCatches,
-            );
-          },
-        },
-      ],
-    );
+    const confirmed = await confirm({
+      eyebrow: "LOCAL RECORD · DELETE",
+      title: "미완료 기록을 삭제할까요?",
+      message: "기기에 보관된 사진과 촬영 정보가 함께 삭제됩니다.\n삭제한 기록은 복구할 수 없습니다.",
+      cancelLabel: "취소",
+      confirmLabel: "삭제",
+      destructive: true,
+    });
+    if (!confirmed) return;
+    await removePendingCatch(userId, pending.localId);
+    await refreshPendingCatches();
   };
   const handleChangeCover = () => {
     if (!nextTrip || isSaving) return;
@@ -497,7 +493,7 @@ const HomeScreen = () => {
                 <TouchableOpacity
                   accessibilityRole="button"
                   accessibilityLabel="미완료 조과 기록 삭제"
-                  onPress={() => discardPendingCatch(pending)}
+                  onPress={() => void discardPendingCatch(pending)}
                   className="ml-2 px-2 py-2"
                 >
                   <FontAwesome name="trash-o" size={18} color={FIELD_COLORS.muted} />
@@ -742,12 +738,12 @@ const HomeScreen = () => {
         onSelect={async (image) => {
           if (!nextTrip) return;
           const { error: coverError } = await updateTripCover(nextTrip.id, image);
-          if (coverError) Alert.alert("사진 변경 실패", coverError.message);
+          if (coverError) void alert({ eyebrow: "TRIP COVER · ERROR", title: "사진 변경 실패", message: coverError.message });
         }}
         onRemove={async () => {
           if (!nextTrip) return;
           const { error: coverError } = await removeTripCover(nextTrip.id);
-          if (coverError) Alert.alert("커버 초기화 실패", coverError.message);
+          if (coverError) void alert({ eyebrow: "TRIP COVER · ERROR", title: "커버 초기화 실패", message: coverError.message });
         }}
       />
     </View>

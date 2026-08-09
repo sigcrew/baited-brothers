@@ -48,7 +48,7 @@ export const useUserCatches = (tripId?: string) => {
       let query = supabase
         .from("user_catches")
         .select(
-          "*, fish:fishes(id, name, name_ko, image_url, category, catalog_sort_order)"
+          "*, fish:fishes!user_catches_fish_id_fkey(id, name, name_ko, image_url, category, catalog_sort_order)"
         )
         .eq("user_id", userId);
 

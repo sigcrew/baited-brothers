@@ -7,11 +7,11 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  Alert,
   ScrollView,
 } from "react-native";
 import { Link, router } from "expo-router";
 import { useAuth } from "@/src/contexts/AuthContext";
+import { useFieldNotice } from "@/src/contexts/FieldNoticeContext";
 import AppleSignInButton from "@/components/auth/AppleSignInButton";
 import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 
@@ -21,20 +21,22 @@ const SignupScreen = () => {
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const { alert } = useFieldNotice();
 
   const handleSignup = async () => {
     if (!email.trim() || !password || !passwordConfirm) {
-      Alert.alert("입력 오류", "모든 항목을 입력해주세요.");
+      setFormError("모든 항목을 입력해 주세요.");
       return;
     }
 
     if (password.length < 6) {
-      Alert.alert("입력 오류", "비밀번호는 6자 이상이어야 합니다.");
+      setFormError("비밀번호는 6자 이상이어야 합니다.");
       return;
     }
 
     if (password !== passwordConfirm) {
-      Alert.alert("입력 오류", "비밀번호가 일치하지 않습니다.");
+      setFormError("비밀번호가 일치하지 않습니다.");
       return;
     }
 
@@ -43,18 +45,20 @@ const SignupScreen = () => {
     setIsSubmitting(false);
 
     if (error) {
-      Alert.alert("회원가입 실패", error.message);
+      setFormError(error.message);
       return;
     }
+    setFormError(null);
 
     if (session) {
       router.replace("/(tabs)");
     } else {
-      Alert.alert(
-        "이메일 확인",
-        "가입한 이메일로 확인 링크가 발송되었습니다. 이메일을 확인해주세요.",
-        [{ text: "확인", onPress: () => router.replace("/(auth)/login") }]
-      );
+      await alert({
+        eyebrow: "ACCOUNT · EMAIL CHECK",
+        title: "이메일을 확인해 주세요",
+        message: "가입한 이메일로 확인 링크를 보냈습니다. 링크를 확인한 뒤 로그인해 주세요.",
+      });
+      router.replace("/(auth)/login");
     }
   };
 
@@ -78,7 +82,10 @@ const SignupScreen = () => {
           placeholder="이메일"
           placeholderTextColor="#9ca3af"
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(value) => {
+            setEmail(value);
+            if (formError) setFormError(null);
+          }}
           autoCapitalize="none"
           keyboardType="email-address"
           autoComplete="email"
@@ -90,7 +97,10 @@ const SignupScreen = () => {
           placeholder="비밀번호 (6자 이상)"
           placeholderTextColor="#9ca3af"
           value={password}
-          onChangeText={setPassword}
+          onChangeText={(value) => {
+            setPassword(value);
+            if (formError) setFormError(null);
+          }}
           secureTextEntry
           autoComplete="new-password"
           editable={!isSubmitting}
@@ -101,11 +111,20 @@ const SignupScreen = () => {
           placeholder="비밀번호 확인"
           placeholderTextColor="#9ca3af"
           value={passwordConfirm}
-          onChangeText={setPasswordConfirm}
+          onChangeText={(value) => {
+            setPasswordConfirm(value);
+            if (formError) setFormError(null);
+          }}
           secureTextEntry
           autoComplete="new-password"
           editable={!isSubmitting}
         />
+
+        {formError ? (
+          <Text accessibilityLiveRegion="polite" className="mb-4 text-sm text-orange-600">
+            {formError}
+          </Text>
+        ) : null}
 
         <TouchableOpacity
           className="rounded-xl bg-blue-600 py-3 active:bg-blue-700"

@@ -3,11 +3,11 @@ import { useState } from "react";
 import {
   Image,
   type ImageSourcePropType,
+  Platform,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-
 import { getField60Illustration } from "@/src/data/field60Illustrations";
 import type { UserCatch } from "@/src/hooks/useUserCatches";
 import { getVerificationLabel } from "@/src/lib/catchRewards";
@@ -23,6 +23,7 @@ type CatchArchiveCardProps = {
   item: UserCatch;
   variant: "compact" | "detail";
   onLocationPress?: () => void;
+  onMorePress?: () => void;
 };
 
 const CARD_COLORS = {
@@ -33,8 +34,16 @@ const CARD_COLORS = {
   wash: "#E9ECE6",
 } as const;
 
-const APP_ICON = require("@/assets/images/card-app-icon-transparent.png");
 const PAPER_TEXTURE = require("@/assets/images/design/catch-card-paper-texture.png");
+const CATCH_STAMP_ASSETS = {
+  general: require("@/assets/images/design/catch-stamps/catch-stamp-general.png"),
+  verified: require("@/assets/images/design/catch-stamps/catch-stamp-verified.png"),
+  corrected: require("@/assets/images/design/catch-stamps/catch-stamp-corrected.png"),
+  pending: require("@/assets/images/design/catch-stamps/catch-stamp-pending.png"),
+} satisfies Record<
+  "general" | "verified" | "corrected" | "pending",
+  ImageSourcePropType
+>;
 
 const formatCaughtAt = (iso: string) =>
   new Date(iso)
@@ -59,36 +68,6 @@ const getNormalizedMemo = (memo: string | null) => {
   return normalized || null;
 };
 
-const AppIconMark = ({ compact }: { compact: boolean }) => {
-  const frame = compact ? 22 : 32;
-  const imageSize = compact ? 38 : 54;
-  const offset = compact ? -8 : -11;
-
-  return (
-    <View
-      accessibilityRole="image"
-      accessibilityLabel="낚시당한 녀석들 앱 아이콘"
-      style={{
-        width: frame,
-        height: frame,
-        overflow: "hidden",
-      }}
-    >
-      <Image
-        source={APP_ICON}
-        resizeMode="cover"
-        style={{
-          position: "absolute",
-          width: imageSize,
-          height: imageSize,
-          left: offset,
-          top: offset,
-        }}
-      />
-    </View>
-  );
-};
-
 const PaperTexture = () => (
   <Image
     source={PAPER_TEXTURE}
@@ -107,6 +86,43 @@ const PaperTexture = () => (
   />
 );
 
+const VerificationMark = ({
+  label,
+  compact,
+  corrected,
+  general,
+}: {
+  label: string;
+  compact: boolean;
+  corrected: boolean;
+  general: boolean;
+}) => {
+  const markLabel = corrected ? "사용자 정정" : label;
+  const pending = label === "인증 확인 중";
+  const size = compact ? 34 : 64;
+  const source = corrected
+    ? CATCH_STAMP_ASSETS.corrected
+    : pending
+      ? CATCH_STAMP_ASSETS.pending
+      : general
+        ? CATCH_STAMP_ASSETS.general
+        : CATCH_STAMP_ASSETS.verified;
+
+  return (
+    <Image
+      source={source}
+      resizeMode="contain"
+      accessibilityLabel={markLabel}
+      accessibilityIgnoresInvertColors
+      style={{
+        width: size,
+        height: size,
+        transform: [{ rotate: corrected ? "-6deg" : "-7deg" }],
+      }}
+    />
+  );
+};
+
 const RulerScale = ({
   sizeCm,
   compact,
@@ -123,7 +139,6 @@ const RulerScale = ({
     <View
       style={{
         height: compact ? 31 : 48,
-        borderTopWidth: 1,
         borderBottomWidth: 1,
         borderColor: CARD_COLORS.teal,
       }}
@@ -223,18 +238,34 @@ const CardPhoto = ({
           source={{ uri: photoUrl! }}
           resizeMode="cover"
           onError={() => setPhotoFailed(true)}
-          style={{ width: "100%", height: "100%" }}
+          style={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+          }}
           accessibilityLabel={`${item.fish?.name_ko ?? item.fish?.name ?? item.custom_species_name ?? "물고기"} 조과 사진`}
         />
       ) : illustration ? (
         <Image
           source={illustration}
           resizeMode="contain"
-          style={{ width: "100%", height: "100%" }}
+          style={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+          }}
           accessibilityLabel={`${item.fish?.name_ko ?? item.fish?.name ?? item.custom_species_name ?? "물고기"} 컬러 일러스트`}
         />
       ) : (
-        <View className="flex-1 items-center justify-center">
+        <View className="absolute inset-0 items-center justify-center">
           <FontAwesome name="image" size={compact ? 22 : 38} color={FIELD_COLORS.muted} />
         </View>
       )}
@@ -246,6 +277,7 @@ export const CatchArchiveCard = ({
   item,
   variant,
   onLocationPress,
+  onMorePress,
 }: CatchArchiveCardProps) => {
   const compact = variant === "compact";
   const title =
@@ -268,6 +300,13 @@ export const CatchArchiveCard = ({
   const date = formatCaughtAt(item.caught_at);
   const cardNumber = getCardNumber(item.id);
   const verificationLabel = getVerificationLabel(item.verification_status);
+  const isGeneralRecord =
+    item.verification_status === "general_record" ||
+    item.verification_status === "unverified";
+  const titleLength = Array.from(title.replace(/\s+/g, "")).length;
+  const compactTitleFontSize = titleLength >= 4 ? 17 : titleLength === 3 ? 23 : 27;
+  const headerMetaLineHeight = compact ? 10 : 18;
+  const stampSlotWidth = compact ? 36 : 68;
 
   return (
     <View
@@ -303,39 +342,55 @@ export const CatchArchiveCard = ({
               color: CARD_COLORS.ink,
               fontFamily: monoFont,
               fontSize: compact ? 7 : 15,
+              lineHeight: compact ? 11 : 20,
               letterSpacing: compact ? 0.8 : 2.4,
+              includeFontPadding: false,
             }}
           >
             FIELD CATCH
           </Text>
-          <Text
-            style={{
-              color:
-                item.verification_status === "general_record" ||
-                item.verification_status === "unverified"
-                  ? CARD_COLORS.orange
-                  : CARD_COLORS.teal,
-              fontFamily: monoFont,
-              fontSize: compact ? 6 : 10,
-            }}
+          <View
+            className="flex-row items-center"
+            style={{ height: headerMetaLineHeight }}
           >
-            {item.species_corrected_at
-              ? `사용자 정정 · ${verificationLabel}`
-              : verificationLabel}
-          </Text>
-          <View className="flex-row items-center">
             <Text
               style={{
                 color: CARD_COLORS.ink,
                 fontFamily: monoFont,
                 fontSize: compact ? 6 : 12,
+                lineHeight: headerMetaLineHeight,
                 letterSpacing: compact ? 0.4 : 1.2,
-                marginRight: compact ? 4 : 8,
+                includeFontPadding: false,
               }}
             >
               {cardNumber}
             </Text>
-            <AppIconMark compact={compact} />
+            {!compact && onMorePress ? (
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="조과 카드 더보기"
+                onPress={(event) => {
+                  event.stopPropagation();
+                  onMorePress();
+                }}
+                hitSlop={{ top: 10, right: 10, bottom: 10, left: 6 }}
+                className="items-center justify-center"
+                style={{
+                  height: headerMetaLineHeight,
+                  minWidth: headerMetaLineHeight,
+                  marginLeft: 4,
+                }}
+              >
+                <FontAwesome
+                  name="ellipsis-h"
+                  size={14}
+                  color={CARD_COLORS.teal}
+                  style={
+                    Platform.OS === "android" ? { marginTop: 1 } : undefined
+                  }
+                />
+              </TouchableOpacity>
+            ) : null}
           </View>
         </View>
 
@@ -344,19 +399,40 @@ export const CatchArchiveCard = ({
 
         {compact ? (
           <>
-            <Text
-              numberOfLines={1}
-              style={{
-                marginTop: 7,
-                color: CARD_COLORS.ink,
-                fontFamily: displayFont,
-                fontSize: 27,
-                lineHeight: 34,
-                textAlign: "center",
-              }}
+            <View
+              className="mt-[7px] flex-row items-center"
+              style={{ minHeight: 36 }}
             >
-              {title}
-            </Text>
+              <View style={{ width: stampSlotWidth }} />
+              <Text
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                style={{
+                  flex: 1,
+                  color: CARD_COLORS.ink,
+                  fontFamily: displayFont,
+                  fontSize: compactTitleFontSize,
+                  lineHeight: 34,
+                  textAlign: "center",
+                }}
+              >
+                {title}
+              </Text>
+              <View
+                style={{
+                  width: stampSlotWidth,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <VerificationMark
+                  label={verificationLabel}
+                  compact
+                  corrected={Boolean(item.species_corrected_at)}
+                  general={isGeneralRecord}
+                />
+              </View>
+            </View>
             <Text
               numberOfLines={1}
               style={{
@@ -408,31 +484,53 @@ export const CatchArchiveCard = ({
                 borderColor: CARD_COLORS.teal,
               }}
             >
-              <Text
-                style={{
-                  color: CARD_COLORS.ink,
-                  fontFamily: displayFont,
-                  fontSize: 52,
-                  lineHeight: 62,
-                  textAlign: "center",
-                }}
-              >
-                {title}
-              </Text>
-              <Text
-                numberOfLines={1}
-                adjustsFontSizeToFit
-                style={{
-                  color: CARD_COLORS.ink,
-                  fontFamily: monoFont,
-                  fontSize: 12,
-                  lineHeight: 18,
-                  letterSpacing: 1.2,
-                  textAlign: "center",
-                }}
-              >
-                {scientificName}
-              </Text>
+              <View className="w-full flex-row items-center">
+                <View style={{ width: stampSlotWidth }} />
+                <View className="flex-1 items-center">
+                  <Text
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    style={{
+                      alignSelf: "stretch",
+                      color: CARD_COLORS.ink,
+                      fontFamily: displayFont,
+                      fontSize: 52,
+                      lineHeight: 62,
+                      textAlign: "center",
+                    }}
+                  >
+                    {title}
+                  </Text>
+                  <Text
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    style={{
+                      color: CARD_COLORS.ink,
+                      fontFamily: monoFont,
+                      fontSize: 12,
+                      lineHeight: 18,
+                      letterSpacing: 1.2,
+                      textAlign: "center",
+                    }}
+                  >
+                    {scientificName}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    width: stampSlotWidth,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <VerificationMark
+                    label={verificationLabel}
+                    compact={false}
+                    corrected={Boolean(item.species_corrected_at)}
+                    general={isGeneralRecord}
+                  />
+                </View>
+              </View>
             </View>
 
             <View style={{ position: "relative" }}>

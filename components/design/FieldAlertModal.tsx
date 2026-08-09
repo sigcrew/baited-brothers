@@ -13,6 +13,10 @@ type FieldAlertModalProps = {
   title: string;
   message: string;
   onClose: () => void;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  onConfirm?: () => void;
+  destructive?: boolean;
 };
 
 export const FieldAlertModal = ({
@@ -21,11 +25,16 @@ export const FieldAlertModal = ({
   title,
   message,
   onClose,
+  confirmLabel = "확인",
+  cancelLabel = "취소",
+  onConfirm,
+  destructive = false,
 }: FieldAlertModalProps) => (
   <Modal
     visible={visible}
     transparent
     statusBarTranslucent
+    navigationBarTranslucent
     animationType="fade"
     presentationStyle="overFullScreen"
     onRequestClose={onClose}
@@ -85,18 +94,52 @@ export const FieldAlertModal = ({
             <View className="ml-2 h-px flex-1" style={{ backgroundColor: FIELD_COLORS.rule }} />
           </View>
 
-          <TouchableOpacity
-            accessibilityRole="button"
-            accessibilityLabel="확인"
-            activeOpacity={0.85}
-            onPress={onClose}
-            className="h-12 items-center justify-center"
-            style={{ backgroundColor: FIELD_COLORS.teal }}
-          >
-            <Text className="text-[15px] text-white" style={{ fontFamily: bodyExtraBoldFont }}>
-              확인
-            </Text>
-          </TouchableOpacity>
+          {onConfirm ? (
+            <View className="flex-row gap-2">
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel={cancelLabel}
+                activeOpacity={0.82}
+                onPress={onClose}
+                className="h-12 flex-1 items-center justify-center border"
+                style={{ borderColor: FIELD_COLORS.rule }}
+              >
+                <Text
+                  className="text-[15px]"
+                  style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}
+                >
+                  {cancelLabel}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel={confirmLabel}
+                activeOpacity={0.85}
+                onPress={onConfirm}
+                className="h-12 flex-1 items-center justify-center"
+                style={{
+                  backgroundColor: destructive ? FIELD_COLORS.orange : FIELD_COLORS.teal,
+                }}
+              >
+                <Text className="text-[15px] text-white" style={{ fontFamily: bodyExtraBoldFont }}>
+                  {confirmLabel}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={confirmLabel}
+              activeOpacity={0.85}
+              onPress={onClose}
+              className="h-12 items-center justify-center"
+              style={{ backgroundColor: FIELD_COLORS.teal }}
+            >
+              <Text className="text-[15px] text-white" style={{ fontFamily: bodyExtraBoldFont }}>
+                {confirmLabel}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     </View>

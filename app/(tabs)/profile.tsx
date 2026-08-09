@@ -1,11 +1,12 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Alert, Image, ScrollView, Text, View, TouchableOpacity } from "react-native";
+import { Image, ScrollView, Text, View, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { useUserCatches } from "@/src/hooks/useUserCatches";
 import { useFishingTrips } from "@/src/hooks/useFishingTrips";
 import { useUserAvatar } from "@/src/hooks/useUserAvatar";
+import { useFieldNotice } from "@/src/contexts/FieldNoticeContext";
 import { ArchiveRule } from "@/components/design/ArchiveRule";
 import { ArchiveTabHeader } from "@/components/design/ArchiveTabHeader";
 import {
@@ -36,13 +37,26 @@ const ProfileScreen = () => {
   const { catches, unlockedFishIds } = useUserCatches();
   const { trips } = useFishingTrips();
   const avatarUrl = useUserAvatar();
+  const { confirm } = useFieldNotice();
 
   const email = session?.user?.email;
   const displayName =
     session?.user?.user_metadata?.display_name ??
     session?.user?.user_metadata?.full_name ??
     null;
-  const handleSignOut = () => Alert.alert("로그아웃", "현재 계정에서 로그아웃할까요?", [{ text: "취소", style: "cancel" }, { text: "로그아웃", style: "destructive", onPress: async () => { await signOut(); router.replace("/(auth)/login"); } }]);
+  const handleSignOut = async () => {
+    const confirmed = await confirm({
+      eyebrow: "ACCOUNT · SIGN OUT",
+      title: "로그아웃할까요?",
+      message: "현재 계정의 기록 동기화를 종료하고 로그인 화면으로 이동합니다.",
+      confirmLabel: "로그아웃",
+      cancelLabel: "취소",
+      destructive: true,
+    });
+    if (!confirmed) return;
+    await signOut();
+    router.replace("/(auth)/login");
+  };
 
   const handleGoLogin = () => {
     router.push("/(auth)/login");
@@ -113,7 +127,7 @@ const ProfileScreen = () => {
       <ProfileRow icon="bell-o" label="알림 설정" onPress={() => router.push("/settings/notifications")} />
       <ProfileRow icon="shield" label="개인정보 처리방침" onPress={() => router.push("/privacy")} />
       {session ? <ProfileRow icon="user-times" label="계정 탈퇴" color={FIELD_COLORS.red} onPress={() => router.push("/account/delete")} /> : null}
-      {session ? <ProfileRow icon="sign-out" label="로그아웃" color={FIELD_COLORS.orange} onPress={handleSignOut} /> : <ProfileRow icon="sign-in" label="로그인" color={FIELD_COLORS.teal} onPress={handleGoLogin} />}
+      {session ? <ProfileRow icon="sign-out" label="로그아웃" color={FIELD_COLORS.orange} onPress={() => void handleSignOut()} /> : <ProfileRow icon="sign-in" label="로그인" color={FIELD_COLORS.teal} onPress={handleGoLogin} />}
     </View>
   </ScrollView>;
 };

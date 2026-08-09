@@ -4,6 +4,7 @@ import * as Location from "expo-location";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Platform,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -67,8 +68,11 @@ const isKoreaCoordinate = (latitude: number, longitude: number) =>
 
 const INFO_SHEET_SNAP_POINTS = ["24%", "42%", "72%"];
 const MAP_HEADER_HEIGHT = 50;
-const MAP_FILTER_ROW_HEIGHT = 36;
+const MAP_FILTER_ROW_HEIGHT = Platform.OS === "android" ? 34 : 36;
+const MAP_FILTER_HORIZONTAL_PADDING = Platform.OS === "android" ? 12 : 14;
+const MAP_FILTER_COUNT_HEIGHT = Platform.OS === "android" ? 18 : 20;
 const MAP_FAVORITE_ROW_HEIGHT = 32;
+const MAP_TAB_BAR_HEIGHT = Platform.OS === "android" ? 72 : 64;
 
 const radians = (value: number) => (value * Math.PI) / 180;
 
@@ -724,11 +728,12 @@ export default function MapScreen() {
                 accessibilityState={{ selected: active }}
                 accessibilityLabel={`${filter.label} 지도 필터 ${filterCounts[filter.key]}곳`}
                 onPress={() => setActiveFilter(filter.key)}
-                className="flex-row items-center rounded-full border px-3.5"
+                className="flex-row items-center rounded-full border"
                 style={{
                   borderColor: active ? FIELD_COLORS.teal : FIELD_COLORS.rule,
                   backgroundColor: active ? FIELD_COLORS.teal : "rgba(255,255,255,0.96)",
                   height: MAP_FILTER_ROW_HEIGHT,
+                  paddingHorizontal: MAP_FILTER_HORIZONTAL_PADDING,
                   shadowColor: FIELD_COLORS.ink,
                   shadowOffset: { width: 0, height: 2 },
                   shadowOpacity: 0.1,
@@ -751,14 +756,14 @@ export default function MapScreen() {
                   className="text-[9px]"
                   style={{
                     backgroundColor: active ? "rgba(255,255,255,0.18)" : FIELD_COLORS.foam,
-                    borderRadius: 10,
+                    borderRadius: MAP_FILTER_COUNT_HEIGHT / 2,
                     color: active ? "#FFFFFF" : FIELD_COLORS.muted,
                     fontFamily: monoFont,
-                    height: 20,
+                    height: MAP_FILTER_COUNT_HEIGHT,
                     includeFontPadding: false,
-                    lineHeight: 20,
+                    lineHeight: MAP_FILTER_COUNT_HEIGHT,
                     marginLeft: 8,
-                    minWidth: 20,
+                    minWidth: MAP_FILTER_COUNT_HEIGHT,
                     paddingHorizontal: 5,
                     textAlign: "center",
                   }}
@@ -859,7 +864,7 @@ export default function MapScreen() {
             <BottomSheetScrollView
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{
-                paddingBottom: insets.bottom + 84,
+                paddingBottom: insets.bottom + MAP_TAB_BAR_HEIGHT,
                 paddingHorizontal: 16,
               }}
             >
@@ -936,13 +941,31 @@ export default function MapScreen() {
                         {conditions.weather.label}
                       </Text>
                     </View>
-                    <Text className="mt-0.5 text-[11px]" style={{ color: FIELD_COLORS.teal, fontFamily: bodySemiBoldFont }}>
+                    <Text
+                      className="text-[11px]"
+                      style={{
+                        color: FIELD_COLORS.teal,
+                        fontFamily: bodySemiBoldFont,
+                        includeFontPadding: false,
+                        lineHeight: 14,
+                        marginTop: 2,
+                      }}
+                    >
                       {conditions.weather.temperatureC == null ? "-" : `${conditions.weather.temperatureC.toFixed(0)}°`}
                       {conditions.weather.precipitationProbabilityPercent == null
                         ? ""
                         : ` · 강수 ${conditions.weather.precipitationProbabilityPercent.toFixed(0)}%`}
                     </Text>
-                    <Text className="mt-0.5 text-[8px] tracking-[0.5px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>
+                    <Text
+                      className="text-[8px] tracking-[0.5px]"
+                      style={{
+                        color: FIELD_COLORS.muted,
+                        fontFamily: monoFont,
+                        includeFontPadding: false,
+                        lineHeight: 10,
+                        marginTop: 1,
+                      }}
+                    >
                       KMA FORECAST
                     </Text>
                   </View>
@@ -1165,18 +1188,20 @@ export default function MapScreen() {
               </View>
             </View>
 
-            <TouchableOpacity
-              accessibilityRole="button"
-              accessibilityLabel={`${placeName || selected.name} 출조 계획 만들기`}
-              onPress={() => setFormVisible(true)}
-              className="mt-4 flex-row items-center justify-center py-3"
-              style={{ backgroundColor: FIELD_COLORS.teal }}
-            >
-              <FontAwesome name="calendar-plus-o" size={18} color="#FFFFFF" />
-              <Text className="ml-3 text-base text-white" style={{ fontFamily: bodyExtraBoldFont }}>
-                이 장소로 출조 계획
-              </Text>
-            </TouchableOpacity>
+            <View style={{ paddingBottom: 16, paddingTop: 16 }}>
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel={`${placeName || selected.name} 출조 계획 만들기`}
+                onPress={() => setFormVisible(true)}
+                className="flex-row items-center justify-center py-3"
+                style={{ backgroundColor: FIELD_COLORS.teal }}
+              >
+                <FontAwesome name="calendar-plus-o" size={18} color="#FFFFFF" />
+                <Text className="ml-3 text-base text-white" style={{ fontFamily: bodyExtraBoldFont }}>
+                  이 장소로 출조 계획
+                </Text>
+              </TouchableOpacity>
+            </View>
             </>
             )}
             </BottomSheetScrollView>

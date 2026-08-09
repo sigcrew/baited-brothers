@@ -2,7 +2,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Image,
   KeyboardAvoidingView,
   Linking,
@@ -21,6 +20,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFishes, type Fish } from "@/src/hooks/useFishes";
 import { useCreateCatch } from "@/src/hooks/useCreateCatch";
 import { useAuth } from "@/src/contexts/AuthContext";
+import { useFieldNotice } from "@/src/contexts/FieldNoticeContext";
 import {
   useFishRecognition,
   type FishRecognitionCandidate,
@@ -77,36 +77,6 @@ const AI_PHOTO_CONSENT_KEY = "ai-photo-consent-v1";
 const PRIVACY_POLICY_URL =
   "https://sigcrew.github.io/baited-brothers/privacy/";
 
-const askToAttachLocation = () =>
-  new Promise<boolean>((resolve) => {
-    let resolved = false;
-    const finish = (value: boolean) => {
-      if (resolved) return;
-      resolved = true;
-      resolve(value);
-    };
-
-    Alert.alert(
-      "촬영 위치를 인증할까요?",
-      "위치를 허용하면 조과를 지도와 도감 해금에 반영합니다. 위치 없이도 사진 분석과 조과 기록은 계속할 수 있습니다.",
-      [
-        {
-          text: "위치 없이 계속",
-          style: "cancel",
-          onPress: () => finish(false),
-        },
-        {
-          text: "위치 허용",
-          onPress: () => finish(true),
-        },
-      ],
-      {
-        cancelable: true,
-        onDismiss: () => finish(false),
-      },
-    );
-  });
-
 const RecordScreen = () => {
   const router = useRouter();
   const params = useLocalSearchParams<{
@@ -127,6 +97,7 @@ const RecordScreen = () => {
   const cameraOpenedTracked = useRef(false);
   const resumedPendingId = useRef<string | null>(null);
   const { session } = useAuth();
+  const { alert, confirm } = useFieldNotice();
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const lastCameraPermission = useRef(cameraPermission);
   if (cameraPermission) {
@@ -141,6 +112,7 @@ const RecordScreen = () => {
   );
   const [completion, setCompletion] = useState<CompletionResult | null>(null);
   const [size, setSize] = useState("");
+  const [sizeError, setSizeError] = useState<string | null>(null);
   const [memo, setMemo] = useState("");
   const [isCapturing, setIsCapturing] = useState(false);
   const [isRequestingCameraPermission, setIsRequestingCameraPermission] =
@@ -407,7 +379,11 @@ const RecordScreen = () => {
       const pending = await getPendingCatch(userId, pendingId);
       if (!pending) {
         if (active) {
-          Alert.alert("복구할 기록 없음", "이미 저장했거나 삭제된 기록입니다.");
+          await alert({
+            eyebrow: "LOCAL RECORD · NOTICE",
+            title: "복구할 기록이 없습니다",
+            message: "이미 저장했거나 삭제된 기록입니다.",
+          });
           router.replace("/(tabs)");
         }
         return;
@@ -471,7 +447,7 @@ const RecordScreen = () => {
         status: "failed_retryable",
         lastError: message,
       });
-      Alert.alert("기록 복구 실패", message);
+      await alert({ eyebrow: "LOCAL RECORD · ERROR", title: "기록 복구 실패", message });
     });
 
     return () => {
@@ -501,7 +477,11 @@ const RecordScreen = () => {
   const pickLibraryPhoto = async () => {
     if (isRecognizing) return;
     if (fishesLoading) {
-      Alert.alert("도감 준비 중", "도감 60종을 불러온 뒤 다시 시도해 주세요.");
+      await alert({
+        eyebrow: "FIELD GUIDE · LOADING",
+        title: "도감을 준비하고 있습니다",
+        message: "도감 60종을 불러온 뒤 다시 시도해 주세요.",
+      });
       return;
     }
 
@@ -561,10 +541,11 @@ const RecordScreen = () => {
         );
       }
     } catch (error) {
-      Alert.alert(
-        "사진 불러오기 실패",
-        error instanceof Error ? error.message : "다른 사진으로 다시 시도해 주세요.",
-      );
+      await alert({
+        eyebrow: "PHOTO · ERROR",
+        title: "사진 불러오기 실패",
+        message: error instanceof Error ? error.message : "다른 사진으로 다시 시도해 주세요.",
+      });
     }
   };
 
@@ -588,7 +569,11 @@ const RecordScreen = () => {
       }
     } catch {
       setIsRequestingCameraPermission(false);
-      Alert.alert("권한 요청 실패", "카메라 권한을 다시 요청해 주세요.");
+      void alert({
+        eyebrow: "CAMERA · PERMISSION",
+        title: "권한 요청 실패",
+        message: "카메라 권한을 다시 요청해 주세요.",
+      });
     }
   };
 
@@ -598,7 +583,13 @@ const RecordScreen = () => {
     try {
       let locationPermission = await Location.getForegroundPermissionsAsync();
       if (!locationPermission.granted && locationPermission.canAskAgain) {
-        const wantsLocation = await askToAttachLocation();
+        const wantsLocation = await confirm({
+          eyebrow: "FIELD CATCH · LOCATION",
+          title: "촬영 위치를 인증할까요?",
+          message: "위치를 허용하면 조과를 지도와 도감 해금에 반영합니다. 위치 없이도 사진 분석과 조과 기록은 계속할 수 있습니다.",
+          cancelLabel: "위치 없이 계속",
+          confirmLabel: "위치 허용",
+        });
         void trackAnalyticsEvent("location_choice_selected", {
           choice: wantsLocation ? "request_permission" : "without_position",
         });
@@ -673,7 +664,11 @@ const RecordScreen = () => {
       });
       await preserveAndPrepareCapture(nextCapture);
     } catch (error) {
-      Alert.alert("촬영 실패", error instanceof Error ? error.message : "다시 시도해 주세요.");
+      await alert({
+        eyebrow: "CAMERA · ERROR",
+        title: "촬영 실패",
+        message: error instanceof Error ? error.message : "다시 시도해 주세요.",
+      });
     } finally {
       setIsCapturing(false);
     }
@@ -683,9 +678,10 @@ const RecordScreen = () => {
     if (!size.trim()) return { isValid: true, sizeCm: undefined };
     const parsedSize = Number(size);
     if (!Number.isFinite(parsedSize) || parsedSize <= 0) {
-      Alert.alert("크기 확인", "크기는 0보다 큰 숫자로 입력해 주세요.");
+      setSizeError("크기는 0보다 큰 숫자로 입력해 주세요.");
       return { isValid: false, sizeCm: undefined };
     }
+    setSizeError(null);
     return { isValid: true, sizeCm: parsedSize };
   };
 
@@ -703,7 +699,11 @@ const RecordScreen = () => {
     );
     const userId = session?.user.id;
     if (!userId) {
-      Alert.alert("저장 실패", "로그인이 필요합니다.");
+      await alert({
+        eyebrow: "FIELD CATCH · LOGIN",
+        title: "로그인이 필요합니다",
+        message: "조과를 저장하려면 다시 로그인해 주세요.",
+      });
       return;
     }
     const currentPending = await getPendingCatch(
@@ -763,7 +763,11 @@ const RecordScreen = () => {
         lastError: result.error.message,
         nextRetryAt: new Date(Date.now() + 15_000).toISOString(),
       });
-      Alert.alert("저장 실패", result.error.message);
+      await alert({
+        eyebrow: "FIELD CATCH · SAVE ERROR",
+        title: "저장하지 못했습니다",
+        message: result.error.message,
+      });
       return;
     }
     await removePendingCatch(userId, capture.pendingCatchId);
@@ -1409,21 +1413,43 @@ const RecordScreen = () => {
                 </Text>
                 <TextInput
                   value={size}
-                  onChangeText={setSize}
+                  onChangeText={(value) => {
+                    setSize(value);
+                    if (sizeError) setSizeError(null);
+                  }}
                   keyboardType="decimal-pad"
                   placeholder="예: 32.5"
                   className="mt-2 rounded-xl border border-slate-200 bg-white px-4 py-3"
+                  style={{ borderColor: sizeError ? FIELD_COLORS.orange : undefined }}
                 />
+                {sizeError ? (
+                  <Text
+                    accessibilityLiveRegion="polite"
+                    className="mt-2 text-xs"
+                    style={{ color: FIELD_COLORS.orange, fontFamily: bodyFont }}
+                  >
+                    {sizeError}
+                  </Text>
+                ) : null}
                 <Text className="mt-4 text-sm font-medium text-slate-700">
                   메모(선택)
                 </Text>
-                <TextInput
-                  value={memo}
-                  onChangeText={setMemo}
-                  multiline
-                  placeholder="채비, 물때, 기억할 점"
-                  className="mt-2 min-h-[88px] rounded-xl border border-slate-200 bg-white px-4 py-3"
-                />
+                <View className="mt-2 min-h-[88px] rounded-xl border border-slate-200 bg-white px-4 py-3">
+                  <TextInput
+                    value={memo}
+                    onChangeText={setMemo}
+                    multiline
+                    placeholder="채비, 물때, 기억할 점"
+                    textAlignVertical="top"
+                    style={{
+                      minHeight: 64,
+                      padding: 0,
+                      fontSize: 16,
+                      includeFontPadding: false,
+                      ...(Platform.OS === "android" ? {} : { lineHeight: 22 }),
+                    }}
+                  />
+                </View>
                 <TouchableOpacity
                   disabled={isSaving}
                   onPress={save}

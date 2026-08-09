@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Image,
   Text,
   TextInput,
@@ -11,6 +10,7 @@ import {
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { useAuth } from "@/src/contexts/AuthContext";
+import { useFieldNotice } from "@/src/contexts/FieldNoticeContext";
 import { supabase } from "@/src/lib/supabase";
 import { optimizeUserPhoto } from "@/src/lib/optimizeUserPhoto";
 import { useUserAvatar } from "@/src/hooks/useUserAvatar";
@@ -36,6 +36,8 @@ export default function ProfileEditScreen() {
     useState<ImagePicker.ImagePickerAsset | null>(null);
   const [removeAvatar, setRemoveAvatar] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [nameError, setNameError] = useState<string | null>(null);
+  const { alert } = useFieldNotice();
 
   useEffect(() => {
     setDisplayName(
@@ -67,9 +69,10 @@ export default function ProfileEditScreen() {
   const save = async () => {
     const nextName = displayName.trim();
     if (!nextName) {
-      Alert.alert("이름을 입력해 주세요");
+      setNameError("표시 이름을 입력해 주세요.");
       return;
     }
+    setNameError(null);
     if (!session) return;
     setIsSaving(true);
     let uploadedPaths: string[] = [];
@@ -139,14 +142,13 @@ export default function ProfileEditScreen() {
     } catch {
       await removeUserMedia(uploadedPaths);
       setIsSaving(false);
-      Alert.alert("저장 실패", "프로필 사진과 이름을 저장하지 못했습니다.");
+      await alert({ eyebrow: "PROFILE · SAVE ERROR", title: "저장하지 못했습니다", message: "프로필 사진과 이름을 저장하지 못했습니다." });
       return;
     }
 
     setIsSaving(false);
-    Alert.alert("저장 완료", "프로필을 변경했습니다.", [
-      { text: "확인", onPress: () => router.back() },
-    ]);
+    await alert({ eyebrow: "PROFILE · SAVED", title: "프로필을 변경했습니다", message: "새 프로필 정보가 기록과 조과 카드에 반영됩니다." });
+    router.back();
   };
 
   return (
@@ -217,17 +219,25 @@ export default function ProfileEditScreen() {
           </Text>
           <TextInput
             value={displayName}
-            onChangeText={setDisplayName}
+            onChangeText={(value) => {
+              setDisplayName(value);
+              if (nameError) setNameError(null);
+            }}
             editable={!isSaving}
             maxLength={24}
             placeholder="표시 이름"
             className="mt-3 border bg-white px-4 py-4"
             style={{
-              borderColor: FIELD_COLORS.rule,
+              borderColor: nameError ? FIELD_COLORS.orange : FIELD_COLORS.rule,
               color: FIELD_COLORS.ink,
               fontFamily: bodyFont,
             }}
           />
+          {nameError ? (
+            <Text accessibilityLiveRegion="polite" className="mt-2 text-xs" style={{ color: FIELD_COLORS.orange, fontFamily: bodyFont }}>
+              {nameError}
+            </Text>
+          ) : null}
           <Text
             className="mt-5 text-sm"
             style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}

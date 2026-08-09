@@ -1,7 +1,6 @@
 import { useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   ScrollView,
   Text,
   TextInput,
@@ -10,6 +9,7 @@ import {
 import { Stack, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/src/contexts/AuthContext";
+import { useFieldNotice } from "@/src/contexts/FieldNoticeContext";
 import {
   FIELD_COLORS,
   bodyExtraBoldFont,
@@ -22,6 +22,7 @@ export default function DeleteAccountScreen() {
   const { deleteAccount } = useAuth();
   const [confirmation, setConfirmation] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
+  const { alert } = useFieldNotice();
   const canDelete = confirmation.trim() === "계정 삭제";
   const handleDelete = async () => {
     if (!canDelete || isDeleting) return;
@@ -29,15 +30,16 @@ export default function DeleteAccountScreen() {
     const { appleRevocation, error } = await deleteAccount();
     setIsDeleting(false);
     if (error) {
-      Alert.alert("탈퇴 실패", "잠시 후 다시 시도해 주세요.");
+      await alert({ eyebrow: "ACCOUNT · DELETE ERROR", title: "탈퇴하지 못했습니다", message: "잠시 후 다시 시도해 주세요." });
       return;
     }
     if (appleRevocation === "manual_action_required") {
-      Alert.alert(
-        "Apple 연결도 해제해 주세요",
-        "계정 데이터는 삭제되었습니다. iPhone 설정의 Apple 계정 → Apple로 로그인에서 낚시당한 녀석들을 선택해 연결을 직접 해제해 주세요.",
-        [{ text: "확인", onPress: () => router.replace("/(auth)/login") }],
-      );
+      await alert({
+        eyebrow: "ACCOUNT · APPLE CONNECTION",
+        title: "Apple 연결도 해제해 주세요",
+        message: "계정 데이터는 삭제되었습니다. iPhone 설정의 Apple 계정 → Apple로 로그인에서 낚시당한 녀석들을 선택해 연결을 직접 해제해 주세요.",
+      });
+      router.replace("/(auth)/login");
       return;
     }
     router.replace("/(auth)/login");

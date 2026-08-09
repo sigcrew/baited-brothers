@@ -7,9 +7,11 @@ import {
 } from "@gorhom/bottom-sheet";
 import * as ImagePicker from "expo-image-picker";
 import { useCallback, useEffect, useRef } from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import type { TripCoverImage } from "@/src/hooks/useFishingTrips";
+import { useFieldNotice } from "@/src/contexts/FieldNoticeContext";
 import {
   FIELD_COLORS,
   bodyExtraBoldFont,
@@ -43,6 +45,8 @@ export const TripCoverActionSheet = ({
   onSelect,
 }: TripCoverActionSheetProps) => {
   const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const insets = useSafeAreaInsets();
+  const { alert } = useFieldNotice();
 
   useEffect(() => {
     if (!visible) return;
@@ -69,7 +73,7 @@ export const TripCoverActionSheet = ({
   const selectFromCamera = async () => {
     const permission = await ImagePicker.requestCameraPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert("카메라 권한 필요", "커버 사진을 촬영하려면 카메라 접근을 허용해 주세요.");
+      await alert({ eyebrow: "TRIP COVER · PERMISSION", title: "카메라 권한이 필요합니다", message: "커버 사진을 촬영하려면 카메라 접근을 허용해 주세요." });
       return;
     }
     const result = await ImagePicker.launchCameraAsync({
@@ -85,7 +89,7 @@ export const TripCoverActionSheet = ({
   const selectFromLibrary = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert("사진 권한 필요", "커버를 선택하려면 사진 보관함 접근을 허용해 주세요.");
+      await alert({ eyebrow: "TRIP COVER · PERMISSION", title: "사진 권한이 필요합니다", message: "커버를 선택하려면 사진 보관함 접근을 허용해 주세요." });
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -113,6 +117,7 @@ export const TripCoverActionSheet = ({
       accessibilityViewIsModal
       backdropComponent={renderBackdrop}
       backgroundStyle={styles.sheetBackground}
+      bottomInset={insets.bottom}
       enableDynamicSizing
       enablePanDownToClose
       handleIndicatorStyle={styles.handleIndicator}
