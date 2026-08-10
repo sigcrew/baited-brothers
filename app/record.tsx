@@ -27,6 +27,7 @@ import {
 } from "@/src/hooks/useFishRecognition";
 import type { CatchVerificationStatus } from "@/src/lib/catchRewards";
 import { CatchCompletionView } from "@/components/record/CatchCompletionView";
+import { ShareCatchCardModal } from "@/components/share/ShareCatchCardModal";
 import { FishCatalogSheet } from "@/components/record/FishCatalogSheet";
 import { getField60Illustration } from "@/src/data/field60Illustrations";
 import { optimizeUserPhoto } from "@/src/lib/optimizeUserPhoto";
@@ -40,6 +41,7 @@ import {
   updatePendingCatch,
 } from "@/src/lib/pendingCatchQueue";
 import { FIELD_COLORS, bodyExtraBoldFont, bodyFont, monoFont } from "@/src/theme/fieldJournal";
+import type { ShareCatchData } from "@/src/lib/shareCard";
 
 type Capture = {
   uri: string;
@@ -111,6 +113,7 @@ const RecordScreen = () => {
     null,
   );
   const [completion, setCompletion] = useState<CompletionResult | null>(null);
+  const [shareCardVisible, setShareCardVisible] = useState(false);
   const [size, setSize] = useState("");
   const [sizeError, setSizeError] = useState<string | null>(null);
   const [memo, setMemo] = useState("");
@@ -158,6 +161,32 @@ const RecordScreen = () => {
           sizeCm: completionPreviewMode === "existing" ? 32.5 : undefined,
         }
       : null);
+  const completionShareItem: ShareCatchData | null = visibleCompletion
+    ? {
+        id: visibleCompletion.catchId ?? "completion-preview-094",
+        imageSource:
+          capture?.uri
+            ? { uri: capture.uri }
+            : visibleCompletion.fish
+              ? getField60Illustration(
+                  visibleCompletion.fish.catalog_sort_order,
+                  "color",
+                ) ?? require("@/assets/images/card-app-icon-transparent.png")
+              : require("@/assets/images/card-app-icon-transparent.png"),
+        fishName:
+          visibleCompletion.fish?.name_ko ??
+          visibleCompletion.fish?.name ??
+          visibleCompletion.customSpeciesName ??
+          "어종 미확인",
+        scientificName:
+          visibleCompletion.fish?.name.split(/\s+/).slice(0, 2).join(" ") ??
+          "OUTSIDE FIELD 60",
+        sizeCm: visibleCompletion.sizeCm ?? null,
+        caughtAt: capture?.capturedAt ?? new Date().toISOString(),
+        regionLabel: null,
+        verificationStatus: visibleCompletion.verificationStatus,
+      }
+    : null;
 
   useEffect(() => {
     let active = true;
@@ -835,7 +864,8 @@ const RecordScreen = () => {
 
   if (visibleCompletion) {
     return (
-      <CatchCompletionView
+      <>
+        <CatchCompletionView
         fish={visibleCompletion.fish}
         customSpeciesName={visibleCompletion.customSpeciesName}
         isFirstDiscovery={visibleCompletion.isFirstDiscovery}
@@ -847,11 +877,19 @@ const RecordScreen = () => {
         sizeCm={visibleCompletion.sizeCm}
         onViewRecord={viewCompletionRecord}
         onViewEncyclopedia={viewCompletionEncyclopedia}
+        onShare={() => setShareCardVisible(true)}
         onRecordAnother={
           capture?.tripId || tripId ? recordAnotherCatch : undefined
         }
         onGoHome={() => router.replace("/(tabs)")}
-      />
+        />
+        <ShareCatchCardModal
+          item={completionShareItem}
+          visible={shareCardVisible}
+          onClose={() => setShareCardVisible(false)}
+          source="completion"
+        />
+      </>
     );
   }
 

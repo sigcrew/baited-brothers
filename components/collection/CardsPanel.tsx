@@ -20,6 +20,8 @@ import {
 } from "@/src/theme/fieldJournal";
 import { trackAnalyticsEvent } from "@/src/lib/analytics";
 import { useRouter } from "expo-router";
+import { ShareCatchCardModal } from "@/components/share/ShareCatchCardModal";
+import { shareCatchFromUserCatch } from "@/src/lib/shareCard";
 
 type CardsPanelProps = {
   insetsBottom: number;
@@ -59,12 +61,14 @@ const CatchDetailModal = ({
   onClose,
   onLocationPress,
   onEdit,
+  onShare,
 }: {
   item: UserCatch | null;
   visible: boolean;
   onClose: () => void;
   onLocationPress: (item: UserCatch) => void;
   onEdit?: (item: UserCatch) => void;
+  onShare: (item: UserCatch) => void;
 }) => {
   const insets = useSafeAreaInsets();
   const [actionMenuVisible, setActionMenuVisible] = useState(false);
@@ -120,11 +124,11 @@ const CatchDetailModal = ({
                 : undefined
             }
             onMorePress={
-              onEdit ? () => setActionMenuVisible(true) : undefined
+              () => setActionMenuVisible(true)
             }
           />
         </Pressable>
-        {actionMenuVisible && onEdit ? (
+        {actionMenuVisible ? (
           <>
             <Pressable
               accessibilityRole="button"
@@ -149,12 +153,38 @@ const CatchDetailModal = ({
               />
               <TouchableOpacity
                 accessibilityRole="button"
+                accessibilityLabel="공유 카드 만들기"
+                onPress={() => {
+                  setActionMenuVisible(false);
+                  onShare(item);
+                }}
+                className="h-14 flex-row items-center border px-5"
+                style={{ borderColor: FIELD_COLORS.rule }}
+              >
+                <FontAwesome
+                  name="share-alt"
+                  size={17}
+                  color={FIELD_COLORS.orange}
+                />
+                <Text
+                  className="ml-4"
+                  style={{
+                    color: FIELD_COLORS.ink,
+                    fontFamily: bodyExtraBoldFont,
+                  }}
+                >
+                  공유 카드 만들기
+                </Text>
+              </TouchableOpacity>
+              {onEdit ? (
+              <TouchableOpacity
+                accessibilityRole="button"
                 accessibilityLabel="조과 기록 수정"
                 onPress={() => {
                   setActionMenuVisible(false);
                   onEdit(item);
                 }}
-                className="h-14 flex-row items-center border px-5"
+                className="mt-3 h-14 flex-row items-center border px-5"
                 style={{ borderColor: FIELD_COLORS.rule }}
               >
                 <FontAwesome
@@ -172,6 +202,7 @@ const CatchDetailModal = ({
                   기록 수정
                 </Text>
               </TouchableOpacity>
+              ) : null}
               <TouchableOpacity
                 accessibilityRole="button"
                 accessibilityLabel="조과 카드 메뉴 취소"
@@ -209,6 +240,7 @@ export const CardsPanel = ({
 }: CardsPanelProps) => {
   const router = useRouter();
   const [selected, setSelected] = useState<UserCatch | null>(null);
+  const [shareItem, setShareItem] = useState<UserCatch | null>(null);
   const [sortDirection, setSortDirection] = useState<"newest" | "oldest">(
     "newest",
   );
@@ -332,6 +364,13 @@ export const CardsPanel = ({
           });
         }}
         onEdit={onEditCatch}
+        onShare={setShareItem}
+      />
+      <ShareCatchCardModal
+        item={shareItem ? shareCatchFromUserCatch(shareItem) : null}
+        visible={Boolean(shareItem)}
+        onClose={() => setShareItem(null)}
+        source="archive"
       />
     </>
   );

@@ -44,6 +44,10 @@ describe("sanitizeAnalyticsProperties", () => {
         "photo_library_save_succeeded",
         "photo_library_save_failed",
         "permission_result",
+        "share_card_previewed",
+        "share_card_location_changed",
+        "share_sheet_opened",
+        "share_card_failed",
       ]),
     );
   });

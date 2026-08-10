@@ -34,6 +34,7 @@ type CatchCompletionViewProps = {
   sizeCm?: number;
   onViewRecord: () => void;
   onViewEncyclopedia: () => void;
+  onShare: () => void;
   onRecordAnother?: () => void;
   onGoHome: () => void;
 };
@@ -159,6 +160,7 @@ export const CatchCompletionView = ({
   sizeCm,
   onViewRecord,
   onViewEncyclopedia,
+  onShare,
   onRecordAnother,
   onGoHome,
 }: CatchCompletionViewProps) => {
@@ -392,23 +394,16 @@ export const CatchCompletionView = ({
               onPress={onViewRecord}
             />
           )}
+          <CompletionButton
+            label="공유 카드 만들기"
+            variant="secondary"
+            onPress={onShare}
+          />
           {onRecordAnother ? (
             <CompletionButton
               label="한 마리 더 기록하기"
-              variant="secondary"
+              variant="text"
               onPress={onRecordAnother}
-            />
-          ) : isFirstDiscovery ? (
-            <CompletionButton
-              label="카드 보기"
-              variant="secondary"
-              onPress={onViewRecord}
-            />
-          ) : fish ? (
-            <CompletionButton
-              label="도감 보기"
-              variant="secondary"
-              onPress={onViewEncyclopedia}
             />
           ) : null}
           <CompletionButton

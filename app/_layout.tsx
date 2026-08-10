@@ -88,6 +88,7 @@ const RootLayoutNav = () => {
                 <Stack.Screen name="index" options={{ headerShown: false }} />
                 <Stack.Screen name="(auth)" options={{ headerShown: false }} />
                 <Stack.Screen name="google-auth" options={{ headerShown: false }} />
+                <Stack.Screen name="share-preview" options={{ headerShown: false }} />
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                 <Stack.Screen
                   name="record"
