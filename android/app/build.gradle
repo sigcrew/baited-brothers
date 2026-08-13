@@ -87,6 +87,23 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 def androidVersionCode = System.getenv("ANDROID_VERSION_CODE")
+def googleMapsApiKey = System.getenv("GOOGLE_MAPS_API_KEY") ?: findProperty("GOOGLE_MAPS_API_KEY")
+
+if (!googleMapsApiKey) {
+    def rootEnvFile = rootProject.file("../.env")
+    if (rootEnvFile.exists()) {
+        rootEnvFile.eachLine { line ->
+            def match = line =~ /^\s*GOOGLE_MAPS_API_KEY\s*=\s*["']?([^"'#\s]+)["']?\s*$/
+            if (match.matches()) {
+                googleMapsApiKey = match.group(1)
+            }
+        }
+    }
+}
+
+if (!googleMapsApiKey) {
+    throw new GradleException("GOOGLE_MAPS_API_KEY is required to build the Android app.")
+}
 
 android {
     ndkVersion rootProject.ext.ndkVersion
@@ -101,6 +118,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode androidVersionCode ? androidVersionCode.toInteger() : 12
         versionName "1.1.1"
+        manifestPlaceholders = [GOOGLE_MAPS_API_KEY: googleMapsApiKey]
 
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""
     }
