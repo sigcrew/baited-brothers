@@ -22,6 +22,7 @@
         "ascAppId": "6792683065"
       },
       "android": {
+        "applicationId": "com.sigcrew.baitedbrothers",
         "track": "production",
         "releaseStatus": "completed"
       }
