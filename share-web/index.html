@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#f7f3e8" />
+    <meta
+      name="description"
+      content="출조와 조과를 한곳에 남기고, 낚시의 순간을 카드로 공유하세요."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="낚시당한 녀석들" />
+    <meta property="og:locale" content="ko_KR" />
+    <meta
+      property="og:url"
+      content="https://baited-brothers-share.vercel.app/open"
+    />
+    <meta property="og:title" content="낚시당한 녀석들" />
+    <meta
+      property="og:description"
+      content="당신의 조과도 기록해 보세요. 출조와 조과를 한곳에 남길 수 있어요."
+    />
+    <meta
+      property="og:image"
+      content="https://baited-brothers-share.vercel.app/app-icon.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="낚시당한 녀석들" />
+    <meta
+      name="twitter:description"
+      content="당신의 조과도 기록해 보세요. 출조와 조과를 한곳에 남길 수 있어요."
+    />
+    <meta
+      name="twitter:image"
+      content="https://baited-brothers-share.vercel.app/app-icon.png"
+    />
+    <meta
+      name="apple-itunes-app"
+      content="app-id=6792683065, app-argument=https://baited-brothers-share.vercel.app/open"
+    />
+    <title>낚시당한 녀석들</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+          "Noto Sans KR", sans-serif;
+        --ink: #082f4d;
+        --muted: #526676;
+        --orange: #e85f25;
+        --paper: #f7f3e8;
+        --paper-bright: #fffdf5;
+        --teal: #087e7d;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        align-items: center;
+        background:
+          radial-gradient(
+            circle at 20% 10%,
+            rgba(8, 126, 125, 0.05) 0 1px,
+            transparent 1.5px
+          ),
+          var(--paper);
+        background-size: 9px 9px;
+        color: var(--ink);
+        display: flex;
+        justify-content: center;
+        margin: 0;
+        min-height: 100svh;
+        padding: max(24px, env(safe-area-inset-top)) 20px
+          max(20px, env(safe-area-inset-bottom));
+      }
+
+      main {
+        animation: arrive 420ms ease-out both;
+        margin: auto;
+        max-width: 420px;
+        text-align: center;
+        width: 100%;
+      }
+
+      .brand {
+        align-items: center;
+        display: inline-flex;
+        font-size: 18px;
+        font-weight: 850;
+        letter-spacing: -0.4px;
+      }
+
+      .brand-mark {
+        align-items: center;
+        display: flex;
+        height: 42px;
+        margin-right: 9px;
+        overflow: hidden;
+        width: 42px;
+      }
+
+      .brand-mark img {
+        display: block;
+        height: 100%;
+        object-fit: contain;
+        transform: scale(1.55);
+        width: 100%;
+      }
+
+      .field-card {
+        filter: drop-shadow(0 10px 18px rgba(8, 47, 77, 0.13));
+        margin: 22px auto 24px;
+        max-width: 220px;
+        transform: rotate(-1deg);
+      }
+
+      .field-card img {
+        display: block;
+        height: auto;
+        width: 100%;
+      }
+
+      h1 {
+        font-size: clamp(30px, 8.4vw, 38px);
+        letter-spacing: -1.2px;
+        line-height: 1.18;
+        margin: 0;
+      }
+
+      .description {
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.65;
+        margin: 13px auto 23px;
+        max-width: 340px;
+      }
+
+      a {
+        align-items: center;
+        border-radius: 12px;
+        display: flex;
+        font-size: 16px;
+        font-weight: 800;
+        justify-content: center;
+        min-height: 54px;
+        text-decoration: none;
+        transition:
+          transform 120ms ease,
+          box-shadow 120ms ease;
+        width: 100%;
+      }
+
+      a:active {
+        transform: translateY(1px) scale(0.995);
+      }
+      a:focus-visible {
+        outline: 3px solid rgba(232, 95, 37, 0.45);
+        outline-offset: 3px;
+      }
+
+      .open {
+        background: var(--teal);
+        box-shadow: 0 3px 10px rgba(8, 47, 77, 0.12);
+        color: #fff;
+      }
+
+      .install {
+        background: var(--paper-bright);
+        border: 2px solid var(--ink);
+        color: var(--ink);
+        margin-top: 14px;
+      }
+
+      .privacy {
+        align-items: center;
+        color: var(--muted);
+        display: flex;
+        font-size: 12px;
+        justify-content: center;
+        line-height: 1.5;
+        margin: 18px 0 0;
+      }
+
+      .privacy-icon {
+        border: 2px solid var(--teal);
+        border-radius: 50%;
+        color: var(--teal);
+        display: inline-grid;
+        flex: 0 0 20px;
+        height: 20px;
+        margin-right: 7px;
+        place-items: center;
+        width: 20px;
+      }
+
+      .privacy-icon svg {
+        display: block;
+        height: 11px;
+        width: 11px;
+      }
+
+      @keyframes arrive {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-height: 730px) {
+        body {
+          padding-top: max(16px, env(safe-area-inset-top));
+        }
+        .field-card {
+          margin-bottom: 17px;
+          margin-top: 14px;
+          max-width: 170px;
+        }
+        .description {
+          margin-bottom: 16px;
+          margin-top: 8px;
+        }
+        .privacy {
+          margin-top: 13px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        main {
+          animation: none;
+        }
+        a {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="brand">
+        <span class="brand-mark"><img src="./brand-icon.png" alt="" /></span>
+        <span>낚시당한 녀석들</span>
+      </div>
+
+      <div class="field-card">
+        <img src="./share-card-preview.png" alt="넙치 42.5cm 조과 카드 예시" />
+      </div>
+
+      <h1>당신의 조과도<br />기록해 보세요</h1>
+      <p class="description">
+        출조와 조과를 한곳에 남기고,<br />낚시의 순간을 카드로 공유하세요.
+      </p>
+
+      <a class="open" id="open-app" href="baited-brothers://">앱에서 열기</a>
+      <a
+        class="install"
+        id="store-link"
+        href="https://apps.apple.com/kr/app/id6792683065"
+        >앱 설치하기</a
+      >
+
+      <p class="privacy">
+        <span class="privacy-icon" aria-hidden="true">
+          <svg viewBox="0 0 16 16" fill="none">
+            <path
+              d="M3.25 8.1 6.5 11.25 12.75 4.75"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </span>
+        <span>상세 포인트와 좌표는 공유하지 않아요.</span>
+      </p>
+    </main>
+
+    <script>
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      const storeUrl = isAndroid
+        ? "https://play.google.com/store/apps/details?id=com.sigcrew.baitedbrothers"
+        : "https://apps.apple.com/kr/app/id6792683065";
+      const storeLink = document.getElementById("store-link");
+      const openApp = document.getElementById("open-app");
+
+      storeLink.href = storeUrl;
+      openApp.addEventListener("click", (event) => {
+        event.preventDefault();
+        const fallbackTimer = window.setTimeout(
+          () => location.replace(storeUrl),
+          1400,
+        );
+        const cancelFallback = () => {
+          if (document.hidden) {
+            window.clearTimeout(fallbackTimer);
+            document.removeEventListener("visibilitychange", cancelFallback);
+          }
+        };
+        document.addEventListener("visibilitychange", cancelFallback);
+        location.href = "baited-brothers://";
+      });
+    </script>
+  </body>
+</html>

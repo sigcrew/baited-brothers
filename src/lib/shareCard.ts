@@ -18,7 +18,29 @@ export type ShareCatchData = {
 
 const FALLBACK_IMAGE = require("@/assets/images/card-app-icon-transparent.png");
 
-export const SHARE_JOIN_URL = "baited-brothers://";
+export const APP_STORE_URL = "https://apps.apple.com/kr/app/id6792683065";
+export const PLAY_STORE_URL =
+  "https://play.google.com/store/apps/details?id=com.sigcrew.baitedbrothers";
+export const SMART_APP_LINK_URL =
+  process.env.EXPO_PUBLIC_SHARE_LINK_URL?.trim() ||
+  "https://baited-brothers-share.vercel.app/open";
+export const SHARE_JOIN_URL = SMART_APP_LINK_URL;
+
+export const getShareMessage = (
+  item: Pick<ShareCatchData, "fishName" | "sizeCm">,
+) => {
+  const catchLabel =
+    item.sizeCm != null
+      ? `${item.fishName} ${item.sizeCm.toFixed(1)}cm`
+      : item.fishName;
+
+  return [
+    `낚시당한 녀석들에서 ${catchLabel} 조과를 기록했어요.`,
+    "",
+    "나만의 출조와 조과를 기록해 보세요.",
+    `앱에서 열기 또는 설치하기: ${SMART_APP_LINK_URL}`,
+  ].join("\n");
+};
 
 export const getBroadRegionLabel = (locationName?: string | null) => {
   const normalized = locationName?.trim();
@@ -51,15 +73,14 @@ export const shareCatchFromUserCatch = (item: UserCatch): ShareCatchData => {
     id: item.id,
     imageSource: item.image_url
       ? { uri: item.image_url }
-      : illustration ?? FALLBACK_IMAGE,
+      : (illustration ?? FALLBACK_IMAGE),
     fishName:
       item.fish?.name_ko ??
       item.fish?.name ??
       item.custom_species_name ??
       "어종 미확인",
     scientificName:
-      item.fish?.name?.split(/\s+/).slice(0, 2).join(" ") ??
-      "OUTSIDE FIELD 60",
+      item.fish?.name?.split(/\s+/).slice(0, 2).join(" ") ?? "OUTSIDE FIELD 60",
     sizeCm: item.size_cm,
     caughtAt: item.caught_at,
     regionLabel: getBroadRegionLabel(item.location_name),

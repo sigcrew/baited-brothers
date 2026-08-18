@@ -1,0 +1,14 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.sigcrew.baitedbrothers",
+      "sha256_cert_fingerprints": [
+        "2E:CA:0A:07:CA:70:A6:EC:0D:88:9C:9D:1D:C7:00:7D:73:8F:28:4C:38:E7:5F:A8:9E:84:C2:61:20:47:59:13",
+        "A2:27:90:BE:DC:88:9C:61:55:FF:EF:43:38:C3:91:2D:69:CC:D0:1E:65:D1:9E:92:F4:72:21:4F:67:74:FD:79",
+        "FA:C6:17:45:DC:09:03:78:6F:B9:ED:E6:2A:96:2B:39:9F:73:48:F0:BB:6F:89:9B:83:32:66:75:91:03:3B:9C"
+      ]
+    }
+  }
+]

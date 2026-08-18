@@ -1,0 +1,15 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["867RGMZD7Y.com.sigcrew.baitedbrothers"],
+        "components": [
+          {
+            "/": "/open",
+            "comment": "Baited Brothers shared app link"
+          }
+        ]
+      }
+    ]
+  }
+}

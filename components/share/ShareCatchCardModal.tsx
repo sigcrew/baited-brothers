@@ -1,5 +1,4 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import * as Sharing from "expo-sharing";
 import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -10,6 +9,7 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
+import Share from "react-native-share";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ViewShot from "react-native-view-shot";
 
@@ -19,7 +19,11 @@ import {
 } from "@/components/share/ShareCatchCard";
 import { useFieldNotice } from "@/src/contexts/FieldNoticeContext";
 import { trackAnalyticsEvent } from "@/src/lib/analytics";
-import type { ShareCatchData } from "@/src/lib/shareCard";
+import {
+  getShareCardNumber,
+  getShareMessage,
+  type ShareCatchData,
+} from "@/src/lib/shareCard";
 import {
   FIELD_COLORS,
   bodyExtraBoldFont,
@@ -74,19 +78,21 @@ export const ShareCatchCardModal = ({
     if (isSharing) return;
     setIsSharing(true);
     try {
-      if (!(await Sharing.isAvailableAsync())) {
-        throw new Error("이 기기에서는 공유 기능을 사용할 수 없습니다.");
-      }
       const uri = await viewShotRef.current?.capture?.();
       if (!uri) throw new Error("카드 이미지를 만들지 못했습니다.");
       void trackAnalyticsEvent("share_sheet_opened", {
         source,
         region_visible: showRegion,
       });
-      await Sharing.shareAsync(uri, {
-        mimeType: "image/png",
-        UTI: "public.png",
-        dialogTitle: "조과 카드 공유",
+      await Share.open({
+        title: "조과 카드 공유",
+        subject: `${item.fishName} 조과 카드`,
+        message: getShareMessage(item),
+        url: uri,
+        type: "image/png",
+        filename: `baited-brothers-${getShareCardNumber(item.id).toLowerCase()}`,
+        failOnCancel: false,
+        useInternalStorage: true,
       });
     } catch (error) {
       void trackAnalyticsEvent("share_card_failed", { source });
@@ -138,7 +144,12 @@ export const ShareCatchCardModal = ({
             onPress={onClose}
             accessibilityRole="button"
             accessibilityLabel="공유 카드 닫기"
-            style={{ width: 42, height: 42, alignItems: "center", justifyContent: "center" }}
+            style={{
+              width: 42,
+              height: 42,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
             <FontAwesome name="close" size={21} color={FIELD_COLORS.ink} />
           </TouchableOpacity>
@@ -147,10 +158,19 @@ export const ShareCatchCardModal = ({
         <ScrollView
           bounces={false}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ alignItems: "center", padding: 16, paddingBottom: insets.bottom + 108 }}
+          contentContainerStyle={{
+            alignItems: "center",
+            padding: 16,
+            paddingBottom: insets.bottom + 108,
+          }}
         >
           <Text
-            style={{ alignSelf: "flex-start", color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont, fontSize: 14 }}
+            style={{
+              alignSelf: "flex-start",
+              color: FIELD_COLORS.ink,
+              fontFamily: bodyExtraBoldFont,
+              fontSize: 14,
+            }}
           >
             위치 표시
           </Text>
@@ -168,7 +188,11 @@ export const ShareCatchCardModal = ({
           >
             {[
               { label: "위치 숨김", value: false, disabled: false },
-              { label: "지역만 표시", value: true, disabled: !item.regionLabel },
+              {
+                label: "지역만 표시",
+                value: true,
+                disabled: !item.regionLabel,
+              },
             ].map((option) => {
               const selected = showRegion === option.value;
               return (
@@ -183,7 +207,9 @@ export const ShareCatchCardModal = ({
                     minHeight: 39,
                     alignItems: "center",
                     justifyContent: "center",
-                    backgroundColor: selected ? FIELD_COLORS.teal : "transparent",
+                    backgroundColor: selected
+                      ? FIELD_COLORS.teal
+                      : "transparent",
                     opacity: option.disabled ? 0.42 : 1,
                   }}
                 >
@@ -213,7 +239,12 @@ export const ShareCatchCardModal = ({
             />
           </ViewShot>
           <Text
-            style={{ marginTop: 12, color: FIELD_COLORS.muted, fontFamily: bodyFont, fontSize: 12 }}
+            style={{
+              marginTop: 12,
+              color: FIELD_COLORS.muted,
+              fontFamily: bodyFont,
+              fontSize: 12,
+            }}
           >
             상세 포인트와 좌표는 카드에 포함하지 않습니다.
           </Text>
@@ -252,8 +283,15 @@ export const ShareCatchCardModal = ({
             ) : (
               <FontAwesome name="share-alt" size={17} color="#FFFFFF" />
             )}
-            <Text style={{ marginLeft: 9, color: "#FFFFFF", fontFamily: bodyExtraBoldFont, fontSize: 17 }}>
-              이미지로 공유하기
+            <Text
+              style={{
+                marginLeft: 9,
+                color: "#FFFFFF",
+                fontFamily: bodyExtraBoldFont,
+                fontSize: 17,
+              }}
+            >
+              카드와 앱 링크 공유하기
             </Text>
           </TouchableOpacity>
         </View>

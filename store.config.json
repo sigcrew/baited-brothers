@@ -1,7 +1,7 @@
 {
   "configVersion": 0,
   "apple": {
-    "version": "1.0",
+    "version": "1.1.2",
     "copyright": "2026 SIGCREW",
     "categories": ["SPORTS", "LIFESTYLE"],
     "release": {
@@ -13,6 +13,7 @@
         "subtitle": "Your fishing field journal",
         "description": "Keep every fishing trip, catch, and discovery in one field journal. Baited Brothers helps anglers photograph a catch, review AI-suggested species candidates, and make the final identification themselves. Build a 60-species collection, create catch cards, and unlock badges as your fishing history grows.\n\nKey features\n• Record trips with dates, locations, notes, and cover photos\n• Photograph catches and review up to three AI species candidates\n• Confirm the species yourself or search the catalog manually\n• Save catch size, memo, location, and photos\n• Explore a 60-species field guide with bait, fishing tips, and references to public fishing regulations\n• Collect species illustrations, catch cards, and achievement badges\n• Edit or delete catches and permanently delete your account in the app\n\nAI identification is provided as a candidate recommendation and does not automatically confirm a species.\n\nDisclaimer: This app is not affiliated with, endorsed by, or operated by any government agency. Any fishing regulation information shown in the app (such as closed seasons or minimum size limits) is for general reference only and may be incomplete or outdated. Always verify the latest official notices before fishing.\n\nOfficial government sources:\n• Ministry of Oceans and Fisheries (Korea) closed season / minimum size notice: https://www.mof.go.kr/doc/ko/selectDoc.do?bbsSeq=22&docSeq=66688&menuSeq=851\n• National Institute of Fisheries Science: https://www.nifs.go.kr/",
         "keywords": ["fishing", "fish", "catch log", "field guide", "angler", "species"],
+        "releaseNotes": "Share your catch card together with an app link. The link opens Baited Brothers when installed, or guides friends to the store when it is not. We also improved sharing reliability and presentation.",
         "promoText": "Photograph your catch, confirm the species, and build your own fishing field journal.",
         "supportUrl": "https://sigcrew.github.io/baited-brothers/privacy/",
         "privacyPolicyUrl": "https://sigcrew.github.io/baited-brothers/privacy/",
@@ -33,6 +34,7 @@
         "subtitle": "조과와 도감을 쌓는 낚시 일지",
         "description": "출조의 순간부터 잡은 물고기와 도감 수집까지 한곳에 기록하세요. 낚시당한 녀석들은 물고기 사진을 분석해 어종 후보를 추천하고, 사용자가 직접 최종 어종을 확정하는 낚시 필드 저널입니다.\n\n주요 기능\n• 날짜·장소·메모·커버 사진을 담은 출조 일지\n• 촬영 사진을 바탕으로 최대 3개의 AI 어종 후보 추천\n• 후보 직접 확정, 후보에 없을 때 도감에서 수동 검색\n• 물고기 크기·메모·위치·사진을 담은 조과 기록\n• 미끼·낚시법·특징·공개된 낚시 규정 참고 정보를 확인하는 60종 도감\n• 컬러 일러스트, 조과 카드와 배지 수집\n• 조과 수정·삭제 및 앱 내 계정 탈퇴 지원\n\nAI 판별은 어종 후보 추천 기능이며 어종을 자동 확정하지 않습니다.\n\n면책 조항: 본 앱은 정부 기관이 아니며, 어떠한 정부 기관도 대표·운영·보증하지 않습니다. 앱에 표시되는 금어기·금지체장 등 낚시 규정 정보는 참고용이며 완전하거나 최신일 것을 보장하지 않습니다. 출조 전 반드시 최신 공식 고시를 확인하세요.\n\n공식 정부 출처:\n• 해양수산부 금어기·금지체장 기준 알림: https://www.mof.go.kr/doc/ko/selectDoc.do?bbsSeq=22&docSeq=66688&menuSeq=851\n• 국립수산과학원: https://www.nifs.go.kr/",
         "keywords": ["낚시", "조과", "물고기", "도감", "출조", "낚시일지", "어종", "낚시기록"],
+        "releaseNotes": "조과 카드와 앱 링크를 함께 공유할 수 있어요. 링크를 누르면 앱이 설치된 경우 바로 열리고, 설치되지 않은 경우 스토어 안내 페이지로 연결됩니다. 공유 화면과 안정성도 개선했습니다.",
         "promoText": "사진으로 어종 후보를 확인하고 나만의 출조·조과·도감을 완성하세요.",
         "supportUrl": "https://sigcrew.github.io/baited-brothers/privacy/",
         "privacyPolicyUrl": "https://sigcrew.github.io/baited-brothers/privacy/",
