@@ -155,7 +155,7 @@ export const FishingMap = ({
         maxZoomLevel={18}
         showsCompass={false}
         showsUserLocation={false}
-        onMapLoaded={() => setMapLoadState("ready")}
+        onMapReady={() => setMapLoadState("ready")}
         onPress={(event) => {
           if (
             event.nativeEvent.action === "marker-press" ||
