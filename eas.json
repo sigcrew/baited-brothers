@@ -17,6 +17,13 @@
     }
   },
   "submit": {
+    "internal": {
+      "android": {
+        "applicationId": "com.sigcrew.baitedbrothers",
+        "track": "internal",
+        "releaseStatus": "completed"
+      }
+    },
     "production": {
       "ios": {
         "ascAppId": "6792683065"
