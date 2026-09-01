@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/contexts/AuthContext";
 import type { Tables } from "@/src/types/database";
@@ -8,6 +8,7 @@ import {
 } from "@/src/lib/userMedia";
 import { trackAnalyticsEvent } from "@/src/lib/analytics";
 import { countsForCollectionRewards } from "@/src/lib/catchRewards";
+import { toUserMessage, withTimeout } from "@/src/lib/appErrors";
 
 export type UserCatch = Tables<"user_catches"> & {
   thumbnail_url?: string | null;
@@ -30,6 +31,7 @@ export const useUserCatches = (tripId?: string) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const pendingOperations = useRef(new Set<string>());
 
   const fetchCatches = useCallback(
     async (isRefresh = false) => {
@@ -60,7 +62,7 @@ export const useUserCatches = (tripId?: string) => {
 
       if (fetchError) {
         setError(fetchError as Error);
-        setCatches([]);
+        if (!isRefresh) setCatches([]);
       } else {
         const rows = (data as UserCatch[]) ?? [];
         try {
@@ -118,6 +120,10 @@ export const useUserCatches = (tripId?: string) => {
     },
   ) => {
     if (!userId) return { error: new Error("로그인이 필요합니다.") };
+    const operationKey = catchId;
+    if (pendingOperations.current.has(operationKey)) {
+      return { error: new Error("이미 저장 중입니다. 잠시만 기다려 주세요.") };
+    }
     const current = catches.find((item) => item.id === catchId);
     const customSpeciesName = input.customSpeciesName?.trim() || null;
     const speciesIncluded =
@@ -136,25 +142,56 @@ export const useUserCatches = (tripId?: string) => {
       speciesIncluded &&
       (current?.fish_id !== (input.fishId ?? null) ||
         current?.custom_species_name !== customSpeciesName);
-    const { error: updateError } = await supabase
-      .from("user_catches")
-      .update({
-        size_cm: input.sizeCm ?? null,
-        memo: input.memo?.trim() || null,
-        ...(speciesIncluded
-          ? {
-              fish_id: input.fishId ?? null,
-              custom_species_name: customSpeciesName,
-            }
-          : {}),
-      })
-      .eq("id", catchId)
-      .eq("user_id", userId);
-    if (!updateError) {
+    pendingOperations.current.add(operationKey);
+    try {
+      const { data: updatedCatch, error: updateError } = await withTimeout(
+        Promise.resolve(
+          supabase
+            .from("user_catches")
+            .update({
+              size_cm: input.sizeCm ?? null,
+              memo: input.memo?.trim() || null,
+              ...(speciesIncluded
+                ? {
+                    fish_id: input.fishId ?? null,
+                    custom_species_name: customSpeciesName,
+                  }
+                : {}),
+            })
+            .eq("id", catchId)
+            .eq("user_id", userId)
+            .select(
+              "*, fish:fishes!user_catches_fish_id_fkey(id, name, name_ko, image_url, category, catalog_sort_order)",
+            )
+            .maybeSingle(),
+        ),
+        15_000,
+        "조과 저장 시간이 초과되었습니다.",
+      );
+      if (updateError) {
+        return {
+          error: new Error(toUserMessage(updateError, "조과 저장에 실패했습니다.")),
+        };
+      }
+      if (!updatedCatch) {
+        return {
+          error: new Error(
+            "수정할 조과를 찾지 못했습니다. 목록을 새로고침한 뒤 다시 시도해 주세요.",
+          ),
+        };
+      }
+
+      setCatches((items) =>
+        items.map((item) =>
+          item.id === catchId ? (updatedCatch as UserCatch) : item,
+        ),
+      );
       if (speciesChanged && input.fishId) {
-        await supabase.functions.invoke("verify-catch", {
-          body: { catchId },
-        });
+        void supabase.functions
+          .invoke("verify-catch", { body: { catchId } })
+          .finally(() => fetchCatches(true));
+      } else {
+        void fetchCatches(true);
       }
       void trackAnalyticsEvent("catch_updated", {
         has_size: input.sizeCm != null,
@@ -162,32 +199,74 @@ export const useUserCatches = (tripId?: string) => {
         species_changed: speciesChanged,
         outside_catalog: speciesIncluded && !input.fishId,
       });
-      await fetchCatches(true);
+      return { error: null };
+    } catch (updateError) {
+      return {
+        error: new Error(
+          toUserMessage(updateError, "조과 저장에 실패했습니다."),
+        ),
+      };
+    } finally {
+      pendingOperations.current.delete(operationKey);
     }
-    return { error: updateError ? (updateError as Error) : null };
   };
 
   const deleteCatch = async (item: UserCatch) => {
     if (!userId) return { error: new Error("로그인이 필요합니다.") };
-    const { error: deleteError } = await supabase
-      .from("user_catches")
-      .delete()
-      .eq("id", item.id)
-      .eq("user_id", userId);
-    if (deleteError) return { error: deleteError as Error };
+    const operationKey = item.id;
+    if (pendingOperations.current.has(operationKey)) {
+      return { error: new Error("이미 삭제 중입니다. 잠시만 기다려 주세요.") };
+    }
 
-    const legacyMarker = "/storage/v1/object/public/user-uploads/";
-    const legacyPath = item.image_url?.includes(legacyMarker)
-      ? decodeURIComponent(item.image_url.split(legacyMarker)[1] ?? "")
-      : null;
-    await removeUserMedia([
-      item.image_path,
-      item.thumbnail_path,
-      legacyPath,
-    ]);
-    void trackAnalyticsEvent("catch_deleted");
-    await fetchCatches(true);
-    return { error: null };
+    pendingOperations.current.add(operationKey);
+    try {
+      const { data: deletedRows, error: deleteError } = await withTimeout(
+        Promise.resolve(
+          supabase
+            .from("user_catches")
+            .delete()
+            .eq("id", item.id)
+            .eq("user_id", userId)
+            .select("id"),
+        ),
+        15_000,
+        "조과 삭제 시간이 초과되었습니다.",
+      );
+      if (deleteError) {
+        return {
+          error: new Error(toUserMessage(deleteError, "조과 삭제에 실패했습니다.")),
+        };
+      }
+      if (!deletedRows?.length) {
+        return {
+          error: new Error(
+            "삭제할 조과를 찾지 못했습니다. 목록을 새로고침한 뒤 다시 시도해 주세요.",
+          ),
+        };
+      }
+
+      setCatches((items) => items.filter((current) => current.id !== item.id));
+      const legacyMarker = "/storage/v1/object/public/user-uploads/";
+      const legacyPath = item.image_url?.includes(legacyMarker)
+        ? decodeURIComponent(item.image_url.split(legacyMarker)[1] ?? "")
+        : null;
+      void removeUserMedia([
+        item.image_path,
+        item.thumbnail_path,
+        legacyPath,
+      ]).catch(() => undefined);
+      void trackAnalyticsEvent("catch_deleted");
+      void fetchCatches(true);
+      return { error: null };
+    } catch (deleteError) {
+      return {
+        error: new Error(
+          toUserMessage(deleteError, "조과 삭제에 실패했습니다."),
+        ),
+      };
+    } finally {
+      pendingOperations.current.delete(operationKey);
+    }
   };
 
   return {

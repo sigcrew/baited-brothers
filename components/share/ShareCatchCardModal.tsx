@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import Share from "react-native-share";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import ViewShot from "react-native-view-shot";
+import ViewShot, { type ViewShotRef } from "react-native-view-shot";
 
 import {
   ShareCatchCard,
@@ -50,13 +50,18 @@ export const ShareCatchCardModal = ({
   const insets = useSafeAreaInsets();
   const { width: windowWidth } = useWindowDimensions();
   const { alert } = useFieldNotice();
-  const viewShotRef = useRef<ViewShot>(null);
+  const viewShotRef = useRef<ViewShotRef>(null);
+  const sharingGuard = useRef(false);
   const [showRegion, setShowRegion] = useState(initialShowRegion);
   const [isSharing, setIsSharing] = useState(false);
   const cardWidth = Math.min(windowWidth - 32, 380);
 
   useEffect(() => {
-    if (!visible) return;
+    if (!visible) {
+      sharingGuard.current = false;
+      setIsSharing(false);
+      return;
+    }
     setShowRegion(initialShowRegion);
     void trackAnalyticsEvent("share_card_previewed", {
       source,
@@ -75,7 +80,8 @@ export const ShareCatchCardModal = ({
   };
 
   const shareCard = async () => {
-    if (isSharing) return;
+    if (sharingGuard.current) return;
+    sharingGuard.current = true;
     setIsSharing(true);
     try {
       const uri = await viewShotRef.current?.capture?.();
@@ -105,8 +111,13 @@ export const ShareCatchCardModal = ({
             : "잠시 후 다시 시도해 주세요.",
       });
     } finally {
+      sharingGuard.current = false;
       setIsSharing(false);
     }
+  };
+
+  const requestClose = () => {
+    if (!sharingGuard.current) onClose();
   };
 
   return (
@@ -114,7 +125,7 @@ export const ShareCatchCardModal = ({
       visible={visible}
       animationType="slide"
       presentationStyle="fullScreen"
-      onRequestClose={onClose}
+      onRequestClose={requestClose}
     >
       <View style={{ flex: 1, backgroundColor: FIELD_COLORS.foam }}>
         <View
@@ -141,9 +152,11 @@ export const ShareCatchCardModal = ({
             공유 카드 만들기
           </Text>
           <TouchableOpacity
-            onPress={onClose}
+            onPress={requestClose}
+            disabled={isSharing}
             accessibilityRole="button"
             accessibilityLabel="공유 카드 닫기"
+            accessibilityState={{ disabled: isSharing }}
             style={{
               width: 42,
               height: 42,
@@ -198,10 +211,13 @@ export const ShareCatchCardModal = ({
               return (
                 <TouchableOpacity
                   key={option.label}
-                  disabled={option.disabled}
+                  disabled={option.disabled || isSharing}
                   onPress={() => chooseLocationMode(option.value)}
                   accessibilityRole="button"
-                  accessibilityState={{ selected, disabled: option.disabled }}
+                  accessibilityState={{
+                    selected,
+                    disabled: option.disabled || isSharing,
+                  }}
                   style={{
                     flex: 1,
                     minHeight: 39,
@@ -269,6 +285,7 @@ export const ShareCatchCardModal = ({
             disabled={isSharing}
             accessibilityRole="button"
             accessibilityLabel="이미지로 공유하기"
+            accessibilityState={{ disabled: isSharing, busy: isSharing }}
             style={{
               minHeight: 52,
               flexDirection: "row",

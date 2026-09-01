@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useFishes } from "@/src/hooks/useFishes";
 import { useUserCatches } from "@/src/hooks/useUserCatches";
 import { useFishingTrips } from "@/src/hooks/useFishingTrips";
@@ -25,6 +25,7 @@ const SEGMENTS: { key: CollectionSegment; label: string }[] = [
 
 const CollectionScreen = () => {
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation();
   const router = useRouter();
   const params = useLocalSearchParams<{
     cardPreview?: string;
@@ -38,6 +39,17 @@ const CollectionScreen = () => {
   );
   const [editingCatch, setEditingCatch] = useState<UserCatch | null>(null);
   const [isSavingCatch, setIsSavingCatch] = useState(false);
+  const [isCardOverlayVisible, setIsCardOverlayVisible] = useState(false);
+  const baseAccessibilityHidden =
+    Boolean(editingCatch) || isCardOverlayVisible;
+
+  useEffect(() => {
+    navigation.setOptions({
+      tabBarStyle: baseAccessibilityHidden ? { display: "none" } : undefined,
+    });
+
+    return () => navigation.setOptions({ tabBarStyle: undefined });
+  }, [baseAccessibilityHidden, navigation]);
 
   useEffect(() => {
     if (params.segment === "cards" || params.segment === "badges") {
@@ -175,46 +187,60 @@ const CollectionScreen = () => {
     },
   ) => {
     setIsSavingCatch(true);
-    const { error } = await updateCatch(item.id, input);
-    setIsSavingCatch(false);
-    if (!error) setEditingCatch(null);
-    return error;
+    try {
+      const { error } = await updateCatch(item.id, input);
+      if (!error) setEditingCatch(null);
+      return error;
+    } catch (error) {
+      return error instanceof Error
+        ? error
+        : new Error("조과 저장에 실패했습니다.");
+    } finally {
+      setIsSavingCatch(false);
+    }
   };
 
   return (
     <View className="flex-1" style={{ paddingTop: insets.top, backgroundColor: FIELD_COLORS.foam }}>
-      <ArchiveTabHeader
-        title="수집"
-        actionLabel="기록하기"
-        backgroundColor={FIELD_COLORS.foam}
-        onAction={() => router.push("/record")}
-      />
-      <View className="px-7 pb-0" style={{ backgroundColor: FIELD_COLORS.foam }}>
-        <View className="mt-3 flex-row justify-between">
-          {SEGMENTS.map(({ key, label }) => {
-            const isActive = segment === key;
-            return (
-              <TouchableOpacity
-                key={key}
-                onPress={() => setSegment(key)}
-                className="min-w-[30%] items-center pb-4"
-                accessibilityRole="tab"
-                accessibilityState={{ selected: isActive }}
-              >
-                <Text
-                  className="text-base font-semibold"
-                  style={{ color: isActive ? FIELD_COLORS.teal : "#4B4F50" }}
+      <View
+        accessibilityElementsHidden={baseAccessibilityHidden}
+        importantForAccessibility={
+          baseAccessibilityHidden ? "no-hide-descendants" : "auto"
+        }
+      >
+        <ArchiveTabHeader
+          title="수집"
+          actionLabel="기록하기"
+          backgroundColor={FIELD_COLORS.foam}
+          onAction={() => router.push("/record")}
+        />
+        <View className="px-7 pb-0" style={{ backgroundColor: FIELD_COLORS.foam }}>
+          <View className="mt-3 flex-row justify-between">
+            {SEGMENTS.map(({ key, label }) => {
+              const isActive = segment === key;
+              return (
+                <TouchableOpacity
+                  key={key}
+                  onPress={() => setSegment(key)}
+                  className="min-w-[30%] items-center pb-4"
+                  accessibilityRole="tab"
+                  accessibilityState={{ selected: isActive }}
                 >
-                  {label}
-                </Text>
-                {isActive ? (
-                  <View className="absolute bottom-0 left-0 right-0 h-[3px]" style={{ backgroundColor: FIELD_COLORS.teal }} />
-                ) : null}
-              </TouchableOpacity>
-            );
-          })}
+                  <Text
+                    className="text-base font-semibold"
+                    style={{ color: isActive ? FIELD_COLORS.teal : "#4B4F50" }}
+                  >
+                    {label}
+                  </Text>
+                  {isActive ? (
+                    <View className="absolute bottom-0 left-0 right-0 h-[3px]" style={{ backgroundColor: FIELD_COLORS.teal }} />
+                  ) : null}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+          <View className="h-px" style={{ backgroundColor: FIELD_COLORS.rule }} />
         </View>
-        <View className="h-px" style={{ backgroundColor: FIELD_COLORS.rule }} />
       </View>
 
       {segment === "encyclopedia" && (
@@ -252,6 +278,8 @@ const CollectionScreen = () => {
           requestedCatchId={params.catchId}
           onRequestedCatchOpened={handleRequestedCatchOpened}
           onEditCatch={setEditingCatch}
+          baseAccessibilityHidden={baseAccessibilityHidden}
+          onOverlayVisibilityChange={setIsCardOverlayVisible}
         />
       )}
       <CatchEditModal

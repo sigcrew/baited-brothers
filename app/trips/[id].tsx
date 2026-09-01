@@ -39,6 +39,7 @@ import {
 } from "@/src/theme/fieldJournal";
 import { trackAnalyticsEvent } from "@/src/lib/analytics";
 import { useFieldNotice } from "@/src/contexts/FieldNoticeContext";
+import { toUserMessage } from "@/src/lib/appErrors";
 
 const DEFAULT_COVER = require("@/assets/images/design/first-trip-cover-v1.png");
 
@@ -109,12 +110,32 @@ const TripDetailScreen = () => {
       destructive,
     });
     if (!confirmed) return;
-    const { error } = await action();
-    if (error) {
-      await alert({ eyebrow: "FIELD LOG · ERROR", title: "처리하지 못했습니다", message: error.message });
-      return;
-    }
-    onSuccess?.();
+    const runAction = async (): Promise<void> => {
+      let actionError: Error | null = null;
+      try {
+        const result = await action();
+        actionError = result.error;
+      } catch (error) {
+        actionError = error instanceof Error
+          ? error
+          : new Error("요청을 처리하지 못했습니다.");
+      }
+      if (!actionError) {
+        onSuccess?.();
+        return;
+      }
+
+      const retry = await confirm({
+        eyebrow: "FIELD LOG · RETRY",
+        title: "처리하지 못했습니다",
+        message: toUserMessage(actionError),
+        confirmLabel: "다시 시도",
+        cancelLabel: "닫기",
+        destructive,
+      });
+      if (retry) await runAction();
+    };
+    await runAction();
   };
 
   if (isLoading) {
@@ -171,10 +192,17 @@ const TripDetailScreen = () => {
     },
   ) => {
     setIsSavingCatch(true);
-    const { error } = await updateCatch(item.id, input);
-    setIsSavingCatch(false);
-    if (!error) setEditingCatch(null);
-    return error;
+    try {
+      const { error } = await updateCatch(item.id, input);
+      if (!error) setEditingCatch(null);
+      return error;
+    } catch (error) {
+      return error instanceof Error
+        ? error
+        : new Error("조과 저장에 실패했습니다.");
+    } finally {
+      setIsSavingCatch(false);
+    }
   };
 
   const confirmCatchDelete = (item: UserCatch) =>
@@ -272,6 +300,10 @@ const TripDetailScreen = () => {
     <View className="flex-1" style={{ backgroundColor: FIELD_COLORS.foam }}>
       <Stack.Screen options={{ headerShown: false }} />
       <ScrollView
+        accessibilityElementsHidden={Boolean(editVisible || editingCatch)}
+        importantForAccessibility={
+          editVisible || editingCatch ? "no-hide-descendants" : "auto"
+        }
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -594,6 +626,8 @@ const TripDetailScreen = () => {
                       )}
                       <View className="flex-row">
                         <TouchableOpacity
+                          accessibilityRole="button"
+                          accessibilityLabel={`${item.fish?.name_ko ?? item.fish?.name ?? item.custom_species_name ?? "조과"} 기록 수정`}
                           onPress={() => setEditingCatch(item)}
                           className="px-3 py-2"
                         >
@@ -605,6 +639,8 @@ const TripDetailScreen = () => {
                           </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
+                          accessibilityRole="button"
+                          accessibilityLabel={`${item.fish?.name_ko ?? item.fish?.name ?? item.custom_species_name ?? "조과"} 기록 삭제`}
                           onPress={() => confirmCatchDelete(item)}
                           className="ml-2 px-3 py-2"
                         >

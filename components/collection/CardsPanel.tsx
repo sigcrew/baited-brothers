@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -34,6 +34,8 @@ type CardsPanelProps = {
   requestedCatchId?: string;
   onRequestedCatchOpened?: () => void;
   onEditCatch?: (item: UserCatch) => void;
+  baseAccessibilityHidden?: boolean;
+  onOverlayVisibilityChange?: (visible: boolean) => void;
 };
 
 const CatchCardTile = ({
@@ -72,10 +74,24 @@ const CatchDetailModal = ({
 }) => {
   const insets = useSafeAreaInsets();
   const [actionMenuVisible, setActionMenuVisible] = useState(false);
+  const [actionPending, setActionPending] = useState(false);
+  const actionGuard = useRef(false);
 
   useEffect(() => {
-    if (!visible) setActionMenuVisible(false);
+    if (!visible) {
+      setActionMenuVisible(false);
+      setActionPending(false);
+      actionGuard.current = false;
+    }
   }, [visible]);
+
+  const runAction = (action: () => void) => {
+    if (actionGuard.current) return;
+    actionGuard.current = true;
+    setActionPending(true);
+    setActionMenuVisible(false);
+    action();
+  };
 
   if (!item) return null;
 
@@ -91,43 +107,42 @@ const CatchDetailModal = ({
       }
     >
       <View
+        accessibilityViewIsModal
         className="flex-1 items-center justify-center px-4"
         style={{ paddingTop: insets.top + 12, paddingBottom: insets.bottom + 12 }}
       >
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="카드 상세 닫기"
-          onPress={onClose}
-          style={{
-            position: "absolute",
-            inset: 0,
-            backgroundColor: "rgba(5, 28, 35, 0.68)",
-          }}
-        />
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="조과 카드 닫기"
-          accessibilityViewIsModal
-          onPress={onClose}
-          style={{
-            width: "100%",
-            maxWidth: 430,
-            backgroundColor: FIELD_COLORS.foam,
-          }}
-        >
-          <CatchArchiveCard
-            item={item}
-            variant="detail"
-            onLocationPress={
-              item.location_lat != null && item.location_lng != null
-                ? () => onLocationPress(item)
-                : undefined
-            }
-            onMorePress={
-              () => setActionMenuVisible(true)
-            }
-          />
-        </Pressable>
+        {!actionMenuVisible ? (
+          <>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="카드 상세 닫기"
+              onPress={onClose}
+              style={{
+                position: "absolute",
+                inset: 0,
+                backgroundColor: "rgba(5, 28, 35, 0.68)",
+              }}
+            />
+            <View
+              style={{
+                width: "100%",
+                maxWidth: 430,
+                backgroundColor: FIELD_COLORS.foam,
+              }}
+            >
+              <CatchArchiveCard
+                item={item}
+                variant="detail"
+                onLocationPress={
+                  item.location_lat != null && item.location_lng != null
+                    ? () => onLocationPress(item)
+                    : undefined
+                }
+                onMorePress={() => setActionMenuVisible(true)}
+              />
+            </View>
+          </>
+        ) : null}
         {actionMenuVisible ? (
           <>
             <Pressable
@@ -137,7 +152,7 @@ const CatchDetailModal = ({
               style={{
                 position: "absolute",
                 inset: 0,
-                backgroundColor: "rgba(5, 28, 35, 0.38)",
+                backgroundColor: "rgba(5, 28, 35, 0.78)",
               }}
             />
             <View
@@ -154,10 +169,9 @@ const CatchDetailModal = ({
               <TouchableOpacity
                 accessibilityRole="button"
                 accessibilityLabel="공유 카드 만들기"
-                onPress={() => {
-                  setActionMenuVisible(false);
-                  onShare(item);
-                }}
+                disabled={actionPending}
+                accessibilityState={{ disabled: actionPending }}
+                onPress={() => runAction(() => onShare(item))}
                 className="h-14 flex-row items-center border px-5"
                 style={{ borderColor: FIELD_COLORS.rule }}
               >
@@ -180,10 +194,9 @@ const CatchDetailModal = ({
               <TouchableOpacity
                 accessibilityRole="button"
                 accessibilityLabel="조과 기록 수정"
-                onPress={() => {
-                  setActionMenuVisible(false);
-                  onEdit(item);
-                }}
+                disabled={actionPending}
+                accessibilityState={{ disabled: actionPending }}
+                onPress={() => runAction(() => onEdit(item))}
                 className="mt-3 h-14 flex-row items-center border px-5"
                 style={{ borderColor: FIELD_COLORS.rule }}
               >
@@ -206,6 +219,8 @@ const CatchDetailModal = ({
               <TouchableOpacity
                 accessibilityRole="button"
                 accessibilityLabel="조과 카드 메뉴 취소"
+                disabled={actionPending}
+                accessibilityState={{ disabled: actionPending }}
                 onPress={() => setActionMenuVisible(false)}
                 className="mt-3 h-12 items-center justify-center"
               >
@@ -237,6 +252,8 @@ export const CardsPanel = ({
   requestedCatchId,
   onRequestedCatchOpened,
   onEditCatch,
+  baseAccessibilityHidden = false,
+  onOverlayVisibilityChange,
 }: CardsPanelProps) => {
   const router = useRouter();
   const [selected, setSelected] = useState<UserCatch | null>(null);
@@ -244,6 +261,7 @@ export const CardsPanel = ({
   const [sortDirection, setSortDirection] = useState<"newest" | "oldest">(
     "newest",
   );
+  const overlayVisible = Boolean(selected || shareItem);
   const sortedCatches = useMemo(
     () =>
       [...catches].sort((left, right) =>
@@ -270,6 +288,11 @@ export const CardsPanel = ({
     const updatedCatch = catches.find((item) => item.id === selected.id);
     if (updatedCatch) setSelected(updatedCatch);
   }, [catches, selected?.id]);
+
+  useEffect(() => {
+    onOverlayVisibilityChange?.(overlayVisible);
+    return () => onOverlayVisibilityChange?.(false);
+  }, [onOverlayVisibilityChange, overlayVisible]);
 
   if (!isLoggedIn) {
     return (
@@ -301,6 +324,12 @@ export const CardsPanel = ({
   return (
     <>
       <FlatList
+        accessibilityElementsHidden={baseAccessibilityHidden || overlayVisible}
+        importantForAccessibility={
+          baseAccessibilityHidden || overlayVisible
+            ? "no-hide-descendants"
+            : "auto"
+        }
         data={sortedCatches}
         keyExtractor={(item) => item.id}
         numColumns={2}
@@ -363,8 +392,18 @@ export const CardsPanel = ({
             params: { focusId: `catch:${item.id}` },
           });
         }}
-        onEdit={onEditCatch}
-        onShare={setShareItem}
+        onEdit={
+          onEditCatch
+            ? (item) => {
+                setSelected(null);
+                onEditCatch(item);
+              }
+            : undefined
+        }
+        onShare={(item) => {
+          setSelected(null);
+          setShareItem(item);
+        }}
       />
       <ShareCatchCardModal
         item={shareItem ? shareCatchFromUserCatch(shareItem) : null}

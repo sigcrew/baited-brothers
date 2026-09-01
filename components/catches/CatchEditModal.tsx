@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Keyboard,
@@ -20,6 +20,7 @@ import {
   bodyExtraBoldFont,
   bodyFont,
 } from "@/src/theme/fieldJournal";
+import { toUserMessage } from "@/src/lib/appErrors";
 
 type Props = {
   item: UserCatch | null;
@@ -53,7 +54,11 @@ export const CatchEditModal = ({
   );
   const [catalogVisible, setCatalogVisible] = useState(false);
   const [validation, setValidation] = useState<string | null>(null);
+  const [saveFailed, setSaveFailed] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const submissionGuard = useRef(false);
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const isBusy = isSaving || isSubmitting;
 
   useEffect(() => {
     setSize(item?.size_cm ? String(item.size_cm) : "");
@@ -62,6 +67,9 @@ export const CatchEditModal = ({
     setCustomSpeciesName(item?.custom_species_name ?? null);
     setCatalogVisible(false);
     setValidation(null);
+    setSaveFailed(false);
+    setIsSubmitting(false);
+    submissionGuard.current = false;
   }, [item]);
 
   useEffect(() => {
@@ -79,38 +87,70 @@ export const CatchEditModal = ({
   }, []);
 
   const submit = async () => {
-    if (!item || isSaving) return;
+    if (!item || isBusy || submissionGuard.current) return;
     const parsed = size.trim() ? Number(size) : null;
     if (parsed !== null && (!Number.isFinite(parsed) || parsed <= 0)) {
       setValidation("크기는 0보다 큰 숫자로 입력해 주세요.");
+      setSaveFailed(false);
       return;
     }
-    const error = await onSave(item, {
-      sizeCm: parsed,
-      memo: memo.trim() || null,
-      fishId: selectedFishId,
-      customSpeciesName,
-    });
-    if (error) setValidation(error.message);
+    submissionGuard.current = true;
+    setIsSubmitting(true);
+    setValidation(null);
+    setSaveFailed(false);
+    try {
+      const error = await onSave(item, {
+        sizeCm: parsed,
+        memo: memo.trim() || null,
+        fishId: selectedFishId,
+        customSpeciesName,
+      });
+      if (error) {
+        setValidation(toUserMessage(error, "조과 저장에 실패했습니다."));
+        setSaveFailed(true);
+      }
+    } catch (error) {
+      setValidation(toUserMessage(error, "조과 저장에 실패했습니다."));
+      setSaveFailed(true);
+    } finally {
+      submissionGuard.current = false;
+      setIsSubmitting(false);
+    }
+  };
+
+  const requestClose = () => {
+    if (!isBusy) onClose();
+  };
+
+  const clearSaveError = () => {
+    if (!saveFailed) return;
+    setValidation(null);
+    setSaveFailed(false);
   };
 
   return (
     <>
       <Modal
-        visible={Boolean(item)}
+        visible={
+          Boolean(item) && (Platform.OS === "android" || !catalogVisible)
+        }
         transparent
         animationType="fade"
-        onRequestClose={onClose}
+        onRequestClose={requestClose}
       >
         <KeyboardAvoidingView
+          accessibilityViewIsModal
           behavior="padding"
           enabled={isKeyboardVisible}
           className="flex-1 justify-end bg-black/50"
         >
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="조과 수정 닫기"
             className="flex-1"
             activeOpacity={1}
-            onPress={onClose}
+            disabled={isBusy}
+            onPress={requestClose}
           />
           <View
             className="bg-white"
@@ -151,6 +191,8 @@ export const CatchEditModal = ({
               <TouchableOpacity
                 accessibilityRole="button"
                 accessibilityLabel="조과 어종 변경"
+                disabled={isBusy}
+                accessibilityState={{ disabled: isBusy }}
                 onPress={() => setCatalogVisible(true)}
                 className="mt-2 flex-row items-center justify-between border px-4 py-3"
                 style={{ borderColor: FIELD_COLORS.rule }}
@@ -192,8 +234,13 @@ export const CatchEditModal = ({
                 크기 (cm)
               </Text>
               <TextInput
+                accessibilityLabel="조과 크기"
                 value={size}
-                onChangeText={setSize}
+                editable={!isBusy}
+                onChangeText={(value) => {
+                  setSize(value);
+                  clearSaveError();
+                }}
                 keyboardType="decimal-pad"
                 className="mt-2 border px-4 py-3"
                 style={{
@@ -219,8 +266,13 @@ export const CatchEditModal = ({
                 style={{ borderColor: FIELD_COLORS.rule, minHeight: 112 }}
               >
                 <TextInput
+                  accessibilityLabel="조과 메모"
                   value={memo}
-                  onChangeText={setMemo}
+                  editable={!isBusy}
+                  onChangeText={(value) => {
+                    setMemo(value);
+                    clearSaveError();
+                  }}
                   multiline
                   textAlignVertical="top"
                   style={{
@@ -238,6 +290,7 @@ export const CatchEditModal = ({
               </View>
               {validation ? (
                 <Text
+                  accessibilityLiveRegion="assertive"
                   className="mt-3 text-sm"
                   style={{ color: FIELD_COLORS.red }}
                 >
@@ -247,27 +300,35 @@ export const CatchEditModal = ({
             </ScrollView>
             <View className="flex-row px-6 pt-3">
               <TouchableOpacity
-                disabled={isSaving}
-                onPress={onClose}
+                accessibilityRole="button"
+                accessibilityLabel="조과 수정 취소"
+                accessibilityState={{ disabled: isBusy }}
+                disabled={isBusy}
+                onPress={requestClose}
                 className="h-12 flex-1 items-center justify-center border"
                 style={{ borderColor: FIELD_COLORS.rule }}
               >
                 <Text style={{ fontFamily: bodyExtraBoldFont }}>취소</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                disabled={isSaving}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  saveFailed ? "조과 수정 저장 다시 시도" : "조과 수정 저장"
+                }
+                accessibilityState={{ disabled: isBusy, busy: isBusy }}
+                disabled={isBusy}
                 onPress={submit}
                 className="ml-3 h-12 flex-1 items-center justify-center"
                 style={{ backgroundColor: FIELD_COLORS.teal }}
               >
-                {isSaving ? (
+                {isBusy ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
                   <Text
                     className="text-white"
                     style={{ fontFamily: bodyExtraBoldFont }}
                   >
-                    저장
+                      {saveFailed ? "다시 시도" : "저장"}
                   </Text>
                 )}
               </TouchableOpacity>
@@ -283,10 +344,12 @@ export const CatchEditModal = ({
         onSelect={(fish) => {
           setSelectedFishId(fish.id);
           setCustomSpeciesName(null);
+          clearSaveError();
         }}
         onSelectCustom={(name) => {
           setSelectedFishId(null);
           setCustomSpeciesName(name);
+          clearSaveError();
         }}
       />
     </>
