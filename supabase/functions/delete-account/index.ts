@@ -1,4 +1,4 @@
-import { createClient } from "npm:@supabase/supabase-js@2.49.1";
+import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2.49.1";
 import {
   decryptAppleRefreshToken,
   isAppleUser,
@@ -25,7 +25,7 @@ const json = (body: unknown, status = 200) =>
   });
 
 const listObjectPaths = async (
-  client: ReturnType<typeof createClient>,
+  client: SupabaseClient,
   bucket: string,
   prefix: string,
 ): Promise<string[]> => {
