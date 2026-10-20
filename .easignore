@@ -47,6 +47,8 @@ assets/images/species/field60-illustrated/outline-background/
 assets/images/species/field60-illustrated/review/
 ml/fishial/artifacts/
 /admin-dashboard/
+/website/
+/official-blog/
 expo-env.d.ts
 .DS_Store
 **/.DS_Store
