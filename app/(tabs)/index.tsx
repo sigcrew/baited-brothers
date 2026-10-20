@@ -343,7 +343,7 @@ const HomeScreen = () => {
                 >
                   다음 출조는 {nextTrip.spot_name}입니다.
                 </Text>
-                <Text className="mt-4 text-[15px] tracking-[1.6px]" style={{ color: heroTextColor, fontFamily: bodySemiBoldFont }}>새벽 5:30 · 우럭 목표</Text>
+                <Text className="mt-4 text-[15px] tracking-[1.6px]" style={{ color: heroTextColor, fontFamily: bodySemiBoldFont }}>{nextDate?.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })} 출조 예정</Text>
               </>
             ) : hasTripHistory ? (
               <View className="pt-3">
@@ -546,7 +546,7 @@ const HomeScreen = () => {
                   className="mt-1 text-[11px] tracking-[1px]"
                   style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}
                 >
-                  {formatTripDate(nextTrip.scheduled_at)} · 우럭 목표
+                  {formatTripDate(nextTrip.scheduled_at)}
                 </Text>
               </View>
               <View

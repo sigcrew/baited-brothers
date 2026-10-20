@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { useWindowDimensions, View } from "react-native";
+import { View } from "react-native";
 import Svg, { Circle, Line, Path, Rect } from "react-native-svg";
 
 type ArchiveTabIconName = "home" | "journal" | "map" | "collection" | "profile";
@@ -12,29 +12,23 @@ type ArchiveTabIconProps = {
 
 const STROKE_WIDTH = 2.2;
 
-const TabIconFrame = ({ children, color, focused }: { children: ReactNode; color: string; focused: boolean }) => {
-  const { width } = useWindowDimensions();
-  const indicatorWidth = width * 0.1875;
-
-  return (
-    <View style={{ width: 34, height: 32, alignItems: "center", justifyContent: "center" }}>
-      {focused ? (
-        <View
-          style={{
-            position: "absolute",
-            top: -14,
-            left: (34 - indicatorWidth) / 2,
-            width: indicatorWidth,
-            height: 3,
-            backgroundColor: color,
-            zIndex: 1,
-          }}
-        />
-      ) : null}
-      {children}
-    </View>
-  );
-};
+const TabIconFrame = ({ children, color, focused }: { children: ReactNode; color: string; focused: boolean }) => (
+  <View style={{ width: 34, height: 32, alignItems: "center", justifyContent: "center" }}>
+    {focused ? (
+      <View
+        style={{
+          position: "absolute",
+          top: -4,
+          width: 20,
+          height: 2,
+          borderRadius: 1,
+          backgroundColor: color,
+        }}
+      />
+    ) : null}
+    {children}
+  </View>
+);
 
 export const ArchiveTabIcon = ({ name, color, focused }: ArchiveTabIconProps) => {
   if (name === "home") {

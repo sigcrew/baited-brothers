@@ -1,7 +1,6 @@
 import { Redirect } from "expo-router";
 import { Tabs } from "expo-router";
-import { Platform } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useArchiveTabBarStyle } from "@/components/navigation/useArchiveTabBarStyle";
 
 import { ArchiveTabIcon } from "@/components/navigation/ArchiveTabIcon";
 import { useAuth } from "@/src/contexts/AuthContext";
@@ -9,11 +8,7 @@ import { FIELD_COLORS, bodySemiBoldFont } from "@/src/theme/fieldJournal";
 
 const TabLayout = () => {
   const { session } = useAuth();
-  const insets = useSafeAreaInsets();
-  const isAndroid = Platform.OS === "android";
-  const tabBarHeight = (isAndroid ? 72 : 64) + insets.bottom;
-  const tabBarPadding = 6;
-  const tabBarPaddingBottom = tabBarPadding + insets.bottom;
+  const tabBarStyle = useArchiveTabBarStyle();
   const tabBarIconMarginBottom = 3;
 
   if (!__DEV__ && !session) {
@@ -26,14 +21,7 @@ const TabLayout = () => {
         tabBarActiveTintColor: FIELD_COLORS.teal,
         tabBarInactiveTintColor: "#4B5D61",
         headerShown: false,
-        tabBarStyle: {
-          backgroundColor: FIELD_COLORS.paper,
-          borderTopColor: FIELD_COLORS.rule,
-          borderTopWidth: 1,
-          height: tabBarHeight,
-          paddingTop: tabBarPadding,
-          paddingBottom: tabBarPaddingBottom,
-        },
+        tabBarStyle,
         tabBarIconStyle: { marginTop: 1, marginBottom: tabBarIconMarginBottom },
         tabBarLabelStyle: {
           fontSize: 12,
@@ -61,13 +49,9 @@ const TabLayout = () => {
         options={{
           title: "지도",
           tabBarStyle: {
+            ...tabBarStyle,
             position: "absolute",
             backgroundColor: "rgba(255, 255, 255, 0.94)",
-            borderTopColor: FIELD_COLORS.rule,
-            borderTopWidth: 1,
-            height: tabBarHeight,
-            paddingTop: tabBarPadding,
-            paddingBottom: tabBarPaddingBottom,
           },
           tabBarIcon: ({ color, focused }) => <ArchiveTabIcon name="map" color={color} focused={focused} />,
         }}

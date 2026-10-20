@@ -1,3 +1,4 @@
+import { useArchiveTabBarStyle } from "@/components/navigation/useArchiveTabBarStyle";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -26,6 +27,7 @@ const SEGMENTS: { key: CollectionSegment; label: string }[] = [
 const CollectionScreen = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
+  const tabBarStyle = useArchiveTabBarStyle();
   const router = useRouter();
   const params = useLocalSearchParams<{
     cardPreview?: string;
@@ -45,11 +47,11 @@ const CollectionScreen = () => {
 
   useEffect(() => {
     navigation.setOptions({
-      tabBarStyle: baseAccessibilityHidden ? { display: "none" } : undefined,
+      tabBarStyle: baseAccessibilityHidden ? { ...tabBarStyle, display: "none" } : tabBarStyle,
     });
 
-    return () => navigation.setOptions({ tabBarStyle: undefined });
-  }, [baseAccessibilityHidden, navigation]);
+    return () => navigation.setOptions({ tabBarStyle });
+  }, [baseAccessibilityHidden, navigation, tabBarStyle]);
 
   useEffect(() => {
     if (params.segment === "cards" || params.segment === "badges") {

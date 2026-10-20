@@ -15,5 +15,8 @@ verify_jwt = false
 [functions.verify-catch]
 verify_jwt = true
 
+[functions.search-places]
+verify_jwt = true
+
 [functions.recognition-contributions]
 verify_jwt = true

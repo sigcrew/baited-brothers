@@ -6,6 +6,7 @@ import {
   Keyboard,
   Modal,
   Platform,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
@@ -16,6 +17,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FieldAlertModal } from "@/components/design/FieldAlertModal";
 import { FishingMap } from "@/components/map/FishingMap";
 import type { FishingMapPoint } from "@/components/map/FishingMap.types";
+import { searchPlaces, type PlaceSearchResult } from "@/src/lib/placeSearch";
 import { evaluateCoastalSelection } from "@/src/lib/coastalSelection";
 import { ensureForegroundLocationPermission } from "@/src/lib/locationPermission";
 import { reverseGeocodeKoreanPlaceName } from "@/src/lib/reverseGeocoding";
@@ -64,15 +66,17 @@ export const TripLocationPickerModal = ({
   const [selectedPlace, setSelectedPlace] = useState<TripPlace | null>(initialPlace);
   const [isResolving, setIsResolving] = useState(false);
   const [notice, setNotice] = useState<PickerNotice | null>(null);
+  const [results, setResults] = useState<PlaceSearchResult[]>([]);
   const canSearch = Boolean(query.trim()) && !isResolving;
 
   useEffect(() => {
-    if (!visible) return;
     requestRef.current += 1;
+    if (!visible) return;
     setQuery(placeName);
     setSelectedPlace(initialPlace);
     setIsResolving(false);
     setNotice(null);
+    setResults([]);
   }, [initialPlace, placeName, visible]);
 
   const showInvalidCoordinate = (latitude: number, longitude: number) => {
@@ -96,11 +100,12 @@ export const TripLocationPickerModal = ({
 
   const selectCoordinate = async (coordinate: { latitude: number; longitude: number }) => {
     Keyboard.dismiss();
+    setResults([]);
     if (showInvalidCoordinate(coordinate.latitude, coordinate.longitude)) return;
     const requestId = requestRef.current + 1;
     requestRef.current = requestId;
     setIsResolving(true);
-    let resolvedName = query.trim();
+    let resolvedName = "";
     try {
       const hasPermission = await ensureForegroundLocationPermission();
       if (requestRef.current !== requestId) return;
@@ -121,7 +126,7 @@ export const TripLocationPickerModal = ({
         });
         return;
       }
-      if (!resolvedName) resolvedName = result.name || "";
+      resolvedName = result.name || "";
     } catch {
       // Offshore coordinates may not have a reverse-geocoding result.
     } finally {
@@ -129,7 +134,7 @@ export const TripLocationPickerModal = ({
     }
     if (requestRef.current !== requestId) return;
     const nextName = resolvedName || "선택한 낚시터";
-    if (!query.trim()) setQuery(nextName);
+    setQuery(nextName);
     setSelectedPlace({
       name: nextName,
       latitude: coordinate.latitude,
@@ -167,38 +172,37 @@ export const TripLocationPickerModal = ({
 
   const findTypedPlace = async () => {
     const trimmed = query.trim();
-    if (!trimmed || isResolving) {
-      if (!trimmed) searchInputRef.current?.focus();
-      return;
-    }
+    if (!trimmed || isResolving) return;
     Keyboard.dismiss();
+    const requestId = ++requestRef.current;
     setIsResolving(true);
+    setResults([]);
+    setSelectedPlace(null);
     try {
-      const hasPermission = await ensureForegroundLocationPermission();
-      if (!hasPermission) {
-        setNotice({
-          title: "위치 권한이 필요합니다",
-          message: "입력한 장소의 위치를 찾으려면 위치 접근을 허용해 주세요.",
-        });
-        return;
-      }
-      const results = await Location.geocodeAsync(trimmed);
-      if (!results[0]) {
-        setNotice({
-          title: "장소를 찾지 못했습니다",
-          message: "항구·방파제·해변 이름을 조금 더 구체적으로 입력해 주세요.",
-        });
-        return;
-      }
-      await selectCoordinate(results[0]);
+      const places = await searchPlaces(trimmed);
+      if (requestRef.current !== requestId) return;
+      setResults(places);
+      if (!places.length) setNotice({
+        title: "장소를 찾지 못했습니다",
+        message: "지역명을 함께 검색하거나 지도에서 직접 위치를 선택해 주세요.",
+      });
     } catch {
+      if (requestRef.current !== requestId) return;
       setNotice({
-        title: "장소 검색에 실패했습니다",
-        message: "잠시 후 다시 시도하거나 지도에서 직접 장소를 선택해 주세요.",
+        title: "장소 검색을 이용할 수 없습니다",
+        message: "잠시 후 다시 검색하거나 지도에서 직접 위치를 선택해 주세요.",
       });
     } finally {
-      setIsResolving(false);
+      if (requestRef.current === requestId) setIsResolving(false);
     }
+  };
+
+  const chooseSearchResult = (place: PlaceSearchResult) => {
+    if (showInvalidCoordinate(place.latitude, place.longitude)) return;
+    ++requestRef.current;
+    setSelectedPlace({ name: place.name, latitude: place.latitude, longitude: place.longitude });
+    setQuery(place.name);
+    setResults([]);
   };
 
   const points: FishingMapPoint[] = selectedPlace
@@ -259,6 +263,7 @@ export const TripLocationPickerModal = ({
         <View className="relative flex-1">
           <FishingMap
             points={points}
+            focusPointId={selectedPlace ? "trip-place-selection" : null}
             onSelectPoint={() => undefined}
             onSelectCoordinate={selectCoordinate}
           />
@@ -273,11 +278,12 @@ export const TripLocationPickerModal = ({
                 ref={searchInputRef}
                 accessibilityLabel="낚시터 이름 검색"
                 value={query}
-                onChangeText={setQuery}
+                onChangeText={(value) => { setQuery(value); setResults([]); }}
                 onSubmitEditing={findTypedPlace}
                 returnKeyType="search"
                 placeholder="낚시터 이름 입력 후 검색"
                 placeholderTextColor={FIELD_COLORS.muted}
+                maxLength={100}
                 editable={!isResolving}
                 style={{
                   flex: 1,
@@ -329,6 +335,20 @@ export const TripLocationPickerModal = ({
             </TouchableOpacity>
           </View>
 
+          {results.length > 0 && (
+            <View style={{ position: "absolute", top: 72, left: 16, right: 16, maxHeight: 260, backgroundColor: "white", borderWidth: 1, borderColor: FIELD_COLORS.rule }}>
+              <Text style={{ padding: 10, color: FIELD_COLORS.muted, fontSize: 11 }}>검색 결과 · Kakao · 장소를 선택하세요</Text>
+              <ScrollView keyboardShouldPersistTaps="handled">
+                {results.map((place) => (
+                  <TouchableOpacity key={place.id} accessibilityRole="button" accessibilityLabel={`${place.name}, ${place.address} 선택`} onPress={() => chooseSearchResult(place)} style={{ padding: 12, borderTopWidth: 1, borderColor: FIELD_COLORS.rule }}>
+                    <Text style={{ fontFamily: bodyExtraBoldFont, color: FIELD_COLORS.ink }}>{place.name}</Text>
+                    <Text style={{ marginTop: 4, fontSize: 12, color: FIELD_COLORS.muted }}>{place.address}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          )}
+
           <View
             className="absolute inset-x-0 bottom-0 border-t bg-white px-5 pt-4"
             style={{
@@ -357,11 +377,7 @@ export const TripLocationPickerModal = ({
               disabled={!selectedPlace || isResolving}
               onPress={() => {
                 if (!selectedPlace) return;
-                const nextName = query.trim() || selectedPlace.name;
-                onConfirm({
-                  ...selectedPlace,
-                  name: nextName,
-                });
+                onConfirm(selectedPlace);
               }}
               className="mt-4 h-12 flex-row items-center justify-center"
               style={{ backgroundColor: selectedPlace ? FIELD_COLORS.teal : FIELD_COLORS.locked }}

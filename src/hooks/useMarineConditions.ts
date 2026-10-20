@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { withTimeout } from "@/src/lib/appErrors";
 import { supabase } from "@/src/lib/supabase";
 
 export type MarineStation = {
@@ -71,8 +72,12 @@ export const useMarineConditions = (
   const [isStale, setIsStale] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
+  const requestSequence = useRef(0);
   const lastKeyRef = useRef<string | null>(null);
+
   const fetchConditions = useCallback(async (force = false) => {
+    const requestId = ++requestSequence.current;
+    const isCurrent = () => requestSequence.current === requestId;
     if (latitude == null || longitude == null) {
       setData(null);
       setIsLoading(false);
@@ -95,6 +100,7 @@ export const useMarineConditions = (
     let cached: CachedConditions | null = null;
     try {
       const raw = await AsyncStorage.getItem(key);
+      if (!isCurrent()) return;
       cached = raw ? (JSON.parse(raw) as CachedConditions) : null;
       if (cached?.data) {
         setData(cached.data);
@@ -111,18 +117,21 @@ export const useMarineConditions = (
       cached = null;
     }
 
+    if (!isCurrent()) return;
     try {
       // marine-conditions는 유료 API 프록시라 사용자 세션 없이는 호출하지 않는다.
       const {
         data: { session },
       } = await supabase.auth.getSession();
+      if (!isCurrent()) return;
       if (!session) {
         throw new Error("로그인 후 해양 정보를 확인할 수 있습니다.");
       }
-      const { data: response, error: invokeError } = await supabase.functions.invoke(
+      const { data: response, error: invokeError } = await withTimeout(supabase.functions.invoke(
         "marine-conditions",
         { body: { latitude, longitude } },
-      );
+      ), 20_000, "해양 정보 요청 시간이 초과되었습니다. 다시 시도해 주세요.");
+      if (!isCurrent()) return;
       if (invokeError) throw invokeError;
 
       const next = response as MarineConditions;
@@ -136,6 +145,7 @@ export const useMarineConditions = (
         JSON.stringify({ savedAt: Date.now(), data: next } satisfies CachedConditions),
       );
     } catch (fetchError) {
+      if (!isCurrent()) return;
       setError(
         fetchError instanceof Error
           ? fetchError
@@ -143,12 +153,13 @@ export const useMarineConditions = (
       );
       setIsStale(Boolean(cached?.data));
     } finally {
-      setIsLoading(false);
+      if (isCurrent()) setIsLoading(false);
     }
   }, [latitude, longitude]);
 
   useEffect(() => {
     void fetchConditions(false);
+    return () => { requestSequence.current += 1; };
   }, [fetchConditions]);
 
   const refetch = useCallback(() => fetchConditions(true), [fetchConditions]);

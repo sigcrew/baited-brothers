@@ -24,7 +24,7 @@ import { useMarineConditions } from "@/src/hooks/useMarineConditions";
 import { useUserCatches } from "@/src/hooks/useUserCatches";
 import { evaluateCoastalSelection } from "@/src/lib/coastalSelection";
 import { countDistinctMapCoordinates } from "@/src/lib/mapClustering";
-import { ensureForegroundLocationPermission } from "@/src/lib/locationPermission";
+import { nextTide, formatTideTime } from "@/src/lib/marineTides";
 import { reverseGeocodeKoreanPlaceName } from "@/src/lib/reverseGeocoding";
 import {
   FIELD_COLORS,
@@ -552,27 +552,8 @@ export default function MapScreen() {
       return;
     }
 
-    try {
-      const hasPermission = await ensureForegroundLocationPermission();
-      if (selectionRequestRef.current !== requestId) return;
-      if (!hasPermission) {
-        showMapAlert(
-          "위치 권한이 필요합니다",
-          "선택한 바다의 지역명을 확인하려면 위치 접근을 허용해 주세요.",
-          "LOCATION NOTICE",
-        );
-        return;
-      }
-    } catch {
-      if (selectionRequestRef.current !== requestId) return;
-      showMapAlert(
-        "지역 이름을 확인하지 못했습니다",
-        "위치 권한 상태를 확인한 뒤 다시 시도해 주세요.",
-        "LOCATION ERROR",
-      );
-      return;
-    }
-
+    // A manually selected coordinate does not require the user's device location.
+    // Name lookup is best effort; denied geocoding falls back to "선택한 바다".
     let resolvedName: string | null = null;
     try {
       const result = await reverseGeocodeKoreanPlaceName(coordinate);
@@ -639,8 +620,8 @@ export default function MapScreen() {
     }
   };
 
-  const highTide = conditions?.tides.find((item) => item.type === "high");
-  const lowTide = conditions?.tides.find((item) => item.type === "low");
+  const highTide = nextTide(conditions?.tides ?? [], "high");
+  const lowTide = nextTide(conditions?.tides ?? [], "low");
   const selectedPlace = selected ? {
     name: placeName || selected.name,
     latitude: selected.latitude,
@@ -1163,7 +1144,7 @@ export default function MapScreen() {
             ) : null}
 
             <View className="mt-2.5 flex-row border-y" style={{ borderColor: FIELD_COLORS.rule }}>
-              <Metric label="다음 만조" value={formatClock(highTide?.at)} />
+              <Metric label="다음 만조" value={formatTideTime(highTide?.at)} />
               <View className="w-px" style={{ backgroundColor: FIELD_COLORS.rule }} />
               <Metric
                 label="바람"
@@ -1201,7 +1182,7 @@ export default function MapScreen() {
                       )}
                       {lowTide ? (
                         <Text className="ml-2 text-[10px]" style={{ color: FIELD_COLORS.teal, fontFamily: bodyExtraBoldFont }}>
-                          간조 {formatClock(lowTide.at)}
+                          간조 {formatTideTime(lowTide.at)}
                         </Text>
                       ) : null}
                     </View>
