@@ -51,15 +51,22 @@ export const FieldNoticeProvider = ({ children }: PropsWithChildren) => {
   const noticeRef = useRef<ActiveNotice | null>(null);
   const [toastNotice, setToastNotice] = useState<ToastOptions | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const queueRef = useRef<ActiveNotice[]>([]);
 
   useEffect(() => () => {
     if (toastTimer.current) clearTimeout(toastTimer.current);
     noticeRef.current?.resolve(false);
     noticeRef.current = null;
+    queueRef.current.splice(0).forEach((queued) => queued.resolve(false));
   }, []);
 
+  // 확인창이 떠 있는 동안 다른 알림이 오면, 예전에는 확인창을 false로 끝내 버려
+  // 사용자가 누르지도 않은 "취소"가 됐다. 지금은 뒤에 줄을 세웠다가 차례로 띄운다.
   const presentNotice = useCallback((next: ActiveNotice) => {
-    noticeRef.current?.resolve(false);
+    if (noticeRef.current) {
+      queueRef.current.push(next);
+      return;
+    }
     noticeRef.current = next;
     setNotice(next);
   }, []);
@@ -80,8 +87,9 @@ export const FieldNoticeProvider = ({ children }: PropsWithChildren) => {
 
   const closeNotice = useCallback((confirmed: boolean) => {
     const current = noticeRef.current;
-    noticeRef.current = null;
-    setNotice(null);
+    const next = queueRef.current.shift() ?? null;
+    noticeRef.current = next;
+    setNotice(next);
     current?.resolve(confirmed);
   }, []);
 

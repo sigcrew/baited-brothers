@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Switch, Text, View } from "react-native";
+import { Platform, Switch, Text, View } from "react-native";
 import { SettingsScaffold } from "@/components/settings/SettingsScaffold";
 import {
   FIELD_COLORS,
@@ -102,7 +102,7 @@ export default function NotificationSettingsScreen() {
         className="mt-5 text-xs leading-5"
         style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
       >
-        알림 허용 여부는 iPhone 설정에서도 변경할 수 있습니다. 실제 알림 전송은
+        알림 허용 여부는 {Platform.OS === "ios" ? "iPhone 설정" : "기기 설정"}에서도 변경할 수 있습니다. 실제 알림 전송은
         배포 빌드의 알림 권한과 연동됩니다. 출조 3시간 전에 알림을 보내며,
         임박한 일정은 15분 전에 알려드립니다.
       </Text>

@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 import { getField60Illustration } from "@/src/data/field60Illustrations";
+import { getShareCardNumber } from "@/src/lib/shareCard";
 import type { UserCatch } from "@/src/hooks/useUserCatches";
 import { getVerificationLabel } from "@/src/lib/catchRewards";
 import {
@@ -55,13 +56,8 @@ const formatCaughtAt = (iso: string) =>
     .replace(/\. /g, ".")
     .replace(/\.$/, "");
 
-const getCardNumber = (id: string) => {
-  let hash = 0;
-  for (let index = 0; index < id.length; index += 1) {
-    hash = (hash * 31 + id.charCodeAt(index)) % 999;
-  }
-  return `CAT-${String(hash + 1).padStart(3, "0")}`;
-};
+// 공유 카드와 같은 번호를 보여 준다(예전에는 해시 범위가 달라 같은 조과가 두 번호를 가졌다).
+const getCardNumber = (id: string) => getShareCardNumber(id);
 
 const getNormalizedMemo = (memo: string | null) => {
   const normalized = memo?.replace(/\s+/g, " ").trim();

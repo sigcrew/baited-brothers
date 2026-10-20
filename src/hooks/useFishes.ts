@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/src/lib/supabase";
 import type { Tables } from "@/src/types/database";
 import { FIELD_60_FALLBACK_FISHES } from "@/src/data/field60CatalogFallback";
@@ -57,9 +57,13 @@ export const useFishes = (
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
+  // fishes.length를 deps에 넣으면 서버 목록 크기가 폴백과 다를 때마다 effect가
+  // 다시 돌아 두 번 fetch했다. 현재 길이는 ref로 읽는다.
+  const fishCountRef = useRef(0);
+  fishCountRef.current = fishes.length;
   const fetchFishes = useCallback(async (isRefresh = false) => {
     if (isRefresh) setIsRefreshing(true);
-    else setIsLoading(fishes.length === 0);
+    else setIsLoading(fishCountRef.current === 0);
     setError(null);
 
     let query = supabase
@@ -91,7 +95,7 @@ export const useFishes = (
 
     if (isRefresh) setIsRefreshing(false);
     else setIsLoading(false);
-  }, [fallbackFishes, fishes.length, group, scope]);
+  }, [fallbackFishes, group, scope]);
 
   const refetch = useCallback(() => fetchFishes(true), [fetchFishes]);
   const retry = useCallback(() => fetchFishes(false), [fetchFishes]);

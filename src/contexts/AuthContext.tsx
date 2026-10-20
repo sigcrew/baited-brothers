@@ -22,7 +22,7 @@ type AuthContextType = {
   signUp: (
     email: string,
     password: string
-  ) => Promise<{ error: Error | null; session: Session | null }>;
+  ) => Promise<{ error: Error | null; session: Session | null; alreadyRegistered: boolean }>;
   signInWithApple: (
     identityToken: string,
     authorizationCode: string,
@@ -102,7 +102,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signUp = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signUp({ email, password });
-    return { error: error ?? null, session: data.session ?? null };
+    // 이메일 확인이 켜져 있으면 Supabase는 중복 가입에 오류 대신 identities가 빈
+    // 가짜 사용자를 돌려준다(계정 존재 여부 노출 방지). 안내 문구용으로만 구분한다.
+    const alreadyRegistered =
+      !error && !data.session && Array.isArray(data.user?.identities) && data.user.identities.length === 0;
+    return { error: error ?? null, session: data.session ?? null, alreadyRegistered };
   };
 
   const signOut = async () => {

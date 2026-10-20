@@ -41,7 +41,7 @@ export default function PrivacyScreen() {
       }}
     >
       <Stack.Screen options={{ headerShown: false }} />
-      <TouchableOpacity onPress={() => router.back()} className="py-3">
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="이전 화면으로 돌아가기" onPress={() => router.back()} className="py-3">
         <Text style={{ color: FIELD_COLORS.teal, fontFamily: bodyExtraBoldFont }}>
           ← 돌아가기
         </Text>

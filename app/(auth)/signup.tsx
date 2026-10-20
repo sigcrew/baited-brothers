@@ -17,6 +17,7 @@ import {
   AuthTextField,
   JournalRule,
 } from "@/components/auth/FieldJournalAuth";
+import { authErrorMessage } from "@/src/lib/authErrors";
 import { validateNewPassword } from "@/src/lib/passwordReset";
 import { FIELD_COLORS, bodyFont } from "@/src/theme/fieldJournal";
 
@@ -45,11 +46,16 @@ const SignupScreen = () => {
     }
 
     setIsSubmitting(true);
-    const { error, session } = await signUp(email.trim(), password);
+    const { error, session, alreadyRegistered } = await signUp(email.trim(), password);
     setIsSubmitting(false);
 
     if (error) {
-      setFormError(error.message);
+      setFormError(authErrorMessage(error, "가입하지 못했습니다. 잠시 후 다시 시도해 주세요."));
+      return;
+    }
+    if (alreadyRegistered) {
+      // 이메일 확인이 켜진 프로젝트는 중복 가입에도 200과 빈 identities를 돌려준다.
+      setFormError("이미 가입된 이메일입니다. 로그인하거나 비밀번호를 재설정해 주세요.");
       return;
     }
     setFormError(null);

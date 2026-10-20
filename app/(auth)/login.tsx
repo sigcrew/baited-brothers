@@ -16,6 +16,7 @@ import {
   AuthTextField,
   JournalRule,
 } from "@/components/auth/FieldJournalAuth";
+import { authErrorMessage } from "@/src/lib/authErrors";
 import { FIELD_COLORS, bodyFont, bodySemiBoldFont } from "@/src/theme/fieldJournal";
 
 const LoginScreen = () => {
@@ -39,7 +40,7 @@ const LoginScreen = () => {
     setIsSubmitting(false);
 
     if (error) {
-      setFormError(error.message);
+      setFormError(authErrorMessage(error, "로그인하지 못했습니다. 잠시 후 다시 시도해 주세요."));
       return;
     }
     setFormError(null);

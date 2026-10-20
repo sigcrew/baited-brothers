@@ -25,12 +25,12 @@ export const BadgesPanel = ({ insetsBottom, unlockContext, isRefreshing = false,
       renderItem={({ item, index }) => {
         const unlocked = isBadgeUnlocked(item.id, unlockContext);
         return <TouchableOpacity
-          accessibilityRole={unlocked ? "button" : undefined}
-          accessibilityLabel={unlocked ? `${item.title} 배지 상세 보기` : `${item.title} 배지 잠김`}
-          accessibilityState={{ disabled: !unlocked }}
+          // 잠긴 배지도 열어 획득 조건을 볼 수 있게 한다(스크린리더 사용자도 조건을 알 수 있다).
+          accessibilityRole="button"
+          accessibilityLabel={unlocked ? `${item.title} 배지 상세 보기` : `${item.title} 배지, 잠김. 획득 조건 보기`}
+          accessibilityState={{ selected: unlocked }}
           activeOpacity={0.72}
-          disabled={!unlocked}
-          onPress={unlocked ? () => setSelectedBadgeIndex(index) : undefined}
+          onPress={() => setSelectedBadgeIndex(index)}
           className={`flex-1 px-3 py-6 ${index % 2 ? "border-l" : ""}`}
           style={{ borderColor: FIELD_COLORS.rule }}
         >
@@ -41,11 +41,11 @@ export const BadgesPanel = ({ insetsBottom, unlockContext, isRefreshing = false,
         </TouchableOpacity>;
       }}
     />
-    {selectedBadge && selectedBadgeIndex !== null && isBadgeUnlocked(selectedBadge.id, unlockContext) ? <BadgeDetailModal
+    {selectedBadge && selectedBadgeIndex !== null ? <BadgeDetailModal
       badge={selectedBadge}
       badgeNumber={selectedBadgeIndex + 1}
       context={unlockContext}
-      unlocked
+      unlocked={isBadgeUnlocked(selectedBadge.id, unlockContext)}
       visible
       onClose={() => setSelectedBadgeIndex(null)}
     /> : null}

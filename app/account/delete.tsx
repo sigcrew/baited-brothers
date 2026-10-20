@@ -53,7 +53,7 @@ export default function DeleteAccountScreen() {
       contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
     >
       <Stack.Screen options={{ headerShown: false }} />
-      <TouchableOpacity onPress={() => router.back()} className="py-3">
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="이전 화면으로 돌아가기" onPress={() => router.back()} className="py-3">
         <Text style={{ color: FIELD_COLORS.teal, fontFamily: bodyExtraBoldFont }}>
           ← 돌아가기
         </Text>
@@ -78,6 +78,8 @@ export default function DeleteAccountScreen() {
         계속하려면 ‘계정 삭제’를 입력하세요.
       </Text>
       <TextInput
+        accessibilityLabel="계정 삭제 확인 문구 입력"
+        accessibilityHint="계속하려면 '계정 삭제'라고 입력합니다"
         value={confirmation}
         onChangeText={setConfirmation}
         editable={!isDeleting}

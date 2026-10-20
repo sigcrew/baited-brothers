@@ -197,14 +197,21 @@ export const FishingMap = ({
     return () => clearTimeout(timeout);
   }, [mapAttempt]);
 
+  // points/region은 ref로 읽는다. deps에 넣으면 마커가 바뀔 때마다 다시 패닝하고,
+  // 빼면 stale closure가 된다. 포커스 대상이 바뀔 때만 한 번 이동한다.
+  const pointsRef = useRef(points);
+  pointsRef.current = points;
+  const regionRef = useRef(region);
+  regionRef.current = region;
   useEffect(() => {
     if (!focusPointId) return;
-    const point = points.find((item) => item.id === focusPointId);
+    const point = pointsRef.current.find((item) => item.id === focusPointId);
     if (!point) return;
+    const current = regionRef.current;
     const latitudeDelta = focusLatitudeDelta
-      ?? Math.min(Math.max(region.latitudeDelta, 0.04), 0.18);
+      ?? Math.min(Math.max(current.latitudeDelta, 0.04), 0.18);
     const longitudeDelta = focusLatitudeDelta
-      ?? Math.min(Math.max(region.longitudeDelta, 0.04), 0.18);
+      ?? Math.min(Math.max(current.longitudeDelta, 0.04), 0.18);
     mapRef.current?.animateToRegion({
       latitude: point.latitude - latitudeDelta * 0.2,
       longitude: point.longitude,

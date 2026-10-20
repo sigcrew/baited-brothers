@@ -351,6 +351,9 @@ export const EncyclopediaPanel = ({
             return (
               <TouchableOpacity
                 key={item ?? "all"}
+                accessibilityRole="tab"
+                accessibilityLabel={`${label} 어종 분류`}
+                accessibilityState={{ selected: isSelected }}
                 onPress={() => setSelectedCategory(item)}
                 className="mr-6 border-b-2 pb-2"
                 style={{ borderColor: isSelected ? FIELD_COLORS.teal : "transparent" }}
