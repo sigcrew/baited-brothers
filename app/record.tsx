@@ -1,24 +1,10 @@
-import { RecognitionContributionCard } from "@/components/record/RecognitionContributionCard";
 import type { RecognitionAnalysis } from "@/src/lib/fishRecognition";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  ActivityIndicator,
-  Image,
-  KeyboardAvoidingView,
-  Linking,
-  Platform,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFishes, type Fish } from "@/src/hooks/useFishes";
 import { useCreateCatch } from "@/src/hooks/useCreateCatch";
 import { useAuth } from "@/src/contexts/AuthContext";
@@ -27,10 +13,21 @@ import {
   useFishRecognition,
   type FishRecognitionCandidate,
 } from "@/src/hooks/useFishRecognition";
-import type { CatchVerificationStatus } from "@/src/lib/catchRewards";
 import { CatchCompletionView } from "@/components/record/CatchCompletionView";
 import { ShareCatchCardModal } from "@/components/share/ShareCatchCardModal";
 import { FishCatalogSheet } from "@/components/record/FishCatalogSheet";
+import { AiConsentLoadingScreen, AiConsentScreen } from "@/components/record/AiConsentScreen";
+import { CameraPermissionScreen } from "@/components/record/CameraPermissionScreen";
+import { CameraCaptureScreen } from "@/components/record/CameraCaptureScreen";
+import { CatchReviewScreen } from "@/components/record/CatchReviewScreen";
+import {
+  AI_PHOTO_CONSENT_KEY,
+  MAX_RECOGNITION_BASE64_LENGTH,
+  parseOptionalSize as parseSizeInput,
+  type AiConsentState,
+  type RecordCapture as Capture,
+  type RecordCompletion as CompletionResult,
+} from "@/src/lib/recordFlow";
 import { getField60Illustration } from "@/src/data/field60Illustrations";
 import { optimizeUserPhoto } from "@/src/lib/optimizeUserPhoto";
 import { extractLibraryPhotoMetadata } from "@/src/lib/photoMetadata";
@@ -45,44 +42,7 @@ import {
   unlockPendingCatch,
   updatePendingCatch,
 } from "@/src/lib/pendingCatchQueue";
-import { FIELD_COLORS, bodyExtraBoldFont, bodyFont, monoFont } from "@/src/theme/fieldJournal";
 import type { ShareCatchData } from "@/src/lib/shareCard";
-
-type Capture = {
-  uri: string;
-  width: number;
-  height: number;
-  base64: string;
-  mimeType: "image/jpeg" | "image/png";
-  latitude: number | null;
-  longitude: number | null;
-  capturedAt: string | null;
-  locationAccuracyM: number | null;
-  locationCapturedAt: string | null;
-  source: "camera" | "photo_library";
-  tripId: string | null;
-  tripName: string | null;
-  pendingCatchId: string;
-  clientRequestId: string;
-};
-
-type CompletionResult = {
-  fish: Fish | null;
-  customSpeciesName: string | null;
-  catchId: string | null;
-  isFirstDiscovery: boolean;
-  isDevelopmentTest: boolean;
-  isFileUpload: boolean;
-  discoveredCount: number;
-  verificationStatus: CatchVerificationStatus;
-  verificationReason: string | null;
-  sizeCm?: number;
-};
-
-const MAX_RECOGNITION_BASE64_LENGTH = 13_500_000;
-const AI_PHOTO_CONSENT_KEY = "ai-photo-consent-v1";
-const PRIVACY_POLICY_URL =
-  "https://sigcrew.github.io/baited-brothers/privacy/";
 
 const RecordScreen = () => {
   const router = useRouter();
@@ -97,7 +57,6 @@ const RecordScreen = () => {
   const tripName = typeof params.tripName === "string" ? params.tripName : undefined;
   const pendingId =
     typeof params.pendingId === "string" ? params.pendingId : undefined;
-  const insets = useSafeAreaInsets();
   const cameraRef = useRef<CameraView>(null);
   const saveRequestId = useRef<string | null>(null);
   const flowTracked = useRef(false);
@@ -137,9 +96,7 @@ const RecordScreen = () => {
   const [needsRetake, setNeedsRetake] = useState(false);
   const [recognitionSlow, setRecognitionSlow] = useState(false);
   const [catalogVisible, setCatalogVisible] = useState(false);
-  const [aiConsent, setAiConsent] = useState<
-    "loading" | "pending" | "accepted" | "manual"
-  >("loading");
+  const [aiConsent, setAiConsent] = useState<AiConsentState>("loading");
   const { fishes, isLoading: fishesLoading } = useFishes(null, "core");
   const { createCatch, isSaving } = useCreateCatch();
   const {
@@ -784,14 +741,9 @@ const RecordScreen = () => {
   };
 
   const parseOptionalSize = () => {
-    if (!size.trim()) return { isValid: true, sizeCm: undefined };
-    const parsedSize = Number(size);
-    if (!Number.isFinite(parsedSize) || parsedSize <= 0) {
-      setSizeError("크기는 0보다 큰 숫자로 입력해 주세요.");
-      return { isValid: false, sizeCm: undefined };
-    }
-    setSizeError(null);
-    return { isValid: true, sizeCm: parsedSize };
+    const result = parseSizeInput(size);
+    setSizeError(result.error);
+    return result;
   };
 
   const save = async () => {
@@ -975,658 +927,98 @@ const RecordScreen = () => {
   }
 
   if (aiConsent === "loading") {
-    return (
-      <View className="flex-1 items-center justify-center px-8" style={{ backgroundColor: FIELD_COLORS.foam }}>
-        <ActivityIndicator color={FIELD_COLORS.teal} />
-        <Text className="mt-4 text-sm" style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}>
-          사진 처리 동의 상태를 확인하고 있어요
-        </Text>
-      </View>
-    );
+    return <AiConsentLoadingScreen />;
   }
 
   if (aiConsent === "pending") {
     return (
-      <View
-        className="flex-1 justify-center px-7"
-        style={{
-          backgroundColor: FIELD_COLORS.foam,
-          paddingTop: insets.top + 24,
-          paddingBottom: insets.bottom + 24,
-        }}
-      >
-        <Text
-          className="text-[10px] tracking-[1.5px]"
-          style={{ color: FIELD_COLORS.teal, fontFamily: monoFont }}
-        >
-          AI PHOTO ANALYSIS
-        </Text>
-        <Text
-          className="mt-4 text-[32px] leading-[42px]"
-          style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}
-        >
-          사진 판별 전{`\n`}확인이 필요해요
-        </Text>
-        <Text
-          className="mt-5 text-[15px] leading-7"
-          style={{ color: FIELD_COLORS.ink, fontFamily: bodyFont }}
-        >
-          촬영한 물고기 사진은 어종 후보 추천을 위해 Supabase 보안 함수를
-          거쳐 Anthropic으로 전송됩니다. 위치 정보는 AI에 전송하지 않으며,
-          사진은 조과를 저장하거나, 별도의 선택 동의로 개선용 사진을 제공할 때 앱 저장소에 보관됩니다.
-        </Text>
-        <View
-          className="mt-6 border-l-4 bg-white px-4 py-4"
-          style={{ borderLeftColor: FIELD_COLORS.orange }}
-        >
-          <Text
-            className="text-sm leading-6"
-            style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
-          >
-            AI 결과는 참고용이며 최종 어종은 사용자가 직접 선택합니다.
-          </Text>
-        </View>
-        <TouchableOpacity
-          accessibilityRole="button"
-          onPress={acceptAiPhotoConsent}
-          className="mt-7 items-center py-4"
-          style={{ backgroundColor: FIELD_COLORS.teal }}
-        >
-          <Text className="text-base text-white" style={{ fontFamily: bodyExtraBoldFont }}>
-            동의하고 카메라 열기
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          accessibilityRole="button"
-          onPress={beginManualPhotoFlow}
-          className="mt-3 items-center border py-4"
-          style={{ borderColor: FIELD_COLORS.teal }}
-        >
-          <Text
-            className="text-base"
-            style={{ color: FIELD_COLORS.teal, fontFamily: bodyExtraBoldFont }}
-          >
-            AI 없이 기록하기
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          accessibilityRole="link"
-          onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}
-          className="mt-4 items-center py-2"
-        >
-          <Text style={{ color: FIELD_COLORS.teal, fontFamily: bodyExtraBoldFont }}>
-            개인정보 처리방침 보기
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.back()} className="mt-2 items-center py-2">
-          <Text style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}>
-            동의하지 않고 돌아가기
-          </Text>
-        </TouchableOpacity>
-      </View>
+      <AiConsentScreen
+        onAccept={acceptAiPhotoConsent}
+        onContinueWithoutAi={beginManualPhotoFlow}
+        onBack={() => router.back()}
+      />
     );
   }
 
   if (!capture && !effectiveCameraPermission?.granted) {
-    const isPermissionLoading = effectiveCameraPermission == null;
-    const isPermissionBusy =
-      isPermissionLoading || isRequestingCameraPermission;
-
     return (
-      <View className="flex-1 items-center justify-center bg-slate-950 px-8">
-        <Text className="text-xl font-bold text-white">
-          카메라 권한이 필요해요
-        </Text>
-        <Text className="mt-3 text-center text-slate-300">
-          카메라를 허용하면 현장 인증 촬영을 할 수 있습니다. 사진 보관함
-          기록은 카메라 권한 없이도 이용할 수 있습니다.
-        </Text>
-        {isPermissionBusy ? (
-          <View className="mt-6 flex-row items-center rounded-xl bg-white px-6 py-3">
-            <ActivityIndicator color="#0f172a" />
-            <Text className="ml-3 font-semibold text-slate-900">
-              {isPermissionLoading ? "권한 상태 확인 중" : "권한 요청 중"}
-            </Text>
-          </View>
-        ) : (
-          <TouchableOpacity
-            onPress={handleRequestCameraPermission}
-            className="mt-6 rounded-xl bg-white px-6 py-3"
-          >
-            <Text className="font-semibold text-slate-900">권한 허용</Text>
-          </TouchableOpacity>
-        )}
-        <TouchableOpacity
-          accessibilityLabel="사진 보관함에서 물고기 사진 선택"
-          accessibilityRole="button"
-          onPress={pickLibraryPhoto}
-          className="mt-4 border border-white/50 px-6 py-3"
-        >
-          <Text className="font-semibold text-white">
-            사진 보관함에서 선택
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.back()} className="mt-4 py-2">
-          <Text className="text-slate-400">돌아가기</Text>
-        </TouchableOpacity>
-      </View>
+      <CameraPermissionScreen
+        isPermissionLoading={effectiveCameraPermission == null}
+        isRequesting={isRequestingCameraPermission}
+        onRequestPermission={handleRequestCameraPermission}
+        onPickLibrary={pickLibraryPhoto}
+        onBack={() => router.back()}
+      />
     );
   }
 
   if (!capture) {
     return (
-      <View className="flex-1 bg-black">
-        <CameraView ref={cameraRef} style={{ flex: 1 }} facing="back" mode="picture" />
-        <View className="absolute left-0 right-0 top-0 flex-row justify-between px-5" style={{ paddingTop: insets.top + 12 }}>
-          <TouchableOpacity onPress={() => router.back()} className="rounded-lg bg-black/50 px-4 py-2">
-            <Text className="font-medium text-white">닫기</Text>
-          </TouchableOpacity>
-          <View className="rounded-lg bg-black/50 px-3 py-2"><Text className="text-sm text-white">{tripName ? `${tripName} · 현장 기록` : "사진 기록 · GPS 선택"}</Text></View>
-        </View>
-        <View className="absolute bottom-0 left-0 right-0 items-center bg-black/40 pb-8 pt-5" style={{ paddingBottom: insets.bottom + 24 }}>
-          <Text className="mb-4 text-sm text-white">물고기 전체가 잘 보이게 촬영해 주세요</Text>
-          <TouchableOpacity
-            accessibilityLabel="사진 보관함에서 물고기 사진 선택"
-            accessibilityRole="button"
-            onPress={pickLibraryPhoto}
-            className="mb-4 border border-white/60 bg-black/40 px-5 py-3"
-          >
-            <Text className="font-semibold text-white">
-              사진 보관함에서 선택
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            accessibilityLabel="사진 촬영"
-            disabled={isCapturing}
-            onPress={takePhoto}
-            className="h-20 w-20 items-center justify-center rounded-full border-4 border-white bg-white/30"
-          >
-            {isCapturing ? <ActivityIndicator color="#fff" /> : <View className="h-16 w-16 rounded-full bg-white" />}
-          </TouchableOpacity>
-        </View>
-      </View>
+      <CameraCaptureScreen
+        cameraRef={cameraRef}
+        tripName={tripName}
+        isCapturing={isCapturing}
+        onTakePhoto={takePhoto}
+        onPickLibrary={pickLibraryPhoto}
+        onBack={() => router.back()}
+      />
     );
   }
 
+  const selectFish = (fish: Fish) => {
+    setSelectedFish(fish);
+    setCustomSpeciesName(null);
+    setCompletion(null);
+  };
+
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} className="flex-1 bg-[#F4F7F8]">
-      <View
-        className="flex-row items-center justify-between border-b bg-white px-4 pb-3"
-        style={{ paddingTop: insets.top + 10, borderBottomColor: FIELD_COLORS.rule }}
-      >
-        <TouchableOpacity onPress={() => router.back()} className="w-14 py-2">
-          <Text style={{ color: FIELD_COLORS.teal, fontFamily: bodyExtraBoldFont }}>
-            취소
-          </Text>
-        </TouchableOpacity>
-        <Text
-          className="text-lg"
-          style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}
-        >
-          조과 확인
-        </Text>
-        <View className="w-14" />
-      </View>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + 32 }}
-      >
-            <Image source={{ uri: capture.uri }} className="h-56 w-full rounded-xl bg-slate-200" resizeMode="cover" />
-            <View className="mt-3 flex-row justify-between">
-              <Text className="text-xs text-teal-800">
-                {capture.source === "photo_library"
-                  ? capture.latitude != null &&
-                    capture.longitude != null &&
-                    capture.capturedAt
-                    ? "사진 위치 확인됨 · 인증 조과 심사 대상"
-                    : "사진 위치 없음 · 일반 기록으로 저장"
-                  : capture.latitude != null && capture.longitude != null
-                    ? "GPS 확보 완료 · 서버 인증 예정"
-                    : "위치 미인증 · 지도와 도감 해금에서 제외"}
-              </Text>
-              <TouchableOpacity
-                onPress={
-                  capture.source === "photo_library"
-                    ? pickLibraryPhoto
-                    : retakePhoto
-                }
-              >
-                <Text className="text-sm font-medium text-slate-600">
-                  {capture.source === "photo_library"
-                    ? "다른 사진"
-                    : "다시 찍기"}
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <Text
-              className="mt-6 text-[24px]"
-              style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}
-            >
-              어종을 확정해 주세요
-            </Text>
-            <Text
-              className="mt-1 text-sm leading-6"
-              style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
-            >
-              {aiConsent === "accepted"
-                ? "AI가 도감 60종 안에서 후보를 찾습니다. 추천 결과는 참고용이며 최종 선택은 직접 확인해 주세요."
-                : "사진은 AI로 전송되지 않습니다. 도감에서 직접 어종을 선택해 주세요."}
-            </Text>
-            <View
-              className="mt-4 border-l-4 bg-white px-4 py-3"
-              style={{ borderLeftColor: FIELD_COLORS.orange }}
-            >
-              <Text
-                className="text-xs leading-5"
-                style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
-              >
-                {aiConsent === "accepted"
-                  ? "AI가 어종을 자동으로 확정하거나 기록하지 않습니다. 후보 또는 도감 검색에서 어종을 선택한 뒤 직접 기록해 주세요."
-                  : "도감 60종 밖이라면 이름을 직접 입력해 일반 기록으로 남길 수 있습니다."}
-              </Text>
-            </View>
-            {!isRecognizing && recognitionAnalysis && (
-              <RecognitionContributionCard key={recognitionAnalysis.id} analysis={recognitionAnalysis} imageBase64={capture.base64} clientRequestId={capture.clientRequestId} />
-            )}
-            {selectedFish || customSpeciesName ? (
-              <View
-                className="mt-4 border p-4"
-                style={{ borderColor: FIELD_COLORS.teal, backgroundColor: "#EAF4F1" }}
-              >
-                <View className="flex-row items-start justify-between">
-                  <View className="flex-1">
-                    <Text
-                      className="text-xl"
-                      style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}
-                    >
-                      {selectedFish?.name_ko ??
-                        selectedFish?.name ??
-                        customSpeciesName}
-                    </Text>
-                    <Text
-                      className="mt-1 text-[10px] uppercase tracking-[1px]"
-                      style={{ color: FIELD_COLORS.teal, fontFamily: monoFont }}
-                    >
-                      {selectedFish?.name ?? "OUTSIDE FIELD 60"}
-                    </Text>
-                  </View>
-                  <Text
-                    className="text-[10px] tracking-[1px]"
-                    style={{ color: FIELD_COLORS.teal, fontFamily: monoFont }}
-                  >
-                    사용자 확인
-                  </Text>
-                </View>
-                <TouchableOpacity
-                  onPress={() => {
-                    setSelectedFish(null);
-                    setCustomSpeciesName(null);
-                    setCompletion(null);
-                  }}
-                  className="mt-4 self-start border-b pb-1"
-                  style={{ borderBottomColor: FIELD_COLORS.teal }}
-                >
-                  <Text style={{ color: FIELD_COLORS.teal, fontFamily: bodyExtraBoldFont }}>
-                    다른 어종 선택
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <>
-                {isRecognizing ? (
-                  <View
-                    className="mt-5 flex-row items-center border px-4 py-5"
-                    style={{ borderColor: FIELD_COLORS.rule, backgroundColor: "#fff" }}
-                  >
-                    <ActivityIndicator color={FIELD_COLORS.teal} />
-                    <View className="ml-4 flex-1">
-                      <Text
-                        style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}
-                      >
-                        사진의 특징을 비교하고 있어요
-                      </Text>
-                      <Text
-                        className="mt-1 text-xs"
-                        style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
-                      >
-                        체형·지느러미·무늬를 도감 60종과 대조합니다.
-                      </Text>
-                      {recognitionSlow ? (
-                        <TouchableOpacity
-                          accessibilityRole="button"
-                          onPress={() => setCatalogVisible(true)}
-                          className="mt-3 self-start border-b pb-1"
-                          style={{ borderBottomColor: FIELD_COLORS.teal }}
-                        >
-                          <Text
-                            style={{
-                              color: FIELD_COLORS.teal,
-                              fontFamily: bodyExtraBoldFont,
-                            }}
-                          >
-                            기다리지 않고 직접 찾기
-                          </Text>
-                        </TouchableOpacity>
-                      ) : null}
-                    </View>
-                  </View>
-                ) : null}
-
-                {!isRecognizing && candidateRows.length > 0 ? (
-                  <View className="mt-5">
-                    <View className="flex-row items-end justify-between">
-                      <Text
-                        className="text-lg"
-                        style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}
-                      >
-                        AI 어종 후보 추천
-                      </Text>
-                      <Text
-                        className="text-[9px] tracking-[1px]"
-                        style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}
-                      >
-                        TOP {candidateRows.length}
-                      </Text>
-                    </View>
-                    <Text
-                      className="mt-2 text-xs leading-5"
-                      style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
-                    >
-                      사진에서 추정한 후보입니다. 식별 포인트를 비교한 뒤 선택해 주세요.
-                    </Text>
-                    {candidateRows.map(({ candidate, fish }, index) => {
-                      const illustration = getField60Illustration(
-                        fish.catalog_sort_order,
-                        "color",
-                      );
-                      return (
-                        <TouchableOpacity
-                          key={fish.id}
-                          accessibilityRole="button"
-                          accessibilityLabel={`${index + 1}순위 후보, ${fish.name_ko ?? fish.name}`}
-                          onPress={() => {
-                            setSelectedFish(fish);
-                            setCustomSpeciesName(null);
-                            setCompletion(null);
-                          }}
-                          className="mt-3 flex-row border bg-white p-3"
-                          style={{ borderColor: index === 0 ? FIELD_COLORS.teal : FIELD_COLORS.rule }}
-                        >
-                          <View
-                            className="h-20 w-24 items-center justify-center overflow-hidden"
-                            style={{ backgroundColor: FIELD_COLORS.locked }}
-                          >
-                            {illustration ? (
-                              <Image
-                                source={illustration}
-                                className="h-full w-full"
-                                resizeMode="contain"
-                              />
-                            ) : null}
-                          </View>
-                          <View className="min-w-0 flex-1 pl-4">
-                            <View className="flex-row items-center justify-between">
-                              <Text
-                                className="text-lg"
-                                style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}
-                              >
-                                {fish.name_ko ?? fish.name}
-                              </Text>
-                              <Text
-                                className="text-sm"
-                                style={{ color: FIELD_COLORS.orange, fontFamily: bodyExtraBoldFont }}
-                              >
-                                {index + 1}순위
-                              </Text>
-                            </View>
-                            <Text
-                              numberOfLines={1}
-                              className="mt-1 text-[9px] uppercase tracking-[0.8px]"
-                              style={{ color: FIELD_COLORS.teal, fontFamily: monoFont }}
-                            >
-                              {fish.name}
-                            </Text>
-                            <Text
-                              numberOfLines={2}
-                              className="mt-2 text-xs leading-5"
-                              style={{ color: FIELD_COLORS.ink, fontFamily: bodyFont }}
-                            >
-                              식별 포인트 · {fish.identification_features ?? "형태와 무늬를 도감 설명과 비교해 주세요."}
-                            </Text>
-                            {fish.similar_species_notes ? (
-                              <Text
-                                numberOfLines={2}
-                                className="mt-1 text-xs leading-5"
-                                style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
-                              >
-                                유사종 차이 · {fish.similar_species_notes}
-                              </Text>
-                            ) : null}
-                          </View>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
-                ) : null}
-
-                {!isRecognizing && (recognitionError || needsRetake) ? (
-                  <View
-                    className="mt-5 border-l-4 bg-white px-4 py-4"
-                    style={{ borderLeftColor: FIELD_COLORS.orange }}
-                  >
-                    <Text
-                      style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}
-                    >
-                      {recognitionError
-                        ? "AI 추천을 불러오지 못했어요"
-                        : "사진에서 식별 특징이 충분하지 않아요"}
-                    </Text>
-                    <Text
-                      className="mt-1 text-xs leading-5"
-                      style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
-                    >
-                      {recognitionError
-                        ? "다시 시도하거나 아래 도감 검색에서 직접 선택할 수 있습니다."
-                        : "반사와 가림을 줄이고, 한 마리의 머리부터 꼬리까지 보이는 옆면을 촬영해 주세요. 눈·입·지느러미가 선명하면 비교에 도움이 됩니다."}
-                    </Text>
-                    {!recognitionError && recognitionNote ? (
-                      <Text
-                        className="mt-2 text-xs leading-5"
-                        style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
-                      >
-                        AI가 안내한 이유 · {recognitionNote}
-                      </Text>
-                    ) : null}
-                    <View className="mt-4 flex-row">
-                      {recognitionError ? (
-                        <TouchableOpacity
-                          accessibilityRole="button"
-                          accessibilityLabel="AI 어종 후보 추천 다시 시도"
-                          disabled={isRecognizing}
-                          onPress={retryRecognition}
-                          className="mr-3 border px-4 py-2"
-                          style={{ borderColor: FIELD_COLORS.teal }}
-                        >
-                          <Text
-                            style={{
-                              color: FIELD_COLORS.teal,
-                              fontFamily: bodyExtraBoldFont,
-                            }}
-                          >
-                            다시 시도
-                          </Text>
-                        </TouchableOpacity>
-                      ) : null}
-                      <TouchableOpacity
-                        accessibilityRole="button"
-                        accessibilityLabel="사진 다시 촬영"
-                        onPress={retakePhoto}
-                        className="border px-4 py-2"
-                        style={{ borderColor: FIELD_COLORS.rule }}
-                      >
-                        <Text
-                          style={{
-                            color: FIELD_COLORS.ink,
-                            fontFamily: bodyExtraBoldFont,
-                          }}
-                        >
-                          다시 촬영
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                ) : null}
-
-                {!isRecognizing ? (
-                  <TouchableOpacity
-                    accessibilityRole="button"
-                    accessibilityLabel={
-                      candidateRows.length > 0
-                        ? "추천 후보에 없는 어종을 도감에서 직접 검색"
-                        : "도감에서 직접 어종 찾기"
-                    }
-                    onPress={() => setCatalogVisible(true)}
-                    className="mt-5 items-center border py-3"
-                    style={{ borderColor: FIELD_COLORS.rule }}
-                  >
-                    <Text style={{ color: FIELD_COLORS.teal, fontFamily: bodyExtraBoldFont }}>
-                      {candidateRows.length > 0
-                        ? "후보에 없어요 · 직접 검색"
-                        : "도감에서 직접 찾기"}
-                    </Text>
-                  </TouchableOpacity>
-                ) : null}
-              </>
-            )}
-            {selectedFish || customSpeciesName ? (
-              <View className="mt-5">
-                {customSpeciesName ? (
-                  <View
-                    className="mb-5 border-l-4 bg-white px-4 py-4"
-                    style={{ borderLeftColor: FIELD_COLORS.orange }}
-                  >
-                    <Text
-                      style={{
-                        color: FIELD_COLORS.ink,
-                        fontFamily: bodyExtraBoldFont,
-                      }}
-                    >
-                      도감 밖 일반 기록
-                    </Text>
-                    <Text
-                      className="mt-1 text-xs leading-5"
-                      style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
-                    >
-                      조과 카드에는 저장되지만 도감 해금·배지·개인 최대어·랭킹에는
-                      반영되지 않습니다.
-                    </Text>
-                  </View>
-                ) : null}
-                {capture.source === "photo_library" ? (
-                  <View
-                    className="mb-5 border-l-4 bg-white px-4 py-4"
-                    style={{ borderLeftColor: FIELD_COLORS.orange }}
-                  >
-                    <Text
-                      style={{
-                        color: FIELD_COLORS.ink,
-                        fontFamily: bodyExtraBoldFont,
-                      }}
-                    >
-                      {Platform.OS === "android"
-                        ? "일반 기록으로 저장"
-                        : "사진 위치 기반 인증"}
-                    </Text>
-                    <Text
-                      className="mt-1 text-xs leading-5"
-                      style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
-                    >
-                      {Platform.OS === "android"
-                        // Android는 ACCESS_MEDIA_LOCATION을 쓰지 않아 보관함 사진의
-                        // 촬영 위치를 읽지 못한다. 위치 인증을 약속하면 거짓이 된다.
-                        ? "Android에서는 보관함 사진의 촬영 위치를 읽지 않아 일반 기록으로 저장됩니다. 조과 카드에는 남지만 도감 해금·배지·랭킹에는 반영되지 않습니다. 현장 인증이 필요하면 앱 카메라로 촬영해 주세요."
-                        : "사진의 촬영 위치가 연안으로 확인되면 도감·배지·개인 최대어에 반영됩니다. 위치가 없거나 확인할 수 없으면 일반 기록으로 저장되며 랭킹에는 반영되지 않습니다."}
-                    </Text>
-                  </View>
-                ) : null}
-                <Text className="text-sm font-medium text-slate-700">
-                  크기(cm, 선택)
-                </Text>
-                <TextInput
-                  value={size}
-                  onChangeText={(value) => {
-                    setSize(value);
-                    if (sizeError) setSizeError(null);
-                  }}
-                  keyboardType="decimal-pad"
-                  placeholder="예: 32.5"
-                  className="mt-2 rounded-xl border border-slate-200 bg-white px-4 py-3"
-                  style={{ borderColor: sizeError ? FIELD_COLORS.orange : undefined }}
-                />
-                {sizeError ? (
-                  <Text
-                    accessibilityLiveRegion="polite"
-                    className="mt-2 text-xs"
-                    style={{ color: FIELD_COLORS.orange, fontFamily: bodyFont }}
-                  >
-                    {sizeError}
-                  </Text>
-                ) : null}
-                <Text className="mt-4 text-sm font-medium text-slate-700">
-                  메모(선택)
-                </Text>
-                <View className="mt-2 min-h-[88px] rounded-xl border border-slate-200 bg-white px-4 py-3">
-                  <TextInput
-                    value={memo}
-                    onChangeText={setMemo}
-                    multiline
-                    placeholder="채비, 물때, 기억할 점"
-                    textAlignVertical="top"
-                    style={{
-                      minHeight: 64,
-                      padding: 0,
-                      fontSize: 16,
-                      includeFontPadding: false,
-                      ...(Platform.OS === "android" ? {} : { lineHeight: 22 }),
-                    }}
-                  />
-                </View>
-                <TouchableOpacity
-                  disabled={isSaving}
-                  onPress={save}
-                  className="mt-6 rounded-xl bg-slate-900 py-4"
-                >
-                  {isSaving ? (
-                    <ActivityIndicator color="#fff" />
-                  ) : (
-                    <Text className="text-center font-semibold text-white">
-                      {customSpeciesName
-                        ? "도감 밖 일반 기록으로 저장"
-                        : "사용자 확인 후 이 어종으로 기록"}
-                    </Text>
-                  )}
-                </TouchableOpacity>
-              </View>
-            ) : null}
-      </ScrollView>
-      <FishCatalogSheet
-        fishes={fishes}
-        isLoading={fishesLoading}
-        visible={catalogVisible}
-        onClose={() => setCatalogVisible(false)}
-        onSelect={(fish) => {
-          setSelectedFish(fish);
-          setCustomSpeciesName(null);
-          setCompletion(null);
-        }}
-        onSelectCustom={(name) => {
-          setSelectedFish(null);
-          setCustomSpeciesName(name);
-          setCompletion(null);
-        }}
-      />
-    </KeyboardAvoidingView>
+    <CatchReviewScreen
+      capture={capture}
+      aiEnabled={aiConsent === "accepted"}
+      recognition={{
+        isRecognizing,
+        isSlow: recognitionSlow,
+        error: recognitionError,
+        needsRetake,
+        note: recognitionNote,
+        analysis: recognitionAnalysis,
+        candidateRows,
+      }}
+      selectedFish={selectedFish}
+      customSpeciesName={customSpeciesName}
+      form={{ size, sizeError, memo, isSaving }}
+      onBack={() => router.back()}
+      onChangePhoto={capture.source === "photo_library" ? pickLibraryPhoto : retakePhoto}
+      onSelectFish={selectFish}
+      onClearSelection={() => {
+        setSelectedFish(null);
+        setCustomSpeciesName(null);
+        setCompletion(null);
+      }}
+      onOpenCatalog={() => setCatalogVisible(true)}
+      onRetry={retryRecognition}
+      onRetake={retakePhoto}
+      onSizeChange={(value) => {
+        setSize(value);
+        if (sizeError) setSizeError(null);
+      }}
+      onMemoChange={setMemo}
+      onSave={save}
+      overlay={
+        <FishCatalogSheet
+          fishes={fishes}
+          isLoading={fishesLoading}
+          visible={catalogVisible}
+          onClose={() => setCatalogVisible(false)}
+          onSelect={selectFish}
+          onSelectCustom={(name) => {
+            setSelectedFish(null);
+            setCustomSpeciesName(name);
+            setCompletion(null);
+          }}
+        />
+      }
+    />
   );
 };
 
