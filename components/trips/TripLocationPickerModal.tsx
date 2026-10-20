@@ -18,7 +18,7 @@ import { FieldAlertModal } from "@/components/design/FieldAlertModal";
 import { FishingMap } from "@/components/map/FishingMap";
 import type { FishingMapPoint } from "@/components/map/FishingMap.types";
 import { searchPlaces, type PlaceSearchResult } from "@/src/lib/placeSearch";
-import { evaluateCoastalSelection } from "@/src/lib/coastalSelection";
+import { evaluateCoastalSelection, isKoreaCoordinate } from "@/src/lib/coastalSelection";
 import { reverseGeocodeKoreanPlaceName } from "@/src/lib/reverseGeocoding";
 import {
   FIELD_COLORS,
@@ -47,9 +47,6 @@ type PickerNotice = {
   title: string;
   message: string;
 };
-
-const isKoreaCoordinate = (latitude: number, longitude: number) =>
-  latitude >= 32.5 && latitude <= 39 && longitude >= 124 && longitude <= 132.5;
 
 export const TripLocationPickerModal = ({
   visible,

@@ -25,7 +25,7 @@ function loadEndpoint() {
  const user={auth:{getUser:async()=>({data:{user:{id:'owner'}}})}};
  const source=fs.readFileSync('supabase/functions/recognition-contributions/index.ts','utf8');
  const js=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
- vm.runInNewContext(js,{exports:{},require:(name)=>name==='./policy.ts'?{normalizeContribution}:{createClient:(_url,key)=>key==='service'?admin:user},Deno:{env:{get:key=>({'SUPABASE_URL':'https://example.test','SUPABASE_ANON_KEY':'anon','SUPABASE_SERVICE_ROLE_KEY':'service'}[key])},serve:fn=>handler=fn},Request,Response,URL,console,atob,Uint8Array});
+ vm.runInNewContext(js,{exports:{},require:(name)=>name==='./policy.ts'?{normalizeContribution}:{createClient:(_url,key)=>key==='service'?admin:user},Deno:{env:{get:key=>({'SUPABASE_URL':'https://example.test','SUPABASE_ANON_KEY':'anon','SUPABASE_SERVICE_ROLE_KEY':'service','RECOGNITION_CLEANUP_SECRET':'cleanup-secret'}[key])},serve:fn=>handler=fn},Request,Response,URL,console,atob,Uint8Array,TextEncoder});
  return {handler,writes};
 }
 test('endpoint requires authentication and rejects absent consent before touching storage',async()=>{
@@ -34,11 +34,13 @@ test('endpoint requires authentication and rejects absent consent before touchin
  assert.equal((await handler(new Request('https://test',{method:'POST',headers:{Authorization:'Bearer user'},body:JSON.stringify({action:'submit',...input(),consent:false})}))).status,400);
 });
 
-test('gateway-verified anon maintenance accepts rotated project JWTs but rejects user and foreign-project roles',async()=>{
+test('cleanup requires the dedicated maintenance secret; the project anon JWT alone is not enough',async()=>{
  const {handler}=loadEndpoint();
- for(const [claims,status] of [[{role:'anon',ref:'example'},200],[{role:'authenticated',ref:'example'},403],[{role:'anon',ref:'foreign'},403]]) {
-  const token='header.'+Buffer.from(JSON.stringify(claims)).toString('base64url')+'.gateway-verified-signature';
-  const response=await handler(new Request('https://test',{method:'POST',headers:{Authorization:'Bearer '+token},body:JSON.stringify({action:'cleanup'})}));
-  assert.equal(response.status,status);
- }
+ const anon='header.'+Buffer.from(JSON.stringify({role:'anon',ref:'example'})).toString('base64url')+'.gateway-verified-signature';
+ const cleanup=(headers)=>handler(new Request('https://test',{method:'POST',headers:{Authorization:'Bearer '+anon,...headers},body:JSON.stringify({action:'cleanup'})}));
+ assert.equal((await cleanup({})).status,403);
+ assert.equal((await cleanup({'x-cleanup-secret':'wrong-secret'})).status,403);
+ const ok=await cleanup({'x-cleanup-secret':'cleanup-secret'});
+ assert.equal(ok.status,200);
+ assert.deepEqual(await ok.json(),{removed:0});
 });

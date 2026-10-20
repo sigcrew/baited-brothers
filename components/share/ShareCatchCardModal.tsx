@@ -34,7 +34,7 @@ type ShareCatchCardModalProps = {
   item: ShareCatchData | null;
   visible: boolean;
   onClose: () => void;
-  source: "completion" | "archive" | "preview";
+  source: "completion" | "archive";
   initialShowRegion?: boolean;
   cardVariant?: ShareCardVariant;
 };

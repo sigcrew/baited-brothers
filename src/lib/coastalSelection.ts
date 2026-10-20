@@ -156,3 +156,17 @@ export const evaluateCoastalSelection = (
     coastDistanceKm,
   };
 };
+
+/** 대한민국 영해를 넉넉히 감싸는 사각 범위. 연안 판정 전의 1차 필터로만 쓴다. */
+export const KOREA_BOUNDS = {
+  minLatitude: 32.5,
+  maxLatitude: 39.0,
+  minLongitude: 124.0,
+  maxLongitude: 132.5,
+} as const;
+
+export const isKoreaCoordinate = (latitude: number, longitude: number) =>
+  latitude >= KOREA_BOUNDS.minLatitude &&
+  latitude <= KOREA_BOUNDS.maxLatitude &&
+  longitude >= KOREA_BOUNDS.minLongitude &&
+  longitude <= KOREA_BOUNDS.maxLongitude;

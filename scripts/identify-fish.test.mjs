@@ -82,7 +82,7 @@ test('a truncated model response is an upstream error, not a request to retake t
   assert.equal(response.status, 502);
   const body = await response.json();
   assert.equal(body.needs_retake, undefined);
-  assert.match(body.error_code, /output limit/);
+  assert.equal(body.error_code, 'output_truncated');
 });
 
 test('isolated comparison endpoint restricts users/models and forwards both views together', async () => {

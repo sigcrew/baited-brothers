@@ -1,9 +1,10 @@
 import { Platform } from "react-native";
 import type FontAwesome from "@expo/vector-icons/FontAwesome";
-import { evaluateCoastalSelection } from "@/src/lib/coastalSelection";
+import { evaluateCoastalSelection, isKoreaCoordinate } from "@/src/lib/coastalSelection";
 import { countDistinctMapCoordinates } from "@/src/lib/mapClustering";
 import type { UserCatch } from "@/src/hooks/useUserCatches";
 import type { FishingTrip } from "@/src/hooks/useFishingTrips";
+import { TAB_BAR_HEIGHT } from "@/src/theme/tabBar";
 import type { FavoriteFishingSpot } from "@/src/hooks/useFavoriteFishingSpots";
 
 /** 지도 탭이 다루는 모든 지점. 조과·출조·즐겨찾기와 임시 지점(현재 위치, 수동 선택). */
@@ -35,16 +36,12 @@ export const MAP_LAYOUT = {
   filterHorizontalPadding: Platform.OS === "android" ? 12 : 14,
   filterCountHeight: Platform.OS === "android" ? 18 : 20,
   favoriteRowHeight: 32,
-  /** app/(tabs)/_layout.tsx의 탭바 높이와 같아야 한다. */
-  tabBarHeight: Platform.OS === "android" ? 72 : 64,
+  tabBarHeight: TAB_BAR_HEIGHT,
   infoSheetSnapPoints: ["24%", "42%", "72%"],
 } as const;
 
 /** 같은 지점으로 취급하는 좌표 오차(약 1m). */
 export const SAME_COORDINATE_EPSILON = 0.00001;
-
-export const isKoreaCoordinate = (latitude: number, longitude: number) =>
-  latitude >= 32.5 && latitude <= 39.0 && longitude >= 124.0 && longitude <= 132.5;
 
 export const haveSameCoordinate = (
   a: { latitude: number; longitude: number },

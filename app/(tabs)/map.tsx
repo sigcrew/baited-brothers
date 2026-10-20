@@ -15,7 +15,7 @@ import { useFishingTrips, type UpdateTripInput } from "@/src/hooks/useFishingTri
 import { useFavoriteFishingSpots, type FavoriteFishingSpot } from "@/src/hooks/useFavoriteFishingSpots";
 import { useMarineConditions } from "@/src/hooks/useMarineConditions";
 import { useUserCatches } from "@/src/hooks/useUserCatches";
-import { evaluateCoastalSelection } from "@/src/lib/coastalSelection";
+import { evaluateCoastalSelection, isKoreaCoordinate } from "@/src/lib/coastalSelection";
 import {
   MAP_LAYOUT,
   buildMapEntries,
@@ -23,7 +23,6 @@ import {
   distanceKm,
   filterVisibleEntries,
   haveSameCoordinate,
-  isKoreaCoordinate,
   type MapEntry,
   type MapFilter,
 } from "@/src/lib/mapScreen";
