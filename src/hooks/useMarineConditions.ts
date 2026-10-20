@@ -104,6 +104,13 @@ export const useMarineConditions = (
     }
 
     try {
+      // marine-conditions는 유료 API 프록시라 사용자 세션 없이는 호출하지 않는다.
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("로그인 후 해양 정보를 확인할 수 있습니다.");
+      }
       const { data: response, error: invokeError } = await supabase.functions.invoke(
         "marine-conditions",
         { body: { latitude, longitude } },

@@ -40,5 +40,8 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,
+    // OAuth 콜백에 토큰 대신 1회용 code를 싣는다. code verifier는 storageAdapter
+    // (네이티브는 SecureStore)에 보관된다.
+    flowType: "pkce",
   },
 });

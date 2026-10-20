@@ -8,6 +8,7 @@ import React, {
 import type { Session } from "@supabase/supabase-js";
 import Constants from "expo-constants";
 import * as WebBrowser from "expo-web-browser";
+import { AppState, Platform } from "react-native";
 import { supabase } from "@/src/lib/supabase";
 import { parseGoogleAuthCallback } from "@/src/lib/googleAuthCallback";
 
@@ -70,6 +71,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
+  // 네이티브에서는 타이머가 백그라운드에서 멈추므로, Supabase 권장대로 앱이 활성일 때만
+  // 토큰 자동 갱신을 돌린다. 이게 없으면 오래 백그라운드에 있다가 돌아온 첫 요청이
+  // 만료된 JWT로 나가 간헐적인 401이 난다.
+  useEffect(() => {
+    if (Platform.OS === "web") return;
+    const applyAppState = (state: string) => {
+      if (state === "active") {
+        void supabase.auth.startAutoRefresh();
+      } else {
+        void supabase.auth.stopAutoRefresh();
+      }
+    };
+    applyAppState(AppState.currentState);
+    const subscription = AppState.addEventListener("change", applyAppState);
+    return () => {
+      subscription.remove();
+      void supabase.auth.stopAutoRefresh();
+    };
+  }, []);
+
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     return { error: error ?? null };
@@ -119,7 +140,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       },
     );
     if (tokenStorageError) {
-      await supabase.auth.signOut({ scope: "local" }).catch(() => undefined);
+      // 서버에 남은 리프레시 토큰까지 무효화한다. local scope만 지우면 사용자는
+      // 거부됐다고 믿는 계정의 세션이 서버에 살아 있게 된다.
+      await supabase.auth.signOut({ scope: "global" }).catch(() => undefined);
       return {
         error: new Error(
           "Apple 계정 연결 정보를 안전하게 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.",
@@ -171,14 +194,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         } = await supabase.auth.getSession();
         if (existingSession) return { error: null };
 
-        const { accessToken, refreshToken, error } = parseGoogleAuthCallback(
-          callbackUrlOrFragment,
-        );
-        if (error) return { error };
+        const parsed = parseGoogleAuthCallback(callbackUrlOrFragment);
+        if (parsed.kind === "error") return { error: parsed.error };
 
+        if (parsed.kind === "code") {
+          const { error: exchangeError } =
+            await supabase.auth.exchangeCodeForSession(parsed.code);
+          return { error: exchangeError ?? null };
+        }
+
+        // 구버전 implicit 콜백 하위 호환.
         const { error: sessionError } = await supabase.auth.setSession({
-          access_token: accessToken,
-          refresh_token: refreshToken,
+          access_token: parsed.accessToken,
+          refresh_token: parsed.refreshToken,
         });
 
         return { error: sessionError ?? null };

@@ -10,16 +10,27 @@ import { useAuth } from "@/src/contexts/AuthContext";
 
 type GoogleAuthParams = {
   "#": string | string[];
+  code: string | string[];
+  error: string | string[];
+  error_description: string | string[];
 };
+
+const first = (value: string | string[] | undefined) =>
+  Array.isArray(value) ? value[0] : value;
 
 const GoogleAuthCallbackScreen = () => {
   const params = useLocalSearchParams<GoogleAuthParams>();
   const { session, completeGoogleSignIn } = useAuth();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const hasStarted = useRef(false);
-  const fragment = Array.isArray(params["#"])
-    ? params["#"][0]
-    : params["#"];
+  // PKCE는 ?code=, 구버전 implicit은 #access_token=... 으로 돌아온다.
+  const code = first(params.code);
+  const providerError = first(params.error_description) ?? first(params.error);
+  const fragment = code
+    ? `code=${encodeURIComponent(code)}`
+    : providerError
+      ? `error_description=${encodeURIComponent(providerError)}`
+      : first(params["#"]);
 
   useEffect(() => {
     if (session) {

@@ -114,19 +114,32 @@ Deno.serve(async (req) => {
       }
     }
 
-    const paths = await listObjectPaths(adminClient, "user-uploads", user.id);
-    for (let index = 0; index < paths.length; index += 100) {
-      const { error } = await adminClient.storage
-        .from("user-uploads")
-        .remove(paths.slice(index, index + 100));
-      if (error) throw error;
-    }
-
+    // 계정(auth.users)을 먼저 지운다. DB 행은 FK cascade로 함께 사라진다. 스토리지는
+    // 그 다음에 정리한다: 반대로 하면 deleteUser가 실패했을 때 사진만 사라진 계정이
+    // 남고 사용자는 "탈퇴 실패"를 보게 된다.
     const { error: deleteError } =
       await adminClient.auth.admin.deleteUser(user.id);
     if (deleteError) throw deleteError;
 
-    return json({ appleRevocation, deleted: true });
+    let storagePurged = true;
+    try {
+      const paths = await listObjectPaths(adminClient, "user-uploads", user.id);
+      for (let index = 0; index < paths.length; index += 100) {
+        const { error } = await adminClient.storage
+          .from("user-uploads")
+          .remove(paths.slice(index, index + 100));
+        if (error) throw error;
+      }
+    } catch (storageError) {
+      // 계정은 이미 삭제됐다. 남은 객체는 운영 정리 대상으로 로그에 남긴다.
+      console.error("Orphaned user-uploads after account deletion", {
+        userId: user.id,
+        error: storageError,
+      });
+      storagePurged = false;
+    }
+
+    return json({ appleRevocation, deleted: true, storagePurged });
   } catch (error) {
     console.error("Account deletion failed", error);
     return json({ error: "Account deletion failed." }, 500);

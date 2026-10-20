@@ -15,7 +15,7 @@ import {
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFishes, type Fish } from "@/src/hooks/useFishes";
 import { useCreateCatch } from "@/src/hooks/useCreateCatch";
@@ -1541,4 +1541,12 @@ const RecordScreen = () => {
   );
 };
 
-export default RecordScreen;
+// 딥링크(baited-brothers://record)로 비로그인 진입하면 카메라 대신 로그인으로 보낸다.
+export default function RecordRoute() {
+  const { session, isLoading } = useAuth();
+  if (!__DEV__ && !session) {
+    if (isLoading) return null;
+    return <Redirect href="/(auth)/login" />;
+  }
+  return <RecordScreen />;
+}

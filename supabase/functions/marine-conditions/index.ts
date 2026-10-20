@@ -541,9 +541,28 @@ const fetchWeatherForecast = async (latitude: number, longitude: number) => {
   };
 };
 
+// 게이트웨이 verify_jwt는 프로젝트 anon 키 자체도 통과시키므로, 여기서 실제 사용자
+// 세션인지 다시 확인한다. 이 함수는 유료 외부 API를 호출하는 프록시다.
+const authenticateRequest = async (request: Request) => {
+  const authorization = request.headers.get("Authorization");
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+  if (!authorization || !supabaseUrl || !anonKey) return null;
+  const client = createClient(supabaseUrl, anonKey, {
+    global: { headers: { Authorization: authorization } },
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  const { data, error } = await client.auth.getUser();
+  if (error || !data.user) return null;
+  return data.user;
+};
+
 Deno.serve(async (request) => {
   if (request.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (request.method !== "POST") return json({ error: "Method not allowed." }, 405);
+
+  const user = await authenticateRequest(request);
+  if (!user) return json({ error: "Authentication required." }, 401);
 
   try {
     const body = await request.json();
