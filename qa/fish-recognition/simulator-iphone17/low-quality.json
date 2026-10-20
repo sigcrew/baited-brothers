@@ -1,0 +1,17 @@
+{
+  "localId": "1789010249487-ssvmpmlr2c",
+  "imageWidth": 960,
+  "imageHeight": 960,
+  "captureMethod": "photo_library",
+  "candidates": [],
+  "status": "needs_confirmation",
+  "lastError": null,
+  "createdAt": "2026-09-10T03:17:29.491Z",
+  "updatedAt": "2026-09-10T03:17:35.956Z",
+  "elapsedPreserveToUpdateSeconds": 6.465,
+  "timingNote": "Local photo preservation to latest analysis state update; not pure inference latency.",
+  "inputPath": "qa/fish-recognition/rejection-data/low-quality/low-quality-pixelated-04.jpg",
+  "referenceLabel": "픽셀화된 물고기 사진",
+  "candidateNamesInOrder": [],
+  "observedUI": "재촬영 안내; 후보 없음"
+}

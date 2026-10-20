@@ -1,0 +1,10 @@
+{
+  "version": "1.1.4",
+  "versionCode": 10016,
+  "source": "Google Play Console production release 4 signed universal APK downloaded by user",
+  "sha256": "fe2f6ccdc5b7ddb671eeb615fb89578c83262f9dc7737436b84c2fc66ca864bc",
+  "signerSha1": "db29be5e446e41e5874cd48d950d0b7423dc45dc",
+  "bundleContainsSearchPlaces": false,
+  "bundleContainsGeocodeAsync": true,
+  "runtimeStatus": "Blocked on Google Play licensing in Google APIs emulator; awaiting unlock of Google Play emulator"
+}

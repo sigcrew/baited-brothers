@@ -1,0 +1,16 @@
+{
+  "localId": "1789012000128-m9c3eo6m2i",
+  "imageWidth": 1280,
+  "imageHeight": 960,
+  "captureMethod": "photo_library",
+  "candidates": [],
+  "status": "needs_confirmation",
+  "lastError": null,
+  "createdAt": "2026-09-10T03:46:40.131Z",
+  "updatedAt": "2026-09-10T03:46:45.717Z",
+  "elapsedPreserveToUpdateSeconds": 5.586,
+  "timingNote": "Local photo preservation to latest analysis state update; not pure inference latency.",
+  "candidateNamesInOrder": [],
+  "inputPath": "qa/fish-recognition/rejection-data/non-fish/non-fish-dog-01.jpg",
+  "endpoint": "identify-fish-qa-evidence"
+}

@@ -1,0 +1,38 @@
+✔ review queue excludes holdout origins, rejected photos, and duplicate content (9.32225ms)
+✔ normalized crop keeps edge pixels inside image dimensions (0.207917ms)
+✔ review selection groups GBIF media and normalized cross-provider observations (1.264166ms)
+✔ only imports decisions bound to the current photos and queue (219.993ms)
+✔ requires an accountable decision, permits uncertainty, never grants training approval (0.164875ms)
+✔ AI drafts stay separate from human decisions and require exact photo coverage (0.1485ms)
+✔ generates a valid ES256 Apple client secret (55.869583ms)
+✔ rejects client secrets longer than Apple's six-month limit (0.329667ms)
+Fish identification failed Error: Claude response exceeded output limit
+    at callClaude (/Users/yong/Desktop/baited-brothers/supabase/functions/identify-fish/index.ts:205:23)
+    at async classifyCatalog (/Users/yong/Desktop/baited-brothers/supabase/functions/identify-fish/index.ts:234:20)
+    at async /Users/yong/Desktop/baited-brothers/supabase/functions/identify-fish/index.ts:378:31
+    at async TestContext.<anonymous> (file:///Users/yong/Desktop/baited-brothers/scripts/identify-fish.test.mjs:81:20)
+    at async Test.run (node:internal/test_runner/test:1113:7)
+    at async Test.processPendingSubtests (node:internal/test_runner/test:788:7)
+✔ keeps jointly ranked candidates instead of forcing adjacent species into slots 2 and 3 (922.409375ms)
+✔ rejects an unsuitable photo without invoking species classification (117.430459ms)
+✔ a truncated model response is an upstream error, not a request to retake the photo (308.931ms)
+✔ isolated comparison endpoint restricts users/models and forwards both views together (1152.065125ms)
+✔ automatic detail keeps the original quality gate and sends both views only to classification (238.103917ms)
+✔ uncertain or unavailable detail retains original-only classification (215.464583ms)
+(node:18549) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/yong/Desktop/baited-brothers/supabase/functions/recognition-contributions/policy.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /Users/yong/Desktop/baited-brothers/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ requires explicit current consent before accepting a contribution (2.482208ms)
+✔ preserves ordered predictions but never accepts client identity, coordinates or verified labels (0.200375ms)
+✔ validates images, predictions, status and correlation keys at the boundary (1.059584ms)
+✔ endpoint requires authentication and rejects absent consent before touching storage (402.273041ms)
+✔ gateway-verified anon maintenance accepts rotated project JWTs but rejects user and foreign-project roles (143.309167ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6082.353458

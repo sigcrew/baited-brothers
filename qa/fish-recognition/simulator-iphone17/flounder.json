@@ -1,0 +1,37 @@
+{
+  "localId": "1789009894263-byrkownaag",
+  "imageWidth": 1000,
+  "imageHeight": 1000,
+  "captureMethod": "photo_library",
+  "candidates": [
+    {
+      "fishId": "4205e7b8-ffd6-4032-ace9-6b6f6ecf62ec",
+      "confidence": 0.35,
+      "reason": "작은 입, 타원형에 가까운 체형, 가슴지느러미 부근 측선의 완만한 굴곡이 문치가자미의 특징과 부합한다."
+    },
+    {
+      "fishId": "04c8c1b2-18f3-4394-bdd6-4599b9cce6d4",
+      "confidence": 0.3,
+      "reason": "작은 입과 마름모꼴에 가까운 체형이 도다리와 유사하나, 주둥이가 뾰족한 특징은 뚜렷하지 않다."
+    },
+    {
+      "fishId": "4679e0e2-96d5-4999-90b2-a76f67c22200",
+      "confidence": 0.2,
+      "reason": "체형과 반점 패턴이 참가자미와 유사할 수 있으나 무안측 꼬리자루의 노란빛 여부를 확인할 수 없어 확신도가 낮다."
+    }
+  ],
+  "status": "needs_confirmation",
+  "lastError": null,
+  "createdAt": "2026-09-10T03:11:34.268Z",
+  "updatedAt": "2026-09-10T03:11:55.774Z",
+  "elapsedPreserveToUpdateSeconds": 21.506,
+  "timingNote": "Local photo preservation to latest analysis state update; not pure inference latency.",
+  "inputPath": "qa/fish-recognition/approved-holdout/images/reviewed-01.jpg",
+  "referenceLabel": "넙치 (기존 라벨, 전문가 미확정)",
+  "candidateNamesInOrder": [
+    "문치가자미",
+    "도다리",
+    "참가자미"
+  ],
+  "observedUI": "후보 직접 확인 및 선택"
+}

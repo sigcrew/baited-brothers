@@ -1,0 +1,18 @@
+{
+  "checkedAt": "2026-09-10",
+  "readOnly": true,
+  "scope": "All records; may include test/legacy data. Not a count of verified user samples.",
+  "catches": {
+    "total": 31,
+    "withPhotoReference": 26,
+    "withAiCandidates": 12,
+    "withSpeciesChoice": 31,
+    "corrected": 0
+  },
+  "correctionHistoryRows": 0,
+  "userUploadsPublic": false,
+  "relatedEventsLast30Days": {
+    "ai_analysis_started": 1,
+    "ai_analysis_succeeded": 1
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "id": "analysis-1789017471691-h06ek6jej9",
+  "status": "succeeded",
+  "candidates": [
+    {
+      "fishId": "f63e7e9b-6494-42d5-a835-fb178ba5e475",
+      "confidence": 0.55,
+      "reason": "몸통 두껍고 회갈색 바탕에 불규칙 무늬, 큰 입과 강한 머리 윤곽이 조피볼락과 부합"
+    },
+    {
+      "fishId": "a1c5a471-8567-49eb-9324-413923621ecf",
+      "confidence": 0.25,
+      "reason": "얼룩진 갈색 체색과 강한 머리 가시 인상이 있으나 두상 굴곡 세부는 해상도 부족으로 확인 어려움"
+    },
+    {
+      "fishId": "b1e0bfba-ca51-4e7e-883b-91de309f242b",
+      "confidence": 0.15,
+      "reason": "길쭉한 체형은 쥐노래미와도 유사하나 측선 개수·꼬리 오목함 확인 불가해 확신 낮음"
+    }
+  ],
+  "model": "claude-sonnet-5",
+  "version": "field60-v31+evidence-v1",
+  "durationMs": 22978,
+  "note": "머리 가시 세부와 측선, 눈 위치가 해상도·각도상 명확히 보이지 않아 볼락류 내 종 구분 확신도 제한적임.",
+  "failureKind": null
+}

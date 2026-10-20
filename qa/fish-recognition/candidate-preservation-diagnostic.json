@@ -1,0 +1,82 @@
+[
+  {
+    "expected": "넙치",
+    "seconds": 17.591,
+    "subject_present": true,
+    "subject_type": "finfish",
+    "image_quality": 0.75,
+    "subject_size": "large",
+    "quality_issues": [
+      "cropped"
+    ],
+    "evaluated_groups": [
+      "flatfish"
+    ],
+    "candidates": [
+      {
+        "fish_id": "1a18b825-ab49-4ab3-b737-15a62a713966",
+        "confidence": 0.55,
+        "reason": "눈이 오른쪽에 위치하고 몸 표면에 골질 돌기로 보이는 작은 돌출물들이 산재해 있으며, 비늘이 거의 없어 매끈한 질감을 보여 돌가자미의 특징과 유사하다.",
+        "name": "돌가자미"
+      },
+      {
+        "fish_id": "04c8c1b2-18f3-4394-bdd6-4599b9cce6d4",
+        "confidence": 0.25,
+        "reason": "눈이 오른쪽에 모여 있고 입이 작으며 몸이 마름모꼴에 가까운 형태로 도다리와 유사한 체형을 보인다.",
+        "name": "도다리"
+      },
+      {
+        "fish_id": "4205e7b8-ffd6-4032-ace9-6b6f6ecf62ec",
+        "confidence": 0.2,
+        "reason": "오른쪽 눈과 작은 입, 타원형에 가까운 체형이 문치가자미와 일부 유사하나 측선의 굴곡은 명확히 확인되지 않는다.",
+        "name": "문치가자미"
+      }
+    ],
+    "needs_retake": false,
+    "note": "사진에서 눈이 오른쪽에 위치한 것으로 보이며, 몸 전체에 작은 돌기 형태의 무늬가 분포해 있어 돌가자미 가능성을 우선으로 판단했습니다. 다만 측선의 굴곡 형태나 무안측 색상 등 세부 특징이 명확히 보이지 않아 확신도는 중간 수준입니다. 도다리, 문치가자미와의 구분을 위해서는 측선 곡률과 무안측 색상이 잘 보이는 추가 각도의 사진이 있으면 더 정확한 판별이 가능합니다.",
+    "quota": {
+      "remaining": 25,
+      "reset_at": null
+    }
+  },
+  {
+    "expected": "참돔",
+    "seconds": 16.551,
+    "subject_present": true,
+    "subject_type": "finfish",
+    "image_quality": 0.9,
+    "subject_size": "large",
+    "quality_issues": [],
+    "evaluated_groups": [
+      "bream",
+      "seabass_croaker",
+      "rockfish"
+    ],
+    "candidates": [
+      {
+        "fish_id": "b5a90813-47cf-4a3f-b5d9-8ff9bb824fc5",
+        "confidence": 0.55,
+        "reason": "붉은빛이 도는 몸에 황색 기운이 있고 체형이 참돔보다 다소 납작하며 등지느러미가 길게 이어지는 형태가 황돔과 유사함. 꼬리지느러미 뒤쪽 붉은색이 뚜렷함.",
+        "name": "황돔"
+      },
+      {
+        "fish_id": "0b8fc84c-74d9-4521-9c53-bcfd2e91f56d",
+        "confidence": 0.35,
+        "reason": "참돔과 유사한 체형과 붉은 몸빛을 보이나 특징적인 푸른 반점이 사진에서 뚜렷하게 확인되지 않고 꼬리 끝 검은 테두리도 명확하지 않음.",
+        "name": "참돔"
+      },
+      {
+        "fish_id": "9048a71c-574d-4329-82b5-28d4c64f6030",
+        "confidence": 0.15,
+        "reason": "은회색 계열의 체색과 강한 등지느러미 가시가 감성돔과 일부 유사하나 전체적인 붉은 색조와 체형은 감성돔보다 참돔·황돔류에 더 가까움.",
+        "name": "감성돔"
+      }
+    ],
+    "needs_retake": false,
+    "note": "전체적으로 붉은빛과 은빛이 섞인 체색, 긴 등지느러미 가시, 갈라진 꼬리지느러미 형태로 볼 때 도미류(bream) 중 참돔 또는 황돔 계열로 판단됨. 눈에 띄는 푸른 반점이나 뚜렷한 검은 꼬리 테두리가 사진에서 명확히 보이지 않아 참돔과 황돔 사이의 정확한 구분에는 다소 불확실성이 있음.\"",
+    "quota": {
+      "remaining": 24,
+      "reset_at": null
+    }
+  }
+]

@@ -1,0 +1,37 @@
+{
+  "localId": "1789009576296-jb5bur1hbs",
+  "imageWidth": 1024,
+  "imageHeight": 768,
+  "captureMethod": "photo_library",
+  "candidates": [
+    {
+      "fishId": "a1c5a471-8567-49eb-9324-413923621ecf",
+      "confidence": 0.55,
+      "reason": "얼룩진 갈색·붉은색 몸, 울퉁불퉁한 머리 윤곽과 위장무늬가 쏨뱅이의 특징과 유사함. 머리 가시 형태도 부합."
+    },
+    {
+      "fishId": "1b410f59-b74f-4432-a1fa-f3f386f0cdd9",
+      "confidence": 0.3,
+      "reason": "짧은 주둥이와 흑갈색 몸에 작은 반점이 흩어진 형태가 개볼락과 일부 유사하나 반점이 더 크고 뚜렷함."
+    },
+    {
+      "fishId": "f63e7e9b-6494-42d5-a835-fb178ba5e475",
+      "confidence": 0.15,
+      "reason": "회갈색 몸에 불규칙한 짙은 무늬와 강한 머리 가시가 조피볼락과 유사하나 체형이 더 통통함."
+    }
+  ],
+  "status": "needs_confirmation",
+  "lastError": null,
+  "createdAt": "2026-09-10T03:06:16.313Z",
+  "updatedAt": "2026-09-10T03:06:37.556Z",
+  "elapsedPreserveToUpdateSeconds": 21.243,
+  "timingNote": "Local photo preservation to latest analysis state update; not pure inference latency.",
+  "inputPath": "qa/fish-recognition/approved-holdout/images/reviewed-07.jpg",
+  "referenceLabel": "조피볼락 (기존 라벨, 전문가 미확정)",
+  "candidateNamesInOrder": [
+    "쏨뱅이",
+    "개볼락",
+    "조피볼락"
+  ],
+  "observedUI": "후보 직접 확인 및 선택"
+}

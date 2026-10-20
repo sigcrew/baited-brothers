@@ -1,0 +1,30 @@
+
+> baited-brothers@1.1.4 test:ci
+> jest --runInBand --ci --no-watchman
+
+PASS components/collection/__tests__/CardsPanel.test.tsx
+PASS components/share/__tests__/ShareCatchCardModal.test.tsx
+PASS src/hooks/__tests__/useMarineConditions.test.tsx
+PASS src/lib/__tests__/shareCard.test.ts
+PASS components/catches/__tests__/CatchEditModal.test.tsx
+PASS src/lib/__tests__/marineTides.test.ts
+PASS src/lib/__tests__/mapClustering.test.ts
+PASS components/record/__tests__/RecognitionContributionCard.test.tsx
+PASS src/hooks/__tests__/useFishRecognition.test.ts
+PASS src/lib/__tests__/appErrors.test.ts
+PASS src/lib/__tests__/pendingCatchQueue.test.ts
+PASS src/lib/__tests__/reverseGeocoding.test.ts
+PASS src/data/__tests__/badges.test.ts
+PASS src/lib/__tests__/coastalSelection.test.ts
+PASS src/lib/__tests__/locationPermission.test.ts
+PASS src/lib/__tests__/analytics.test.ts
+PASS src/lib/__tests__/fishQualityGate.test.ts
+PASS src/lib/__tests__/googleAuthCallback.test.ts
+PASS src/lib/__tests__/catchVerification.test.ts
+PASS src/lib/__tests__/catchRewards.test.ts
+
+Test Suites: 20 passed, 20 total
+Tests:       91 passed, 91 total
+Snapshots:   0 total
+Time:        3.579 s, estimated 4 s
+Ran all test suites.

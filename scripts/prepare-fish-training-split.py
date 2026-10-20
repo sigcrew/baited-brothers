@@ -160,14 +160,15 @@ def main() -> None:
     audit = json.loads(audit_path.read_text(encoding="utf-8"))
     holdout_path = (root / args.holdout_manifest).resolve()
     holdout = json.loads(holdout_path.read_text(encoding="utf-8"))
+    excluded_cases = holdout.get("cases", []) + holdout.get("quarantinedCases", [])
     holdout_files = {
         (holdout_path.parent / str(case["path"])).resolve()
-        for case in holdout.get("cases", [])
+        for case in excluded_cases
         if case.get("path")
     }
     holdout_hashes = {
         str(case["sha256"])
-        for case in holdout.get("cases", [])
+        for case in excluded_cases
         if case.get("sha256")
     }
     review_path = (root / args.review_decisions).resolve()

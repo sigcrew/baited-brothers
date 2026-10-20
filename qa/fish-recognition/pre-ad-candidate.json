@@ -1,0 +1,452 @@
+{
+  "generatedAt": "2026-09-10T01:14:41.951Z",
+  "summary": {
+    "functionName": "identify-fish-qa",
+    "total": 10,
+    "fishCases": 8,
+    "top1Accuracy": 0.5,
+    "top3Accuracy": 0.75,
+    "rejectionCases": 2,
+    "rejectionAccuracy": 1,
+    "nonFishCases": 1,
+    "nonFishRejectionAccuracy": 1,
+    "lowQualityCases": 1,
+    "lowQualityRejectionAccuracy": 1,
+    "errors": 0,
+    "provisional": false,
+    "releaseGate": {
+      "minimumCasesPerCoreSpecies": 5,
+      "minimumNonFishCases": 30,
+      "minimumLowQualityCases": 30,
+      "targetTop3Accuracy": 0.9,
+      "targetRejectionAccuracy": 0.95
+    }
+  },
+  "rows": [
+    {
+      "id": "reviewed-01",
+      "kind": "fish",
+      "expected": "Paralichthys olivaceus (Temminck & Schlegel, 1846)",
+      "expectedId": "6328bd41-3642-4369-a953-99450e964f99",
+      "needsRetake": false,
+      "candidates": [
+        "1a18b825-ab49-4ab3-b737-15a62a713966",
+        "04c8c1b2-18f3-4394-bdd6-4599b9cce6d4",
+        "4205e7b8-ffd6-4032-ace9-6b6f6ecf62ec"
+      ],
+      "top1Match": false,
+      "top3Match": false,
+      "note": "눈의 좌우 위치, 측선의 굴곡, 지느러미 무늬 세부(띠 유무)를 정확히 판별하기 어려운 각도라 확신도가 제한적입니다. 체표 질감(거친 돌기)과 반점 패턴을 근거로 돌가자미를 1순위로 판단했습니다.",
+      "seconds": 21.09,
+      "response": {
+        "subject_present": true,
+        "subject_type": "finfish",
+        "image_quality": 0.8,
+        "subject_size": "large",
+        "quality_issues": [],
+        "evaluated_groups": [
+          "flatfish"
+        ],
+        "candidates": [
+          {
+            "fish_id": "1a18b825-ab49-4ab3-b737-15a62a713966",
+            "confidence": 0.4,
+            "reason": "몸 표면에 골질 돌기로 보이는 거친 질감이 확인되고, 비늘이 매끈하지 않아 돌가자미의 특징과 부합한다. 큰 반점도 돌가자미에서 흔히 보이는 무늬와 유사하다."
+          },
+          {
+            "fish_id": "04c8c1b2-18f3-4394-bdd6-4599b9cce6d4",
+            "confidence": 0.3,
+            "reason": "작은 입과 마름모꼴에 가까운 체형이 도다리와 유사하나, 눈 위치를 명확히 확인할 수 없어 확신은 제한적이다."
+          },
+          {
+            "fish_id": "4205e7b8-ffd6-4032-ace9-6b6f6ecf62ec",
+            "confidence": 0.2,
+            "reason": "작은 입과 타원형 체형이 문치가자미와도 유사하나, 가슴지느러미 위 측선의 굴곡을 확인할 수 없어 구분이 어렵다."
+          }
+        ],
+        "needs_retake": false,
+        "note": "눈의 좌우 위치, 측선의 굴곡, 지느러미 무늬 세부(띠 유무)를 정확히 판별하기 어려운 각도라 확신도가 제한적입니다. 체표 질감(거친 돌기)과 반점 패턴을 근거로 돌가자미를 1순위로 판단했습니다.",
+        "quota": {
+          "remaining": 11,
+          "reset_at": null
+        }
+      }
+    },
+    {
+      "id": "reviewed-06",
+      "kind": "fish",
+      "expected": "Platichthys stellatus (Pallas, 1787)",
+      "expectedId": "afa18983-0b46-4dd8-b467-aef6652f60f8",
+      "needsRetake": true,
+      "candidates": [],
+      "top1Match": false,
+      "top3Match": false,
+      "note": "수중 촬영으로 모래/자갈 바닥의 난반사와 초점 흐림이 심해 체표 무늬와 지느러미 형태를 정확히 구분하기 어렵습니다. 몸통이 납작하고 눈이 한쪽에 몰려있어 넙치/가자미류(flatfish)로 추정되나, 확실한 종 식별을 위해 수면 위에서 측면 전체가 선명하게 나오는 사진으로 재촬영을 권장합니다.",
+      "seconds": 6.509,
+      "response": {
+        "subject_present": true,
+        "subject_type": "finfish",
+        "image_quality": 0.35,
+        "subject_size": "medium",
+        "quality_issues": [
+          "blurred",
+          "pixelated"
+        ],
+        "candidates": [],
+        "needs_retake": true,
+        "note": "수중 촬영으로 모래/자갈 바닥의 난반사와 초점 흐림이 심해 체표 무늬와 지느러미 형태를 정확히 구분하기 어렵습니다. 몸통이 납작하고 눈이 한쪽에 몰려있어 넙치/가자미류(flatfish)로 추정되나, 확실한 종 식별을 위해 수면 위에서 측면 전체가 선명하게 나오는 사진으로 재촬영을 권장합니다."
+      }
+    },
+    {
+      "id": "reviewed-07",
+      "kind": "fish",
+      "expected": "Sebastes schlegelii Hilgendorf, 1880",
+      "expectedId": "f63e7e9b-6494-42d5-a835-fb178ba5e475",
+      "needsRetake": false,
+      "candidates": [
+        "f63e7e9b-6494-42d5-a835-fb178ba5e475",
+        "a1c5a471-8567-49eb-9324-413923621ecf",
+        "1b410f59-b74f-4432-a1fa-f3f386f0cdd9"
+      ],
+      "top1Match": true,
+      "top3Match": true,
+      "note": "주 피사체 외 주변 개체들은 형태가 다르게 보여(길쭉한 체형, 다른 무늬) 혼합 판단을 피하기 위해 제외함. 꼬리지느러미 형태 및 측선 확인 불가로 볼락류/쥐노래미류 구분에 제약이 있음.",
+      "seconds": 21.255,
+      "response": {
+        "subject_present": true,
+        "subject_type": "finfish",
+        "image_quality": 0.72,
+        "subject_size": "large",
+        "quality_issues": [
+          "occluded",
+          "cropped"
+        ],
+        "evaluated_groups": [
+          "rockfish",
+          "coastal",
+          "bream"
+        ],
+        "candidates": [
+          {
+            "fish_id": "f63e7e9b-6494-42d5-a835-fb178ba5e475",
+            "confidence": 0.55,
+            "reason": "두꺼운 체형과 큰 입, 강한 머리·아가미덮개 가시, 불규칙한 짙은 무늬가 조피볼락의 특징과 일치함."
+          },
+          {
+            "fish_id": "a1c5a471-8567-49eb-9324-413923621ecf",
+            "confidence": 0.3,
+            "reason": "얼룩진 갈색·적갈색 위장무늬와 날카로운 머리 가시 형태가 쏨뱅이와 유사하나 등지느러미 가시 세부 확인이 어려움."
+          },
+          {
+            "fish_id": "1b410f59-b74f-4432-a1fa-f3f386f0cdd9",
+            "confidence": 0.15,
+            "reason": "짧은 주둥이와 큰 입은 개볼락과도 일부 일치하나 무늬가 잘게 흩어지기보다 크게 뭉쳐있어 가능성은 낮음."
+          }
+        ],
+        "needs_retake": false,
+        "note": "주 피사체 외 주변 개체들은 형태가 다르게 보여(길쭉한 체형, 다른 무늬) 혼합 판단을 피하기 위해 제외함. 꼬리지느러미 형태 및 측선 확인 불가로 볼락류/쥐노래미류 구분에 제약이 있음.",
+        "quota": {
+          "remaining": 9,
+          "reset_at": null
+        }
+      }
+    },
+    {
+      "id": "reviewed-16",
+      "kind": "fish",
+      "expected": "Pagrus major (Temminck & Schlegel, 1843)",
+      "expectedId": "0b8fc84c-74d9-4521-9c53-bcfd2e91f56d",
+      "needsRetake": false,
+      "candidates": [
+        "b5a90813-47cf-4a3f-b5d9-8ff9bb824fc5",
+        "0b8fc84c-74d9-4521-9c53-bcfd2e91f56d",
+        "9048a71c-574d-4329-82b5-28d4c64f6030"
+      ],
+      "top1Match": false,
+      "top3Match": true,
+      "note": "체색이 표본 촬영 조명 영향을 받았을 가능성이 있어 참돔·황돔 구분에 필요한 푸른 반점 유무와 꼬리 끝 검은 테두리 여부를 확정하기 어려움. 이 두 종 사이의 확신도가 근접함.",
+      "seconds": 22.159,
+      "response": {
+        "subject_present": true,
+        "subject_type": "finfish",
+        "image_quality": 0.9,
+        "subject_size": "large",
+        "quality_issues": [],
+        "evaluated_groups": [
+          "bream",
+          "seabass_croaker",
+          "coastal"
+        ],
+        "candidates": [
+          {
+            "fish_id": "b5a90813-47cf-4a3f-b5d9-8ff9bb824fc5",
+            "confidence": 0.45,
+            "reason": "붉은빛과 황색 기운이 도는 체색, 두툼한 체형과 강한 등지느러미 가시가 황돔의 특징과 유사함. 참돔에 비해 몸이 작고 얼굴 윤곽이 더 둥근 편."
+          },
+          {
+            "fish_id": "0b8fc84c-74d9-4521-9c53-bcfd2e91f56d",
+            "confidence": 0.35,
+            "reason": "전체적인 체형과 강한 등지느러미 극조, 붉은 기운이 도는 몸이 참돔과 유사하나 사진에서 뚜렷한 푸른 반점이나 꼬리 끝 검은 테두리는 명확히 확인되지 않음."
+          },
+          {
+            "fish_id": "9048a71c-574d-4329-82b5-28d4c64f6030",
+            "confidence": 0.15,
+            "reason": "은회색 톤과 세로띠 흔적이 일부 감성돔과 겹치나 전체적인 붉은빛 색조는 감성돔의 전형적 은회색과는 차이가 있어 가능성 낮음."
+          }
+        ],
+        "needs_retake": false,
+        "note": "체색이 표본 촬영 조명 영향을 받았을 가능성이 있어 참돔·황돔 구분에 필요한 푸른 반점 유무와 꼬리 끝 검은 테두리 여부를 확정하기 어려움. 이 두 종 사이의 확신도가 근접함.",
+        "quota": {
+          "remaining": 8,
+          "reset_at": null
+        }
+      }
+    },
+    {
+      "id": "reviewed-17",
+      "kind": "fish",
+      "expected": "Acanthopagrus schlegelii (Bleeker, 1854)",
+      "expectedId": "9048a71c-574d-4329-82b5-28d4c64f6030",
+      "needsRetake": false,
+      "candidates": [
+        "9048a71c-574d-4329-82b5-28d4c64f6030",
+        "0b8fc84c-74d9-4521-9c53-bcfd2e91f56d",
+        "b5a90813-47cf-4a3f-b5d9-8ff9bb824fc5"
+      ],
+      "top1Match": true,
+      "top3Match": true,
+      "note": "주 피사체는 은회색 세로띠와 강한 등지느러미 가시를 가진 돔류로 감성돔 특징에 가장 부합함.",
+      "seconds": 21.709,
+      "response": {
+        "subject_present": true,
+        "subject_type": "finfish",
+        "image_quality": 0.8,
+        "subject_size": "medium",
+        "quality_issues": [],
+        "evaluated_groups": [
+          "bream",
+          "coastal",
+          "seabass_croaker"
+        ],
+        "candidates": [
+          {
+            "fish_id": "9048a71c-574d-4329-82b5-28d4c64f6030",
+            "confidence": 0.85,
+            "reason": "은회색 바탕에 흐린 세로띠, 강한 등지느러미 가시, 측편형 체형이 감성돔의 전형적 특징과 일치함"
+          },
+          {
+            "fish_id": "0b8fc84c-74d9-4521-9c53-bcfd2e91f56d",
+            "confidence": 0.05,
+            "reason": "체형은 유사하나 붉은 몸색이나 푸른 반점, 꼬리 뒤 검은 테두리가 전혀 관찰되지 않아 가능성 낮음"
+          },
+          {
+            "fish_id": "b5a90813-47cf-4a3f-b5d9-8ff9bb824fc5",
+            "confidence": 0.03,
+            "reason": "황색 기운이나 노란 지느러미가 보이지 않아 가능성 매우 낮음"
+          }
+        ],
+        "needs_retake": false,
+        "note": "주 피사체는 은회색 세로띠와 강한 등지느러미 가시를 가진 돔류로 감성돔 특징에 가장 부합함.",
+        "quota": {
+          "remaining": 7,
+          "reset_at": null
+        }
+      }
+    },
+    {
+      "id": "reviewed-21",
+      "kind": "fish",
+      "expected": "Dentex hypselosomus Bleeker, 1854",
+      "expectedId": "b5a90813-47cf-4a3f-b5d9-8ff9bb824fc5",
+      "needsRetake": false,
+      "candidates": [
+        "b5a90813-47cf-4a3f-b5d9-8ff9bb824fc5",
+        "0b8fc84c-74d9-4521-9c53-bcfd2e91f56d",
+        "9048a71c-574d-4329-82b5-28d4c64f6030"
+      ],
+      "top1Match": true,
+      "top3Match": true,
+      "note": "라벨에 'Dentex abei?'라는 손글씨 메모가 있으나 이는 후보 목록에 없는 학명이므로 참고만 하고, 목록 내 유사종(황돔, 참돔)을 기준으로 판별함.",
+      "seconds": 23.557,
+      "response": {
+        "subject_present": true,
+        "subject_type": "finfish",
+        "image_quality": 0.85,
+        "subject_size": "large",
+        "quality_issues": [],
+        "evaluated_groups": [
+          "bream",
+          "seabass_croaker",
+          "coastal"
+        ],
+        "candidates": [
+          {
+            "fish_id": "b5a90813-47cf-4a3f-b5d9-8ff9bb824fc5",
+            "confidence": 0.55,
+            "reason": "몸 전체에 붉은빛과 황색 기운이 돌고 지느러미가 노란빛을 띠는 점이 황돔의 특징과 일치하며, 라벨의 'Dentex abei'는 황돔과 유사한 Dentex속 근연종을 시사함."
+          },
+          {
+            "fish_id": "0b8fc84c-74d9-4521-9c53-bcfd2e91f56d",
+            "confidence": 0.3,
+            "reason": "체형과 비늘 패턴이 참돔과 유사하나, 사진에서 특징적인 푸른 반점과 꼬리 뒤 검은 테두리가 뚜렷하게 확인되지 않음."
+          },
+          {
+            "fish_id": "9048a71c-574d-4329-82b5-28d4c64f6030",
+            "confidence": 0.1,
+            "reason": "은회색 체색은 일부 유사하나 감성돔 특유의 세로띠나 강한 등지느러미 가시가 뚜렷하게 관찰되지 않아 가능성 낮음."
+          }
+        ],
+        "needs_retake": false,
+        "note": "라벨에 'Dentex abei?'라는 손글씨 메모가 있으나 이는 후보 목록에 없는 학명이므로 참고만 하고, 목록 내 유사종(황돔, 참돔)을 기준으로 판별함.",
+        "quota": {
+          "remaining": 6,
+          "reset_at": null
+        }
+      }
+    },
+    {
+      "id": "reviewed-31",
+      "kind": "fish",
+      "expected": "Scomber japonicus Houttuyn, 1782",
+      "expectedId": "64edfb87-0282-47e1-bb98-18b190e2c9c6",
+      "needsRetake": false,
+      "candidates": [
+        "d67dd670-1d2c-4259-b38a-5fb62caf67bb",
+        "64edfb87-0282-47e1-bb98-18b190e2c9c6",
+        "65d23d3e-daeb-4e8b-926c-2206aacd4985"
+      ],
+      "top1Match": false,
+      "top3Match": true,
+      "note": "사진 속 개체는 측선을 따라 이어지는 모비늘(scute)이 명확히 관찰되어 전갱이로 판단됨. 다만 조명으로 인한 색상 왜곡 가능성을 고려하여 유사 고등어류도 후보에 포함함.",
+      "seconds": 20.305,
+      "response": {
+        "subject_present": true,
+        "subject_type": "finfish",
+        "image_quality": 0.75,
+        "subject_size": "large",
+        "quality_issues": [],
+        "evaluated_groups": [
+          "pelagic",
+          "coastal"
+        ],
+        "candidates": [
+          {
+            "fish_id": "d67dd670-1d2c-4259-b38a-5fb62caf67bb",
+            "confidence": 0.85,
+            "reason": "아가미 뒤에서 꼬리까지 이어지는 단단한 모비늘 줄이 뚜렷이 보이며, 방추형 은백색 체형과 갈라진 꼬리지느러미가 전갱이의 전형적 특징과 일치함."
+          },
+          {
+            "fish_id": "64edfb87-0282-47e1-bb98-18b190e2c9c6",
+            "confidence": 0.15,
+            "reason": "청록색 등과 은백색 배의 조합이 고등어와 유사하나, 체측에 물결무늬 대신 뚜렷한 모비늘 줄이 있어 고등어보다는 전갱이에 더 부합함."
+          },
+          {
+            "fish_id": "65d23d3e-daeb-4e8b-926c-2206aacd4985",
+            "confidence": 0.05,
+            "reason": "등의 색조가 망치고등어와 비슷해 보일 수 있으나 체측 하단에 점무늬가 없고 모비늘 줄이 뚜렷해 가능성이 낮음."
+          }
+        ],
+        "needs_retake": false,
+        "note": "사진 속 개체는 측선을 따라 이어지는 모비늘(scute)이 명확히 관찰되어 전갱이로 판단됨. 다만 조명으로 인한 색상 왜곡 가능성을 고려하여 유사 고등어류도 후보에 포함함.",
+        "quota": {
+          "remaining": 5,
+          "reset_at": null
+        }
+      }
+    },
+    {
+      "id": "reviewed-55",
+      "kind": "fish",
+      "expected": "Sepioteuthis lessoniana",
+      "expectedId": "876ea8d8-4b24-4608-9979-5cf25bd26da8",
+      "needsRetake": false,
+      "candidates": [
+        "876ea8d8-4b24-4608-9979-5cf25bd26da8",
+        "b4be4206-8945-4856-937b-8efd15797a6e",
+        "d554209f-18ad-4fbd-8094-0efe3c99e785"
+      ],
+      "top1Match": true,
+      "top3Match": true,
+      "note": "여러 개체가 무리지어 유영 중이며 중앙의 가장 선명한 개체를 기준으로 관찰함. 지느러미의 정확한 비율(전체 길이 대비)과 팔 형태는 촬영 각도상 세밀히 확인되지 않아 흰꼴뚜기와 창꼴뚜기 구분에 다소 불확실성이 있음.",
+      "seconds": 21.871,
+      "response": {
+        "subject_present": true,
+        "subject_type": "cephalopod",
+        "image_quality": 0.75,
+        "subject_size": "medium",
+        "quality_issues": [],
+        "evaluated_groups": [
+          "squid",
+          "octopus"
+        ],
+        "candidates": [
+          {
+            "fish_id": "876ea8d8-4b24-4608-9979-5cf25bd26da8",
+            "confidence": 0.55,
+            "reason": "외투막 전체 길이에 걸쳐 넓은 지느러미가 이어지는 형태와 살아있을 때 빠르게 변하는 반점 무늬가 관찰되어 흰꼴뚜기와 가장 부합한다. 무리를 지어 얕은 산호초 지대에서 유영하는 생태도 일치한다."
+          },
+          {
+            "fish_id": "b4be4206-8945-4856-937b-8efd15797a6e",
+            "confidence": 0.3,
+            "reason": "가늘고 긴 외투막 형태가 창꼴뚜기(한치)와 유사하나, 본 개체는 지느러미가 몸 전체에 걸쳐 이어지는 편이라 창꼴뚜기의 마름모꼴 부분 지느러미보다는 흰꼴뚜기 쪽에 더 가깝게 보인다."
+          },
+          {
+            "fish_id": "d554209f-18ad-4fbd-8094-0efe3c99e785",
+            "confidence": 0.15,
+            "reason": "붉갈색 색소포 무늬는 살오징어와 유사하나, 살오징어의 지느러미는 몸 뒤쪽 일부(삼각형)에만 있어 본 개체의 전신에 걸친 넓은 지느러미와는 차이가 있어 가능성이 낮다."
+          }
+        ],
+        "needs_retake": false,
+        "note": "여러 개체가 무리지어 유영 중이며 중앙의 가장 선명한 개체를 기준으로 관찰함. 지느러미의 정확한 비율(전체 길이 대비)과 팔 형태는 촬영 각도상 세밀히 확인되지 않아 흰꼴뚜기와 창꼴뚜기 구분에 다소 불확실성이 있음.",
+        "quota": {
+          "remaining": 4,
+          "reset_at": null
+        }
+      }
+    },
+    {
+      "id": "non-fish-dog-01",
+      "kind": "non_fish",
+      "expected": "reject",
+      "needsRetake": true,
+      "candidates": [],
+      "note": "사진에는 진흙 바닥에 찍힌 동물(포유류로 추정) 발자국과 크기 비교용 스케일 카드만 보이며, 물고기나 두족류는 확인되지 않습니다. 낚시 어종 식별에 사용할 수 없는 사진이므로 물고기/두족류 피사체가 명확히 보이는 사진으로 재촬영이 필요합니다.",
+      "seconds": 5.584,
+      "response": {
+        "subject_present": false,
+        "subject_type": "other",
+        "image_quality": 0.2,
+        "subject_size": "tiny",
+        "quality_issues": [
+          "cropped",
+          "occluded"
+        ],
+        "candidates": [],
+        "needs_retake": true,
+        "note": "사진에는 진흙 바닥에 찍힌 동물(포유류로 추정) 발자국과 크기 비교용 스케일 카드만 보이며, 물고기나 두족류는 확인되지 않습니다. 낚시 어종 식별에 사용할 수 없는 사진이므로 물고기/두족류 피사체가 명확히 보이는 사진으로 재촬영이 필요합니다."
+      }
+    },
+    {
+      "id": "low-quality-pixelated-04",
+      "kind": "low_quality",
+      "expected": "reject",
+      "needsRetake": true,
+      "candidates": [],
+      "note": "이미지가 심하게 픽셀화되어 있어 체형 실루엣(등지느러미 2개, 방추형 몸통)만 대략 확인됩니다. 비늘무늬, 입 모양, 반점 등 세부 식별 특징은 구분되지 않아 정확한 종 동정이 어렵습니다. 고해상도로 재촬영 시 몸통 측면 전체와 지느러미, 머리 부분이 선명하게 나오도록 촬영해 주세요.",
+      "seconds": 7.693,
+      "response": {
+        "subject_present": true,
+        "subject_type": "finfish",
+        "image_quality": 0.35,
+        "subject_size": "medium",
+        "quality_issues": [
+          "pixelated",
+          "blurred"
+        ],
+        "candidates": [],
+        "needs_retake": true,
+        "note": "이미지가 심하게 픽셀화되어 있어 체형 실루엣(등지느러미 2개, 방추형 몸통)만 대략 확인됩니다. 비늘무늬, 입 모양, 반점 등 세부 식별 특징은 구분되지 않아 정확한 종 동정이 어렵습니다. 고해상도로 재촬영 시 몸통 측면 전체와 지느러미, 머리 부분이 선명하게 나오도록 촬영해 주세요."
+      }
+    }
+  ]
+}

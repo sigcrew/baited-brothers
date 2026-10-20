@@ -1,0 +1,95 @@
+{
+  "notes": "Small fixed regression set, not a release accuracy benchmark. Eight reviewed photos and two rejection cases; originals unchanged for paired comparison.",
+  "cases": [
+    {
+      "id": "reviewed-01",
+      "path": "approved-holdout/images/reviewed-01.jpg",
+      "kind": "fish",
+      "expectedScientificName": "Paralichthys olivaceus (Temminck & Schlegel, 1846)",
+      "reviewStatus": "approved",
+      "source": "reviewed-open-photo",
+      "originalPath": "open-photo-candidates/01-paralichthys-olivaceus/02-wikimedia-903260aa91b00cc4bcb1ff31fdfbbebe2dee6a03.jpg",
+      "sha256": "d28c05a4f17f6828cbfa6d97fcf5427041d32ed20acdd7efa5ffca9398d896a3"
+    },
+    {
+      "id": "reviewed-06",
+      "path": "approved-holdout/images/reviewed-06.jpg",
+      "kind": "fish",
+      "expectedScientificName": "Platichthys stellatus (Pallas, 1787)",
+      "reviewStatus": "approved",
+      "source": "reviewed-open-photo",
+      "originalPath": "open-photo-candidates/06-platichthys-stellatus/03-wikimedia-5ef4638b10a059cc960717f431a22b54de2e47f8.jpg",
+      "sha256": "436736cf01fb2755336a8a2b0e3b4dd7f02baa4874e768c09fba71e8f7855906"
+    },
+    {
+      "id": "reviewed-07",
+      "path": "approved-holdout/images/reviewed-07.jpg",
+      "kind": "fish",
+      "expectedScientificName": "Sebastes schlegelii Hilgendorf, 1880",
+      "reviewStatus": "approved",
+      "source": "reviewed-open-photo",
+      "originalPath": "open-photo-candidates/07-sebastes-schlegelii/01-inaturalist-585170816.jpg",
+      "sha256": "733220d002214297fa143d1c319725762fd6282023d02cc6539112a54d78152a"
+    },
+    {
+      "id": "reviewed-16",
+      "path": "approved-holdout/images/reviewed-16.jpg",
+      "kind": "fish",
+      "expectedScientificName": "Pagrus major (Temminck & Schlegel, 1843)",
+      "reviewStatus": "approved",
+      "source": "reviewed-open-photo",
+      "originalPath": "open-photo-candidates/16-pagrus-major/03-wikimedia-3dfb361090e8cea4ffbb61aa437755fdd4bed8b3.jpg",
+      "sha256": "8fd07a27131d6dbc8d4626106b1bf073f13313a673b720a1ee6b9ed94a1dc223"
+    },
+    {
+      "id": "reviewed-17",
+      "path": "approved-holdout/images/reviewed-17.jpg",
+      "kind": "fish",
+      "expectedScientificName": "Acanthopagrus schlegelii (Bleeker, 1854)",
+      "reviewStatus": "approved",
+      "source": "reviewed-open-photo",
+      "originalPath": "open-photo-candidates/17-acanthopagrus-schlegelii/01-inaturalist-691289592.jpg",
+      "sha256": "7c642f0cda656233bca3c1ad1900656e116f42eff69540947d886706e001b74c"
+    },
+    {
+      "id": "reviewed-21",
+      "path": "approved-holdout/images/reviewed-21.jpg",
+      "kind": "fish",
+      "expectedScientificName": "Dentex hypselosomus Bleeker, 1854",
+      "reviewStatus": "approved",
+      "source": "reviewed-open-photo",
+      "originalPath": "open-photo-candidates/21-dentex-hypselosomus/02-gbif-1703048337-0.jpg",
+      "sha256": "6ecff67af0c1eb2e35568a4515e021829cb16f353ab04e196fc18bbf12ae6aaf"
+    },
+    {
+      "id": "reviewed-31",
+      "path": "approved-holdout/images/reviewed-31.jpg",
+      "kind": "fish",
+      "expectedScientificName": "Scomber japonicus Houttuyn, 1782",
+      "reviewStatus": "approved",
+      "source": "reviewed-open-photo",
+      "originalPath": "open-photo-candidates/31-scomber-japonicus/09-wikimedia-f6e84b9fecefa42d6306515c2f24a91be5f460ec.jpg",
+      "sha256": "32f2b64bdae15bf63dd47f49441bc7a3de0529ed58bf843f60950cbc1cc55675"
+    },
+    {
+      "id": "reviewed-55",
+      "path": "approved-holdout/images/reviewed-55.jpg",
+      "kind": "fish",
+      "expectedScientificName": "Sepioteuthis lessoniana",
+      "reviewStatus": "approved",
+      "source": "reviewed-open-photo",
+      "originalPath": "open-photo-candidates/55-sepioteuthis-lessoniana/06-gbif-6185320964-0.jpg",
+      "sha256": "aeb0e872a4e74035dd752ad2644742a64f91f1083b1fbe22442e7a17925fe5f5"
+    },
+    {
+      "id": "non-fish-dog-01",
+      "path": "rejection-data/non-fish/non-fish-dog-01.jpg",
+      "kind": "non_fish"
+    },
+    {
+      "id": "low-quality-pixelated-04",
+      "path": "rejection-data/low-quality/low-quality-pixelated-04.jpg",
+      "kind": "low_quality"
+    }
+  ]
+}

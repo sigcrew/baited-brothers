@@ -1,59 +1,1948 @@
 {
-  "reviewedAt": "2026-07-21T00:00:00+09:00",
-  "scope": "11개 취약 종의 신규 후보 중 육안으로 명백한 비실사·비식별 사진만 제외한 1차 사진 유형 검수",
-  "notice": "photoTypeReview만 판정했습니다. 종 동정 biologicalReview는 전문가 승인 전까지 pending입니다.",
+  "reviewedAt": "2026-09-10T02:16:34.951089+00:00",
+  "scope": "기존 사진 유형 검수 및 도다리·황돔 잔여 로컬 사진 18장 추가 검수",
+  "notice": "사진 유형만 검수. Codex visual screening은 전문가 종 동정이 아니며 biologicalReview를 승인하지 않음. 보존 표본 등 reference_only도 현장 학습 후보에서는 rejected 처리하고 원본 보존.",
   "decisions": [
-    { "file": "qa/fish-recognition/open-photo-candidates/03-pseudopleuronectes-yokohamae/21-gbif-1057513026-0.jpg", "photoTypeReview": "rejected", "reason": "표본 문서 페이지" },
-    { "file": "qa/fish-recognition/open-photo-candidates/03-pseudopleuronectes-yokohamae/22-gbif-1320787151-0.jpg", "photoTypeReview": "rejected", "reason": "엑스레이" },
-    { "file": "qa/fish-recognition/open-photo-candidates/04-pseudopleuronectes-herzensteini/50-gbif-6131016217-0.jpg", "photoTypeReview": "rejected", "reason": "피사체 식별 불가" },
-
-    { "file": "qa/fish-recognition/open-photo-candidates/12-hexagrammos-agrammus/05-wikimedia-e4173e83702a6a67903417ee2719bfc863725999.jpg", "photoTypeReview": "rejected", "reason": "삽화" },
-    { "file": "qa/fish-recognition/open-photo-candidates/12-hexagrammos-agrammus/23-gbif-2432732575-0.jpg", "photoTypeReview": "rejected", "reason": "표본 상자" },
-    { "file": "qa/fish-recognition/open-photo-candidates/12-hexagrammos-agrammus/27-gbif-2432733573-0.jpg", "photoTypeReview": "rejected", "reason": "표본 상자" },
-    { "file": "qa/fish-recognition/open-photo-candidates/12-hexagrammos-agrammus/31-gbif-2432734574-0.jpg", "photoTypeReview": "rejected", "reason": "표본 상자" },
-    { "file": "qa/fish-recognition/open-photo-candidates/12-hexagrammos-agrammus/35-gbif-2432734575-0.jpg", "photoTypeReview": "rejected", "reason": "표본 상자" },
-    { "file": "qa/fish-recognition/open-photo-candidates/12-hexagrammos-agrammus/39-gbif-2432735574-0.jpg", "photoTypeReview": "rejected", "reason": "표본 상자" },
-    { "file": "qa/fish-recognition/open-photo-candidates/12-hexagrammos-agrammus/43-gbif-2432795574-0.jpg", "photoTypeReview": "rejected", "reason": "표본 상자" },
-    { "file": "qa/fish-recognition/open-photo-candidates/12-hexagrammos-agrammus/47-gbif-2432797575-0.jpg", "photoTypeReview": "rejected", "reason": "표본 상자" },
-
-    { "file": "qa/fish-recognition/open-photo-candidates/21-dentex-hypselosomus/03-wikimedia-7653a494ec3b5364497dcd9702e9f8b45dbc857f.jpg", "photoTypeReview": "rejected", "reason": "삽화" },
-    { "file": "qa/fish-recognition/open-photo-candidates/23-lateolabrax-spilonotus/06-wikimedia-75a00f070c9f66c3af2ad5e3ffa707abc546acb6.jpg", "photoTypeReview": "rejected", "reason": "엑스레이 패널" },
-    { "file": "qa/fish-recognition/open-photo-candidates/23-lateolabrax-spilonotus/17-wikimedia-dc5fbda55cb1263ef95befe13129678e39ec5068.jpg", "photoTypeReview": "rejected", "reason": "조리 음식" },
-    { "file": "qa/fish-recognition/open-photo-candidates/23-lateolabrax-spilonotus/09-gbif-1056741650-0.jpg", "photoTypeReview": "rejected", "reason": "표본 문서" },
-    { "file": "qa/fish-recognition/open-photo-candidates/23-lateolabrax-spilonotus/11-gbif-1056741650-1.jpg", "photoTypeReview": "rejected", "reason": "표본 등록 문서" },
-    { "file": "qa/fish-recognition/open-photo-candidates/23-lateolabrax-spilonotus/13-gbif-1056741650-2.jpg", "photoTypeReview": "rejected", "reason": "표본 라벨" },
-    { "file": "qa/fish-recognition/open-photo-candidates/23-lateolabrax-spilonotus/15-gbif-1056741650-3.jpg", "photoTypeReview": "rejected", "reason": "표본 문서" },
-    { "file": "qa/fish-recognition/open-photo-candidates/23-lateolabrax-spilonotus/90-wikimedia-c4e44d1c83bf6601dd2f146770e459b198156f71-panel-c.jpg", "photoTypeReview": "approved", "reason": "CC BY 4.0 논문의 L. maculatus C 전신 패널" },
-    { "file": "qa/fish-recognition/open-photo-candidates/23-lateolabrax-spilonotus/91-wikimedia-c4e44d1c83bf6601dd2f146770e459b198156f71-panel-d.jpg", "photoTypeReview": "approved", "reason": "CC BY 4.0 논문의 L. maculatus D 전신 패널" },
-    { "file": "qa/fish-recognition/open-photo-candidates/23-lateolabrax-spilonotus/92-wikimedia-21ed3aa86ca238260e4df768f54d2e27b82c50e2-panel-b.jpg", "photoTypeReview": "approved", "reason": "CC BY 4.0 논문의 L. maculatus B 반점 패널" },
-
-    { "file": "qa/fish-recognition/open-photo-candidates/25-pennahia-argentata/02-wikimedia-33f52a95b9d23714a54fa84a48c5aec3b37f46f3.jpg", "photoTypeReview": "rejected", "reason": "삽화" },
-    { "file": "qa/fish-recognition/open-photo-candidates/25-pennahia-argentata/06-wikimedia-731c53490d4fa937763139e8569f21bfd103bd24.jpg", "photoTypeReview": "rejected", "reason": "도감 판화" },
-    { "file": "qa/fish-recognition/open-photo-candidates/25-pennahia-argentata/09-wikimedia-d9c8cfb7e58ab162193eff5d111055fe5e869e39.jpg", "photoTypeReview": "rejected", "reason": "복수 종 삽화" },
-    { "file": "qa/fish-recognition/open-photo-candidates/25-pennahia-argentata/10-wikimedia-886368556831b3046e0a8c7e6bde4261f225faf8.jpg", "photoTypeReview": "rejected", "reason": "삽화" },
-    { "file": "qa/fish-recognition/open-photo-candidates/25-pennahia-argentata/11-wikimedia-36ea16ca91606cea55ddab53e2a1be1ae123432e.jpg", "photoTypeReview": "rejected", "reason": "삽화" },
-    { "file": "qa/fish-recognition/open-photo-candidates/25-pennahia-argentata/12-wikimedia-8a00a0311dc57864ad6c2743920b490f045b2275.jpg", "photoTypeReview": "rejected", "reason": "삽화" },
-    { "file": "qa/fish-recognition/open-photo-candidates/25-pennahia-argentata/13-wikimedia-4262e2b25cde40fc2a4af82ad70d19fd839bc181.jpg", "photoTypeReview": "rejected", "reason": "복수 종 삽화" },
-
-    { "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/03-wikimedia-94cbde12ebf7ee2ae96e6617cedb7db019370046.jpg", "photoTypeReview": "rejected", "reason": "초밥" },
-    { "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/08-wikimedia-747ea4950b1014b1c1bfc272469d1cd85fc7d147.jpg", "photoTypeReview": "rejected", "reason": "삽화" },
-    { "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/10-wikimedia-a2cca0ff728b355aef55a0db3c90a94d7eaca3b6.jpg", "photoTypeReview": "rejected", "reason": "삽화" },
-    { "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/20-wikimedia-182a2a47d39d56de36e563633aebde877c388a47.jpg", "photoTypeReview": "rejected", "reason": "문서" },
-    { "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/22-wikimedia-120cbac3781a54c65dbf7f507a0059b530c79356.jpg", "photoTypeReview": "rejected", "reason": "조리 음식" },
-    { "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/24-wikimedia-00dec445ab95026bd8d038e7288af5579f955d19.jpg", "photoTypeReview": "rejected", "reason": "초밥" },
-    { "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/26-wikimedia-b4833f844d63cf3bb29a25933055ba4d3dbb0001.jpg", "photoTypeReview": "rejected", "reason": "초밥" },
-    { "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/28-wikimedia-bd723712e9b1905d5cba0e4d485725793a8f229d.jpg", "photoTypeReview": "rejected", "reason": "초밥" },
-    { "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/30-wikimedia-992913012776e4cbb8cb1773c3273c25e020d81f.jpg", "photoTypeReview": "rejected", "reason": "초밥" },
-    { "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/34-wikimedia-909abfc928624b0caa82856f1a4f134764bbf9c2.jpg", "photoTypeReview": "rejected", "reason": "표적 생물 외 피사체" },
-    { "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/36-wikimedia-a72f5f90e58a54c94f283ad83d656549d7ae34fc.jpg", "photoTypeReview": "rejected", "reason": "초밥" },
-
-    { "file": "qa/fish-recognition/open-photo-candidates/53-todarodes-pacificus/04-inaturalist-425489764.jpg", "photoTypeReview": "rejected", "reason": "조리 음식" },
-    { "file": "qa/fish-recognition/open-photo-candidates/53-todarodes-pacificus/08-wikimedia-1bb2d6305481827aecd7e0e181f5504885c6a95b.jpg", "photoTypeReview": "rejected", "reason": "주석 이미지" },
-    { "file": "qa/fish-recognition/open-photo-candidates/53-todarodes-pacificus/10-wikimedia-ca318a8c1f4dfd8564f161cd8f3b233aa17a0a6b.jpg", "photoTypeReview": "rejected", "reason": "삽화" },
-    { "file": "qa/fish-recognition/open-photo-candidates/53-todarodes-pacificus/12-wikimedia-438b19b2a22e9f05f50baa5e9a84eaa671fd02f5.jpg", "photoTypeReview": "rejected", "reason": "삽화" },
-    { "file": "qa/fish-recognition/open-photo-candidates/53-todarodes-pacificus/20-wikimedia-0aff055feffbbf7e90830f5330be5f4f0dc9c0e1.jpg", "photoTypeReview": "rejected", "reason": "표적 생물 없음" },
-
-    { "file": "qa/fish-recognition/open-photo-candidates/56-uroteuthis-edulis/03-wikimedia-9657bebea606f89ec61dd4d95118c3a5aab1d08e.jpg", "photoTypeReview": "rejected", "reason": "초밥" },
-    { "file": "qa/fish-recognition/open-photo-candidates/58-octopus-minor/05-wikimedia-a13ced5abcde7f944684acb8dd70d94ac9352179.jpg", "photoTypeReview": "rejected", "reason": "시장 내 복수 개체·부분 피사체" }
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/03-pseudopleuronectes-yokohamae/21-gbif-1057513026-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "표본 문서 페이지"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/03-pseudopleuronectes-yokohamae/22-gbif-1320787151-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "엑스레이"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/04-pseudopleuronectes-herzensteini/50-gbif-6131016217-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "피사체 식별 불가"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/12-hexagrammos-agrammus/05-wikimedia-e4173e83702a6a67903417ee2719bfc863725999.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "삽화"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/12-hexagrammos-agrammus/23-gbif-2432732575-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "표본 상자"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/12-hexagrammos-agrammus/27-gbif-2432733573-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "표본 상자"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/12-hexagrammos-agrammus/31-gbif-2432734574-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "표본 상자"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/12-hexagrammos-agrammus/35-gbif-2432734575-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "표본 상자"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/12-hexagrammos-agrammus/39-gbif-2432735574-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "표본 상자"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/12-hexagrammos-agrammus/43-gbif-2432795574-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "표본 상자"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/12-hexagrammos-agrammus/47-gbif-2432797575-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "표본 상자"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/21-dentex-hypselosomus/03-wikimedia-7653a494ec3b5364497dcd9702e9f8b45dbc857f.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "삽화"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/23-lateolabrax-spilonotus/06-wikimedia-75a00f070c9f66c3af2ad5e3ffa707abc546acb6.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "엑스레이 패널"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/23-lateolabrax-spilonotus/17-wikimedia-dc5fbda55cb1263ef95befe13129678e39ec5068.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "조리 음식"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/23-lateolabrax-spilonotus/09-gbif-1056741650-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "표본 문서"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/23-lateolabrax-spilonotus/11-gbif-1056741650-1.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "표본 등록 문서"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/23-lateolabrax-spilonotus/13-gbif-1056741650-2.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "표본 라벨"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/23-lateolabrax-spilonotus/15-gbif-1056741650-3.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "표본 문서"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/23-lateolabrax-spilonotus/90-wikimedia-c4e44d1c83bf6601dd2f146770e459b198156f71-panel-c.jpg",
+      "photoTypeReview": "approved",
+      "reason": "CC BY 4.0 논문의 L. maculatus C 전신 패널"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/23-lateolabrax-spilonotus/91-wikimedia-c4e44d1c83bf6601dd2f146770e459b198156f71-panel-d.jpg",
+      "photoTypeReview": "approved",
+      "reason": "CC BY 4.0 논문의 L. maculatus D 전신 패널"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/23-lateolabrax-spilonotus/92-wikimedia-21ed3aa86ca238260e4df768f54d2e27b82c50e2-panel-b.jpg",
+      "photoTypeReview": "approved",
+      "reason": "CC BY 4.0 논문의 L. maculatus B 반점 패널"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/25-pennahia-argentata/02-wikimedia-33f52a95b9d23714a54fa84a48c5aec3b37f46f3.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "삽화"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/25-pennahia-argentata/06-wikimedia-731c53490d4fa937763139e8569f21bfd103bd24.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "도감 판화"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/25-pennahia-argentata/09-wikimedia-d9c8cfb7e58ab162193eff5d111055fe5e869e39.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "복수 종 삽화"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/25-pennahia-argentata/10-wikimedia-886368556831b3046e0a8c7e6bde4261f225faf8.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "삽화"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/25-pennahia-argentata/11-wikimedia-36ea16ca91606cea55ddab53e2a1be1ae123432e.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "삽화"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/25-pennahia-argentata/12-wikimedia-8a00a0311dc57864ad6c2743920b490f045b2275.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "삽화"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/25-pennahia-argentata/13-wikimedia-4262e2b25cde40fc2a4af82ad70d19fd839bc181.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "복수 종 삽화"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/03-wikimedia-94cbde12ebf7ee2ae96e6617cedb7db019370046.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "초밥"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/08-wikimedia-747ea4950b1014b1c1bfc272469d1cd85fc7d147.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "삽화"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/10-wikimedia-a2cca0ff728b355aef55a0db3c90a94d7eaca3b6.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "삽화"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/20-wikimedia-182a2a47d39d56de36e563633aebde877c388a47.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "문서"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/22-wikimedia-120cbac3781a54c65dbf7f507a0059b530c79356.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "조리 음식"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/24-wikimedia-00dec445ab95026bd8d038e7288af5579f955d19.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "초밥"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/26-wikimedia-b4833f844d63cf3bb29a25933055ba4d3dbb0001.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "초밥"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/28-wikimedia-bd723712e9b1905d5cba0e4d485725793a8f229d.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "초밥"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/30-wikimedia-992913012776e4cbb8cb1773c3273c25e020d81f.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "초밥"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/34-wikimedia-909abfc928624b0caa82856f1a4f134764bbf9c2.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "표적 생물 외 피사체"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/41-konosirus-punctatus/36-wikimedia-a72f5f90e58a54c94f283ad83d656549d7ae34fc.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "초밥"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/53-todarodes-pacificus/04-inaturalist-425489764.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "조리 음식"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/53-todarodes-pacificus/08-wikimedia-1bb2d6305481827aecd7e0e181f5504885c6a95b.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "주석 이미지"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/53-todarodes-pacificus/10-wikimedia-ca318a8c1f4dfd8564f161cd8f3b233aa17a0a6b.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "삽화"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/53-todarodes-pacificus/12-wikimedia-438b19b2a22e9f05f50baa5e9a84eaa671fd02f5.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "삽화"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/53-todarodes-pacificus/20-wikimedia-0aff055feffbbf7e90830f5330be5f4f0dc9c0e1.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "표적 생물 없음"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/56-uroteuthis-edulis/03-wikimedia-9657bebea606f89ec61dd4d95118c3a5aab1d08e.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "초밥"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/58-octopus-minor/05-wikimedia-a13ced5abcde7f944684acb8dd70d94ac9352179.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "시장 내 복수 개체·부분 피사체"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/01-paralichthys-olivaceus/01-gbif-583412402-1.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "엑스레이 영상",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "http://coldb.mnhn.fr/catalognumber/mnhn/ic/1906-0027"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/01-paralichthys-olivaceus/04-wikimedia-cf1edd554f4b3799abff887ff81c139ac53748ee.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사 어류는 확인되나 겹침·가림 또는 여러 개체가 있어 대상 지정 필요",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/01-paralichthys-olivaceus/05-gbif-583478114-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "엑스레이 영상",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "http://coldb.mnhn.fr/catalognumber/mnhn/ic/1999-0471"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/01-paralichthys-olivaceus/06-wikimedia-9826719d601c0903f92bae12ef198c4785f61f87.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사 어류는 확인되나 겹침·가림 또는 여러 개체가 있어 대상 지정 필요",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/01-paralichthys-olivaceus/08-wikimedia-b84a19b7c102b040abe1b0fa73832a81b6e13831.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사이나 몸 일부가 잘리거나 가려져 종 구분 근거를 추가 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/01-paralichthys-olivaceus/10-wikimedia-58ec6a4bebce3f6c7b5222410787cbcdc9309d09.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "대상 어류의 위치 또는 주요 외형을 충분히 확인하기 어려움",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/01-paralichthys-olivaceus/11-gbif-1055549901-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "어류 사진이 아닌 표본 등록 문서",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "023aa2af-13e1-4a95-a033-3e88c705d40f"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/01-paralichthys-olivaceus/12-wikimedia-013f6742c7ee6eba6ea717e406c57ac431530349.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "삽화 또는 인쇄 미술 이미지",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/01-paralichthys-olivaceus/13-gbif-1056030316-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "어류 사진이 아닌 표본 등록 문서",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "85bda07b-820c-49a1-8b48-644901cc6a9b"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/01-paralichthys-olivaceus/16-wikimedia-f4fabd4dba44038031d724c3b4a08f9769d1ca7d.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "조직 또는 현미경 패널로 전체 어류 식별 입력이 아님",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/01-paralichthys-olivaceus/17-gbif-1056147148-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "어류 사진이 아닌 표본 등록 문서",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "624cdd0c-d730-4137-b0da-3fb59de93af7"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/01-paralichthys-olivaceus/18-wikimedia-9afd9d2c2c0e8c9362334d539dfdec7541710ceb.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "몸통을 포 뜬 가공 상태로 주요 외형이 훼손됨",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/01-paralichthys-olivaceus/20-wikimedia-62051bc6efa37b861494200e0b8eb0d4f23c20ee.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/01-paralichthys-olivaceus/22-wikimedia-511e66be6d368072ab9791fd39b165b1b6ae3905.png",
+      "photoTypeReview": "rejected",
+      "reason": "조직 또는 현미경 패널로 전체 어류 식별 입력이 아님",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/01-paralichthys-olivaceus/23-gbif-2432780215-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "건조·보존 표본 사진: 현장 판별용 정답 후보와 분리",
+      "disposition": "reference_only",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://data.biodiversitydata.nl/naturalis/specimen/RMNH.PISC.D.1301"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/01-paralichthys-olivaceus/26-wikimedia-e44e6e5844f386b35a34af99f5b41c362ad88bf9.png",
+      "photoTypeReview": "rejected",
+      "reason": "조직 또는 현미경 패널로 전체 어류 식별 입력이 아님",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/01-paralichthys-olivaceus/27-gbif-2432822230-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "건조·보존 표본 사진: 현장 판별용 정답 후보와 분리",
+      "disposition": "reference_only",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://data.biodiversitydata.nl/naturalis/specimen/RMNH.PISC.D.1302"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/01-paralichthys-olivaceus/31-wikimedia-84b74b75dc2adda17dbccede14b52dcec92b01fa.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "회 또는 조리된 음식 사진",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/01-paralichthys-olivaceus/35-wikimedia-8ae1fe8671e700660e787b353c1da864b8aff7c8.jpg",
+      "photoTypeReview": "approved",
+      "reason": "수중 굴절·반사·위장·원거리 때문에 종 구분 특징의 가시성을 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/02-pleuronichthys-cornutus/02-wikimedia-3bdc8a635caf0a35e566be567e71e9d6cad99e58.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "삽화 또는 인쇄 미술 이미지",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/02-pleuronichthys-cornutus/04-wikimedia-6c3b77a6d24bceae87f01086d36c6f23a7941e94.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "삽화 또는 인쇄 미술 이미지",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/02-pleuronichthys-cornutus/05-gbif-4522883475-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "어류 사진이 아닌 표본 등록 문서",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "98f1885d-34a3-4f9c-803b-e8b5a08188a9"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/02-pleuronichthys-cornutus/06-wikimedia-60b85c815351d0c1c59a006d71fdbc52d1c043a2.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/02-pleuronichthys-cornutus/07-gbif-4522878768-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "어류 사진이 아닌 표본 등록 문서",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "978a7b53-35f4-4c9e-9eae-8e3af9194dc1"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/02-pleuronichthys-cornutus/08-gbif-1055533730-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "어류 사진이 아닌 표본 등록 문서",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "b7ebb9d0-7dc3-43d3-9819-dc8b6ae662ff"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/02-pleuronichthys-cornutus/13-gbif-1056741120-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "어류 사진이 아닌 표본 등록 문서",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "b57e3956-bcfa-4901-9a8f-4ea8d4ec6525"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/02-pleuronichthys-cornutus/15-gbif-2432777229-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "건조·보존 표본 사진: 현장 판별용 정답 후보와 분리",
+      "disposition": "reference_only",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://data.biodiversitydata.nl/naturalis/specimen/RMNH.PISC.D.1336"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/02-pleuronichthys-cornutus/19-gbif-2432778236-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "건조·보존 표본 사진: 현장 판별용 정답 후보와 분리",
+      "disposition": "reference_only",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://data.biodiversitydata.nl/naturalis/specimen/RMNH.PISC.D.1335"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/02-pleuronichthys-cornutus/23-gbif-2432779223-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "건조·보존 표본 사진: 현장 판별용 정답 후보와 분리",
+      "disposition": "reference_only",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://data.biodiversitydata.nl/naturalis/specimen/RMNH.PISC.D.1334"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/06-platichthys-stellatus/06-wikimedia-5dd01746cb24f0e504c9387d66cb78ac804d31fd.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/06-platichthys-stellatus/09-wikimedia-8c9d964209b73451517a70b7a472309199a52c9c.jpg",
+      "photoTypeReview": "approved",
+      "reason": "배면·비정면 각도로 종 구분에 필요한 특징이 충분한지 검토 필요",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/06-platichthys-stellatus/10-inaturalist-108206011.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "새가 물고 있는 작은 먹이로 주요 외형이 가려짐",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/67034693"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/06-platichthys-stellatus/12-wikimedia-e897a6206ebed174ae379b26b437f0b91e4f2c32.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사이나 몸 일부가 잘리거나 가려져 종 구분 근거를 추가 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/06-platichthys-stellatus/13-inaturalist-145268004.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "새가 물고 있는 작은 먹이로 주요 외형이 가려짐",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/88069958"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/06-platichthys-stellatus/16-inaturalist-229328866.jpg",
+      "photoTypeReview": "approved",
+      "reason": "배면·비정면 각도로 종 구분에 필요한 특징이 충분한지 검토 필요",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/134532199"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/06-platichthys-stellatus/18-wikimedia-d33c64e952c7400467bcc3eef392b42ae7325b63.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/06-platichthys-stellatus/20-gbif-6236137556-0.jpg",
+      "photoTypeReview": "approved",
+      "reason": "배면·비정면 각도로 종 구분에 필요한 특징이 충분한지 검토 필요",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/351737536"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/06-platichthys-stellatus/21-wikimedia-c2adf194c50878c0bd4fcccc444e0a85dd3ac6a4.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/06-platichthys-stellatus/23-gbif-6334881307-0.jpg",
+      "photoTypeReview": "approved",
+      "reason": "작은 개체 또는 어린 개체로 성체와 다른 외형에 대한 검수 필요",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/364936638"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/06-platichthys-stellatus/24-wikimedia-608ca61bd502e524d1064d0aae84d2925ff300e6.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "삽화 또는 인쇄 미술 이미지",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/06-platichthys-stellatus/26-gbif-6334881307-1.jpg",
+      "photoTypeReview": "approved",
+      "reason": "작은 개체 또는 어린 개체로 성체와 다른 외형에 대한 검수 필요",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/364936638"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/06-platichthys-stellatus/27-wikimedia-8d5752def8d8806dc7d8ac4b808f2d2796cb1445.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "삽화 또는 인쇄 미술 이미지",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/06-platichthys-stellatus/29-gbif-6399409448-0.jpg",
+      "photoTypeReview": "approved",
+      "reason": "작은 개체 또는 어린 개체로 성체와 다른 외형에 대한 검수 필요",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/367920797"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/06-platichthys-stellatus/30-wikimedia-ae1fa929f453e701fbe74f5865ccaec8b55c56b6.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "삽화 또는 인쇄 미술 이미지",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/06-platichthys-stellatus/32-gbif-6431159325-0.jpg",
+      "photoTypeReview": "approved",
+      "reason": "작은 개체 또는 어린 개체로 성체와 다른 외형에 대한 검수 필요",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/378637227"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/06-platichthys-stellatus/35-wikimedia-946009621a2b2b6a42dfb724904bc750a430aa7e.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "삽화 또는 인쇄 미술 이미지",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/06-platichthys-stellatus/36-inaturalist-172825788.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "어류의 일부만 남거나 가려져 전체 외형 확인이 어려움",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/103285971"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/06-platichthys-stellatus/40-inaturalist-4116528.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사 어류는 확인되나 겹침·가림 또는 여러 개체가 있어 대상 지정 필요",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/3532839"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/07-sebastes-schlegelii/02-gbif-4522877682-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "어류 사진이 아닌 표본 등록 문서",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "a2c4671b-03ce-42b2-9669-1bbd738d1ba6"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/07-sebastes-schlegelii/03-wikimedia-9ea318286746642463d87cec9e3bf06652db3ef7.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사이나 몸 일부가 잘리거나 가려져 종 구분 근거를 추가 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/07-sebastes-schlegelii/04-inaturalist-691293960.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사 어류는 확인되나 겹침·가림 또는 여러 개체가 있어 대상 지정 필요",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/377997974"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/07-sebastes-schlegelii/05-gbif-4522895805-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "어류 사진이 아닌 표본 등록 문서",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "d2468c62-0c88-4b2d-852e-5c1d2d9649bd"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/07-sebastes-schlegelii/06-wikimedia-c652255daa162249abfafd9d9402ba411eeb933b.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사이나 몸 일부가 잘리거나 가려져 종 구분 근거를 추가 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/07-sebastes-schlegelii/08-wikimedia-98e7d306b0d5ef41e12cf7fa9e9ab5ec55224b32.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "회 또는 조리된 음식 사진",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/07-sebastes-schlegelii/11-inaturalist-691301529.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/378001405"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/07-sebastes-schlegelii/12-wikimedia-166858f0cc8a136b19ce8198d42f06bf56f1becc.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "삽화 또는 인쇄 미술 이미지",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/13-hexagrammos-otakii/02-gbif-4506419083-1.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/178562373"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/13-hexagrammos-otakii/05-wikimedia-e41f89dc80e6391e78a7a2299e9fe7bb6b8a6519.jpg",
+      "photoTypeReview": "approved",
+      "reason": "수중 굴절·반사·위장·원거리 때문에 종 구분 특징의 가시성을 검토해야 함; 넓은 가슴지느러미와 외형을 유사 어종과 대조해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/13-hexagrammos-otakii/06-gbif-3426408670-1.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "건조·보존 표본 사진: 현장 판별용 정답 후보와 분리",
+      "disposition": "reference_only",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "urn:catalog:CAS:SU(ICH):7374"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/13-hexagrammos-otakii/07-wikimedia-58528565eaef66bbea59e9938029ce63f4cd0123.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "박제·전시 표본이며 어종 답안 표기가 포함됨",
+      "disposition": "reference_only",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/13-hexagrammos-otakii/09-wikimedia-68c27cad3c22dfae17366cce28ad8ce082859dd7.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사 어류는 확인되나 겹침·가림 또는 여러 개체가 있어 대상 지정 필요",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/13-hexagrammos-otakii/11-wikimedia-688fbafddc25c27da7d59ef97d2c6962d9eafd0b.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "삽화 또는 인쇄 미술 이미지",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/13-hexagrammos-otakii/13-wikimedia-cb6eb5ec50354edc210617513f86f547e6b5c4f9.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "삽화 또는 인쇄 미술 이미지",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/13-hexagrammos-otakii/15-wikimedia-d3448134f3f49a78a126181e8d4a7126cb02b4e9.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "삽화 또는 인쇄 미술 이미지",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/13-hexagrammos-otakii/16-gbif-3426416484-1.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "건조·보존 표본 사진: 현장 판별용 정답 후보와 분리",
+      "disposition": "reference_only",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "urn:catalog:CAS:SU(ICH):3704"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/13-hexagrammos-otakii/18-wikimedia-3c391cda93345c257da802a4f580e805afd21aa0.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/16-pagrus-major/01-inaturalist-112109245.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/69132142"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/16-pagrus-major/02-gbif-4994352274-0.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/206012132"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/16-pagrus-major/04-inaturalist-112122308.jpg",
+      "photoTypeReview": "approved",
+      "reason": "수중 굴절·반사·위장·원거리 때문에 종 구분 특징의 가시성을 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/69139296"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/16-pagrus-major/05-gbif-4994352274-1.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/206012132"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/16-pagrus-major/07-inaturalist-112123594.jpg",
+      "photoTypeReview": "approved",
+      "reason": "대상이 화면에서 작아 충분한 해상도의 대상 확대가 필요",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/69139933"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/16-pagrus-major/08-gbif-3947174405-0.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/68483017"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/16-pagrus-major/09-wikimedia-141b958820bc537a634dcf49deaffd0319c0e95c.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "다종 밀집 장면으로 단일 목표 어류가 명확하지 않음",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/16-pagrus-major/10-inaturalist-112122238.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/69139281"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/16-pagrus-major/11-gbif-3947620405-0.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/69139707"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/16-pagrus-major/13-inaturalist-112109219.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/69132121"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/16-pagrus-major/14-gbif-3947180398-0.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/69132002"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/16-pagrus-major/15-wikimedia-e86cefe20b957806093124e96804a14a836daed3.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "삽화 또는 인쇄 미술 이미지",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/16-pagrus-major/16-inaturalist-4766381.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/4031195"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/16-pagrus-major/17-wikimedia-4292624f636a0e74288d9243bb00e0679e99f6a0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "삽화 또는 인쇄 미술 이미지",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/16-pagrus-major/18-wikimedia-6bcae161d8510d8c374b90373ee09cf73cb93d4c.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "장식된 전시용 어류로 처리 상태가 불명확함",
+      "disposition": "reference_only",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/16-pagrus-major/19-wikimedia-6db110b40135283271446f326c8416ea9427196a.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "뼈 일부 사진으로 전체 어류 외형이 없음",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/16-pagrus-major/22-wikimedia-2a8d5e5a632b5525c69664c429014d4f92974537.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "삽화 또는 인쇄 미술 이미지",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/16-pagrus-major/26-wikimedia-ba0fcc21e37815d429847ccc2479b7bf51ed6d82.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "회 또는 조리된 음식 사진",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/16-pagrus-major/30-wikimedia-e84e0cffb4c06106a6074b937830210077da8cbd.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "삽화 또는 인쇄 미술 이미지",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/17-acanthopagrus-schlegelii/02-gbif-6131261432-0.jpg",
+      "photoTypeReview": "approved",
+      "reason": "수중 굴절·반사·위장·원거리 때문에 종 구분 특징의 가시성을 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/334587564"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/17-acanthopagrus-schlegelii/03-wikimedia-cd1de1a89b29a5ef8b9d46f776040383153a8555.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/17-acanthopagrus-schlegelii/05-gbif-6195549712-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "대상 어류의 위치 또는 주요 외형을 충분히 확인하기 어려움",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/346132554"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/17-acanthopagrus-schlegelii/07-inaturalist-183257170.png",
+      "photoTypeReview": "rejected",
+      "reason": "저대비 수중 장면으로 주요 무늬·외형 판단이 어려움",
+      "disposition": "reference_only",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/108800482"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/17-acanthopagrus-schlegelii/08-gbif-6195549712-1.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사 어류는 확인되나 겹침·가림 또는 여러 개체가 있어 대상 지정 필요",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/346132554"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/17-acanthopagrus-schlegelii/09-wikimedia-102848bb57cd9783529140589652d605d1e7b267.jpg",
+      "photoTypeReview": "approved",
+      "reason": "배면·비정면 각도로 종 구분에 필요한 특징이 충분한지 검토 필요",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/17-acanthopagrus-schlegelii/11-gbif-6333903970-0.jpg",
+      "photoTypeReview": "approved",
+      "reason": "수중 굴절·반사·위장·원거리 때문에 종 구분 특징의 가시성을 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/364962768"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/17-acanthopagrus-schlegelii/12-wikimedia-2e56a14ba8391e3784ab14ef84892d5a77acd90e.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/17-acanthopagrus-schlegelii/14-gbif-6334942909-0.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사이나 몸 일부가 잘리거나 가려져 종 구분 근거를 추가 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/364961598"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/17-acanthopagrus-schlegelii/15-wikimedia-5d295261632adf57f9f7dfe24d6e7ebfd707d621.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/17-acanthopagrus-schlegelii/17-gbif-6334942909-1.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사이나 몸 일부가 잘리거나 가려져 종 구분 근거를 추가 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/364961598"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/17-acanthopagrus-schlegelii/18-wikimedia-6fc85b958206d3b07aa692ee9a06dc25a24c988b.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/17-acanthopagrus-schlegelii/19-inaturalist-587293117.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사 어류는 확인되나 겹침·가림 또는 여러 개체가 있어 대상 지정 필요",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/324473618"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/17-acanthopagrus-schlegelii/20-gbif-6334942909-2.jpg",
+      "photoTypeReview": "approved",
+      "reason": "수중 굴절·반사·위장·원거리 때문에 종 구분 특징의 가시성을 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/364961598"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/17-acanthopagrus-schlegelii/22-inaturalist-112121935.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/69139158"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/17-acanthopagrus-schlegelii/23-gbif-6334942909-3.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사이나 몸 일부가 잘리거나 가려져 종 구분 근거를 추가 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/364961598"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/17-acanthopagrus-schlegelii/24-wikimedia-c2159b7d984a79fba66b9d71411c8322a3e222a7.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "삽화 또는 인쇄 미술 이미지",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/17-acanthopagrus-schlegelii/25-inaturalist-579778725.jpg",
+      "photoTypeReview": "approved",
+      "reason": "수중 굴절·반사·위장·원거리 때문에 종 구분 특징의 가시성을 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/320659719"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/17-acanthopagrus-schlegelii/26-gbif-5206218397-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "부패·손상이 큰 사체로 일반 현장 식별 기준 사진에 부적합",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/291715101"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/17-acanthopagrus-schlegelii/27-wikimedia-89a35f7d28f7f8caf09e4fd860a0fe00e7911e42.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "삽화 또는 인쇄 미술 이미지",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/21-dentex-hypselosomus/01-inaturalist-612895501.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사 어류는 확인되나 겹침·가림 또는 여러 개체가 있어 대상 지정 필요",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/337183085"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/21-dentex-hypselosomus/05-gbif-1055796938-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "어류 사진이 아닌 표본 등록 문서",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "d9b8b7af-d45f-44b9-85c6-1fadbc631ffe"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/21-dentex-hypselosomus/05-wikimedia-22185e62a3d6162fba930e2c5d6d847c46030c88.png",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지; 기존 황돔 자료에서 종 표기 오류가 확인되어 학명 대조가 우선",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/21-dentex-hypselosomus/06-gbif-1056434358-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "어류 사진이 아닌 표본 등록 문서",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "a23a4fd1-8c42-4718-b6b2-c0ca8778dce9"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/21-dentex-hypselosomus/08-gbif-1057051267-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "건조·보존 표본 사진: 현장 판별용 정답 후보와 분리",
+      "disposition": "reference_only",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "a4a6b898-55bf-4139-b307-4485eea0e55d"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/22-lateolabrax-japonicus/01-inaturalist-43192647.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/27739797"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/22-lateolabrax-japonicus/07-inaturalist-691295734.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사 어류는 확인되나 겹침·가림 또는 여러 개체가 있어 대상 지정 필요; 농어·점농어 등 유사종과 반점 및 형태를 대조해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/377998843"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/22-lateolabrax-japonicus/10-inaturalist-112123291.jpg",
+      "photoTypeReview": "approved",
+      "reason": "야간 인공조명으로 색이 변하므로 형태 중심의 정답 검수 필요",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/69139720"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/22-lateolabrax-japonicus/12-inaturalist-428518618.jpg",
+      "photoTypeReview": "approved",
+      "reason": "작은 개체 또는 어린 개체로 성체와 다른 외형에 대한 검수 필요",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/240516031"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/22-lateolabrax-japonicus/14-inaturalist-112122958.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사이나 몸 일부가 잘리거나 가려져 종 구분 근거를 추가 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/69139563"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/22-lateolabrax-japonicus/18-inaturalist-110899220.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "부패·손상이 큰 사체로 일반 현장 식별 기준 사진에 부적합",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/68483056"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/22-lateolabrax-japonicus/20-inaturalist-30333192.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사 어류는 확인되나 겹침·가림 또는 여러 개체가 있어 대상 지정 필요",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/19691470"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/22-lateolabrax-japonicus/22-inaturalist-112123051.jpg",
+      "photoTypeReview": "approved",
+      "reason": "야간 인공조명으로 색이 변하므로 형태 중심의 정답 검수 필요",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/69139611"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/22-lateolabrax-japonicus/26-inaturalist-428498667.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/240505815"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/31-scomber-japonicus/01-inaturalist-42773330.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/27486534"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/31-scomber-japonicus/02-gbif-6352702725-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "해변에 표착한 손상된 어류로 형태 검수용 참고 자료에 한정",
+      "disposition": "reference_only",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/367349733"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/31-scomber-japonicus/05-gbif-6352702725-1.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "해변에 표착한 손상된 어류로 형태 검수용 참고 자료에 한정",
+      "disposition": "reference_only",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/367349733"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/31-scomber-japonicus/07-inaturalist-382789264.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/216440043"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/31-scomber-japonicus/08-gbif-5198478892-0.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/288945554"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/31-scomber-japonicus/13-inaturalist-345436142.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사이나 몸 일부가 잘리거나 가려져 종 구분 근거를 추가 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/196236361"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/31-scomber-japonicus/14-gbif-5932356702-1.jpg",
+      "photoTypeReview": "approved",
+      "reason": "수중 굴절·반사·위장·원거리 때문에 종 구분 특징의 가시성을 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/317184332"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/31-scomber-japonicus/15-wikimedia-796f2a4e5afb752f34322a2206f0bfe179667cb9.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/31-scomber-japonicus/16-inaturalist-608413973.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사 어류는 확인되나 겹침·가림 또는 여러 개체가 있어 대상 지정 필요",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/334965226"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/31-scomber-japonicus/17-gbif-5932356702-2.jpg",
+      "photoTypeReview": "approved",
+      "reason": "수중 굴절·반사·위장·원거리 때문에 종 구분 특징의 가시성을 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/317184332"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/31-scomber-japonicus/18-wikimedia-4c5c0ea14f1726889d22e12d643d2fdc92d57a63.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사이나 몸 일부가 잘리거나 가려져 종 구분 근거를 추가 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/31-scomber-japonicus/20-gbif-5932356702-3.jpg",
+      "photoTypeReview": "approved",
+      "reason": "수중 굴절·반사·위장·원거리 때문에 종 구분 특징의 가시성을 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/317184332"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/31-scomber-japonicus/21-wikimedia-e1304d5b94013c48ce45baa2476691cc8e1cd0e8.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사이나 몸 일부가 잘리거나 가려져 종 구분 근거를 추가 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/31-scomber-japonicus/23-gbif-5932356702-4.jpg",
+      "photoTypeReview": "approved",
+      "reason": "수중 굴절·반사·위장·원거리 때문에 종 구분 특징의 가시성을 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/317184332"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/31-scomber-japonicus/24-wikimedia-d5597f3c6ad91a4af824ff633c828487fa7eaf97.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "꼬리만 확대한 사진으로 전신 정답 후보와 분리",
+      "disposition": "reference_only",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/31-scomber-japonicus/26-gbif-5897495011-0.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "대상 어류의 위치 또는 주요 외형을 충분히 확인하기 어려움",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/326701322"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/31-scomber-japonicus/28-inaturalist-27532904.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/17965390"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/31-scomber-japonicus/31-wikimedia-73825632f83bc8a54991feb926b32e75b5388030.png",
+      "photoTypeReview": "rejected",
+      "reason": "술병 제품 사진으로 대상 어류가 없음",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/31-scomber-japonicus/32-inaturalist-2299709.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사이나 몸 일부가 잘리거나 가려져 종 구분 근거를 추가 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/1886336"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/31-scomber-japonicus/33-wikimedia-6107caaacae7e88155330c967f81e90a3c2fc12d.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "회 또는 조리된 음식 사진",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/43-stephanolepis-cirrhifer/01-inaturalist-461159715.jpg",
+      "photoTypeReview": "approved",
+      "reason": "수중 굴절·반사·위장·원거리 때문에 종 구분 특징의 가시성을 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/257112908"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/43-stephanolepis-cirrhifer/02-gbif-5889664908-0.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/305802851"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/43-stephanolepis-cirrhifer/05-gbif-5889664908-1.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/305802851"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/43-stephanolepis-cirrhifer/08-gbif-5889664908-2.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/305802851"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/43-stephanolepis-cirrhifer/10-inaturalist-551333795.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/305762931"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/43-stephanolepis-cirrhifer/11-gbif-5889368136-0.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사 어류는 확인되나 겹침·가림 또는 여러 개체가 있어 대상 지정 필요",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/311262646"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/43-stephanolepis-cirrhifer/12-wikimedia-8685b12a9262f942fadbe5d0c4c2f88376d1e868.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "회 또는 조리된 음식 사진",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/43-stephanolepis-cirrhifer/13-inaturalist-695111057.jpg",
+      "photoTypeReview": "approved",
+      "reason": "작은 개체 또는 어린 개체로 성체와 다른 외형에 대한 검수 필요",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/379975656"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/43-stephanolepis-cirrhifer/14-gbif-5932745513-0.jpg",
+      "photoTypeReview": "approved",
+      "reason": "수중 굴절·반사·위장·원거리 때문에 종 구분 특징의 가시성을 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/317650501"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/43-stephanolepis-cirrhifer/15-wikimedia-e47b88cf07694a0d0148df5d205ea13d694792d7.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "조직 또는 현미경 패널로 전체 어류 식별 입력이 아님",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/43-stephanolepis-cirrhifer/16-inaturalist-311848446.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "대상 어류의 위치 또는 주요 외형을 충분히 확인하기 어려움",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/179146397"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/43-stephanolepis-cirrhifer/17-gbif-5932745513-1.jpg",
+      "photoTypeReview": "approved",
+      "reason": "수중 굴절·반사·위장·원거리 때문에 종 구분 특징의 가시성을 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/317650501"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/43-stephanolepis-cirrhifer/19-inaturalist-428979410.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/240755752"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/43-stephanolepis-cirrhifer/20-gbif-5932745513-2.jpg",
+      "photoTypeReview": "approved",
+      "reason": "수중 굴절·반사·위장·원거리 때문에 종 구분 특징의 가시성을 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/317650501"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/43-stephanolepis-cirrhifer/23-gbif-4921482584-0.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/226365229"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/43-stephanolepis-cirrhifer/26-gbif-4921482584-1.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/226365229"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/43-stephanolepis-cirrhifer/29-gbif-4921482584-2.jpg",
+      "photoTypeReview": "approved",
+      "reason": "수중 굴절·반사·위장·원거리 때문에 종 구분 특징의 가시성을 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/226365229"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/43-stephanolepis-cirrhifer/31-inaturalist-209264439.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/123529057"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/43-stephanolepis-cirrhifer/32-gbif-4921482584-3.jpg",
+      "photoTypeReview": "rejected",
+      "reason": "대상 어류의 위치 또는 주요 외형을 충분히 확인하기 어려움",
+      "disposition": "exclude",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/226365229"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/43-stephanolepis-cirrhifer/35-gbif-4921482584-4.jpg",
+      "photoTypeReview": "approved",
+      "reason": "수중 굴절·반사·위장·원거리 때문에 종 구분 특징의 가시성을 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/226365229"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/55-sepioteuthis-lessoniana/04-inaturalist-168476805.jpg",
+      "photoTypeReview": "approved",
+      "reason": "수중 굴절·반사·위장·원거리 때문에 종 구분 특징의 가시성을 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/100912038"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/55-sepioteuthis-lessoniana/09-wikimedia-0f6f6117c0924559e565cd9a9b169b9cc9f2e64d.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지; 무늬오징어 근연종과 분포·형태를 대조해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/55-sepioteuthis-lessoniana/11-gbif-6185320964-1.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사 어류는 확인되나 겹침·가림 또는 여러 개체가 있어 대상 지정 필요",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/345614442"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/55-sepioteuthis-lessoniana/12-wikimedia-ed9af18751f67c27a643beecedfbe5efe4bedfbc.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/55-sepioteuthis-lessoniana/14-gbif-6188650498-0.jpg",
+      "photoTypeReview": "approved",
+      "reason": "수중 굴절·반사·위장·원거리 때문에 종 구분 특징의 가시성을 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/347489687"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/55-sepioteuthis-lessoniana/20-gbif-6235017074-0.jpg",
+      "photoTypeReview": "approved",
+      "reason": "수중 굴절·반사·위장·원거리 때문에 종 구분 특징의 가시성을 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/349686128"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/55-sepioteuthis-lessoniana/26-gbif-6235892025-0.jpg",
+      "photoTypeReview": "approved",
+      "reason": "수중 굴절·반사·위장·원거리 때문에 종 구분 특징의 가시성을 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/350385863"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/55-sepioteuthis-lessoniana/27-wikimedia-3131b91b831418ced5438fd7810a2f51fbee83a0.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지; 무늬오징어 근연종과 분포·형태를 대조해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/55-sepioteuthis-lessoniana/31-inaturalist-536584321.jpg",
+      "photoTypeReview": "approved",
+      "reason": "수중 굴절·반사·위장·원거리 때문에 종 구분 특징의 가시성을 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/297922744"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/55-sepioteuthis-lessoniana/32-gbif-6274194679-0.jpg",
+      "photoTypeReview": "approved",
+      "reason": "수중 굴절·반사·위장·원거리 때문에 종 구분 특징의 가시성을 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/359551227"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/55-sepioteuthis-lessoniana/33-wikimedia-4f23b2a42f94ca0a527b986d58cb75d921f86eba.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지; 무늬오징어 근연종과 분포·형태를 대조해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/55-sepioteuthis-lessoniana/34-inaturalist-283536727.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/163901140"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/55-sepioteuthis-lessoniana/35-gbif-6274194679-1.jpg",
+      "photoTypeReview": "approved",
+      "reason": "수중 굴절·반사·위장·원거리 때문에 종 구분 특징의 가시성을 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/359551227"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/55-sepioteuthis-lessoniana/36-wikimedia-c5399f46c03c1760b5cc306816af589299a69a41.jpg",
+      "photoTypeReview": "approved",
+      "reason": "실사에서 주요 몸체와 외형이 보여 어종 정답 검수 후보로 유지",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": null
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/55-sepioteuthis-lessoniana/38-gbif-6274194679-2.jpg",
+      "photoTypeReview": "approved",
+      "reason": "수중 굴절·반사·위장·원거리 때문에 종 구분 특징의 가시성을 검토해야 함",
+      "disposition": "field_candidate",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:05:19.573888+00:00",
+      "canonicalObservation": "https://www.inaturalist.org/observations/359551227"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/02-pleuronichthys-cornutus/01-gbif-1703048474-0.jpg",
+      "photoTypeReview": "rejected",
+      "disposition": "reference_only",
+      "reason": "보존·전시 표본 및 어종 표기가 포함된 자료로 현장 후보와 분리",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:16:34.951089+00:00"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/02-pleuronichthys-cornutus/03-gbif-1703053032-0.jpg",
+      "photoTypeReview": "rejected",
+      "disposition": "reference_only",
+      "reason": "보존·전시 표본 및 어종 표기가 포함된 자료로 현장 후보와 분리",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:16:34.951089+00:00"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/02-pleuronichthys-cornutus/09-gbif-1055791022-0.jpg",
+      "photoTypeReview": "rejected",
+      "disposition": "exclude",
+      "reason": "어류 사진이 아닌 표본 등록 문서",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:16:34.951089+00:00"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/02-pleuronichthys-cornutus/10-gbif-1055867102-0.jpg",
+      "photoTypeReview": "rejected",
+      "disposition": "exclude",
+      "reason": "어류 사진이 아닌 표본 등록 문서",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:16:34.951089+00:00"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/02-pleuronichthys-cornutus/11-gbif-1055894076-0.jpg",
+      "photoTypeReview": "rejected",
+      "disposition": "exclude",
+      "reason": "어류 사진이 아닌 표본 등록 문서",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:16:34.951089+00:00"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/02-pleuronichthys-cornutus/14-gbif-1057195324-0.jpg",
+      "photoTypeReview": "rejected",
+      "disposition": "exclude",
+      "reason": "어류 사진이 아닌 표본 등록 문서",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:16:34.951089+00:00"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/02-pleuronichthys-cornutus/16-gbif-2432777229-1.jpg",
+      "photoTypeReview": "rejected",
+      "disposition": "reference_only",
+      "reason": "보존·전시 표본 및 어종 표기가 포함된 자료로 현장 후보와 분리",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:16:34.951089+00:00"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/02-pleuronichthys-cornutus/17-gbif-2432777229-2.jpg",
+      "photoTypeReview": "rejected",
+      "disposition": "reference_only",
+      "reason": "보존·전시 표본 및 어종 표기가 포함된 자료로 현장 후보와 분리",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:16:34.951089+00:00"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/02-pleuronichthys-cornutus/18-gbif-2432777229-3.jpg",
+      "photoTypeReview": "rejected",
+      "disposition": "reference_only",
+      "reason": "보존·전시 표본 및 어종 표기가 포함된 자료로 현장 후보와 분리",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:16:34.951089+00:00"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/02-pleuronichthys-cornutus/20-gbif-2432778236-1.jpg",
+      "photoTypeReview": "rejected",
+      "disposition": "reference_only",
+      "reason": "보존·전시 표본 및 어종 표기가 포함된 자료로 현장 후보와 분리",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:16:34.951089+00:00"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/02-pleuronichthys-cornutus/21-gbif-2432778236-2.jpg",
+      "photoTypeReview": "rejected",
+      "disposition": "reference_only",
+      "reason": "보존·전시 표본 및 어종 표기가 포함된 자료로 현장 후보와 분리",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:16:34.951089+00:00"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/02-pleuronichthys-cornutus/22-gbif-2432778236-3.jpg",
+      "photoTypeReview": "rejected",
+      "disposition": "reference_only",
+      "reason": "보존·전시 표본 및 어종 표기가 포함된 자료로 현장 후보와 분리",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:16:34.951089+00:00"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/02-pleuronichthys-cornutus/24-gbif-2432779223-1.jpg",
+      "photoTypeReview": "rejected",
+      "disposition": "reference_only",
+      "reason": "보존·전시 표본 및 어종 표기가 포함된 자료로 현장 후보와 분리",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:16:34.951089+00:00"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/02-pleuronichthys-cornutus/25-gbif-2432779223-2.jpg",
+      "photoTypeReview": "rejected",
+      "disposition": "reference_only",
+      "reason": "보존·전시 표본 및 어종 표기가 포함된 자료로 현장 후보와 분리",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:16:34.951089+00:00"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/02-pleuronichthys-cornutus/26-gbif-2432779223-3.jpg",
+      "photoTypeReview": "rejected",
+      "disposition": "reference_only",
+      "reason": "보존·전시 표본 및 어종 표기가 포함된 자료로 현장 후보와 분리",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:16:34.951089+00:00"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/21-dentex-hypselosomus/02-gbif-1703048337-0.jpg",
+      "photoTypeReview": "rejected",
+      "disposition": "reference_only",
+      "reason": "보존·전시 표본 및 어종 표기가 포함된 자료로 현장 후보와 분리; 사진 라벨 Dentex abei?와 수집 라벨 Dentex hypselosomus가 충돌하여 정답 검수 보류",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:16:34.951089+00:00",
+      "sourceLabelConflict": true
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/21-dentex-hypselosomus/07-gbif-1056854468-0.jpg",
+      "photoTypeReview": "rejected",
+      "disposition": "exclude",
+      "reason": "어류 사진이 아닌 표본 등록 문서",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:16:34.951089+00:00"
+    },
+    {
+      "file": "qa/fish-recognition/open-photo-candidates/21-dentex-hypselosomus/09-gbif-1057051267-1.jpg",
+      "photoTypeReview": "rejected",
+      "disposition": "exclude",
+      "reason": "어류 사진이 아닌 표본 등록 문서",
+      "reviewer": "Codex visual screening (not expert species identification)",
+      "reviewedAt": "2026-09-10T02:16:34.951089+00:00"
+    }
   ]
 }

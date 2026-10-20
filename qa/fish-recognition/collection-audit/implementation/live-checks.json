@@ -1,0 +1,12 @@
+{
+  "checkedAt": "2026-09-10T05:16:28.436Z",
+  "passed": [
+    "absent consent rejected",
+    "idempotent explicit submission",
+    "photo and unreviewed analysis stored",
+    "cross-account list/delete isolated",
+    "direct table access protected",
+    "withdrawal removes photo",
+    "expired data excluded and physically purged"
+  ]
+}

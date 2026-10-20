@@ -1,0 +1,21 @@
+{
+  "version": "1.1.1",
+  "versionCode": 1,
+  "source": "Local archived APK; not independently confirmed as former Play-signed store artifact",
+  "sha256": "3a5bc91f94252d72adedb8a5a495248ed270cd988dab2d50ecb5f5663500fda1",
+  "device": "Android 13 temporary emulator",
+  "map": "rendered",
+  "search_without_location_permission": "failed",
+  "search_with_location_permission": "passed",
+  "query": "Haeundae",
+  "coordinates": [
+    35.17195,
+    129.1741
+  ],
+  "trip_form_connection": "passed",
+  "trip_saved": false,
+  "temporary_user_deleted": true,
+  "global_signout": true,
+  "ios_old_version": "not verified: no old installable artifact available",
+  "android_1_1_4": "pending user download: Chrome ERR_BLOCKED_BY_CLIENT"
+}

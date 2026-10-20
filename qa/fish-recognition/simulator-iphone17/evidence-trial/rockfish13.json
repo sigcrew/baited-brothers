@@ -1,0 +1,36 @@
+{
+  "localId": "1789011888589-b03v9p7x9w",
+  "imageWidth": 532,
+  "imageHeight": 1024,
+  "captureMethod": "photo_library",
+  "candidates": [
+    {
+      "fishId": "f63e7e9b-6494-42d5-a835-fb178ba5e475",
+      "confidence": 0.55,
+      "reason": "회갈색 바탕에 불규칙한 짙은 무늬와 두꺼운 체형이 조피볼락 특징과 부합, 머리 가시는 해상도 부족으로 미확인"
+    },
+    {
+      "fishId": "a1c5a471-8567-49eb-9324-413923621ecf",
+      "confidence": 0.2,
+      "reason": "얼룩진 갈색 무늬는 유사하나 쏨뱅이 특유의 날카로운 머리 가시 윤곽이 사진에서 확인되지 않음"
+    },
+    {
+      "fishId": "b1e0bfba-ca51-4e7e-883b-91de309f242b",
+      "confidence": 0.15,
+      "reason": "체형과 무늬 일부 유사하나 측선 5개 여부와 꼬리 오목함이 가려져 확인 불가"
+    }
+  ],
+  "status": "needs_confirmation",
+  "lastError": null,
+  "createdAt": "2026-09-10T03:44:48.600Z",
+  "updatedAt": "2026-09-10T03:45:09.071Z",
+  "elapsedPreserveToUpdateSeconds": 20.471,
+  "timingNote": "Local photo preservation to latest analysis state update; not pure inference latency.",
+  "candidateNamesInOrder": [
+    "조피볼락",
+    "쏨뱅이",
+    "쥐노래미"
+  ],
+  "inputPath": "qa/fish-recognition/approved-holdout/images/reviewed-13.jpg",
+  "endpoint": "identify-fish-qa-evidence"
+}

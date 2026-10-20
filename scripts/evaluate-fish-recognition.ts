@@ -30,6 +30,8 @@ const manifest = JSON.parse(await fs.readFile(manifestPath, "utf8")) as {
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const anonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 const userJwt = process.env.AI_TEST_USER_JWT;
+const functionName = process.env.QA_FUNCTION_NAME ?? "identify-fish";
+if (!/^[a-z0-9-]+$/.test(functionName)) throw new Error("Invalid QA function name");
 
 if (!supabaseUrl || !anonKey || !userJwt) {
   throw new Error(
@@ -85,7 +87,8 @@ const evaluateCase = async (caseIndex: number, testCase: TestCase) => {
   const mimeType = absolutePath.toLowerCase().endsWith(".png")
     ? "image/png"
     : "image/jpeg";
-  const response = await fetch(`${supabaseUrl}/functions/v1/identify-fish`, {
+  const startedAt = Date.now();
+  const response = await fetch(`${supabaseUrl}/functions/v1/${functionName}`, {
     method: "POST",
     headers: { ...authHeaders, "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -141,6 +144,8 @@ const evaluateCase = async (caseIndex: number, testCase: TestCase) => {
       top1Match,
       top3Match,
       note: result.note,
+      seconds: (Date.now() - startedAt) / 1000,
+      response: result,
     };
     console.log(
       `[${caseIndex + 1}/${manifest.cases.length}] ${testCase.id}: ${
@@ -162,6 +167,8 @@ const evaluateCase = async (caseIndex: number, testCase: TestCase) => {
     needsRetake: result.needs_retake,
     candidates: candidateIds,
     note: result.note,
+    seconds: (Date.now() - startedAt) / 1000,
+    response: result,
   };
   console.log(
     `[${caseIndex + 1}/${manifest.cases.length}] ${testCase.id}: ${
@@ -213,6 +220,7 @@ const worker = async () => {
 await Promise.all(Array.from({ length: concurrency }, () => worker()));
 
 const summary = {
+  functionName,
   total: manifest.cases.length,
   fishCases: fishCount,
   top1Accuracy: fishCount ? top1 / fishCount : null,

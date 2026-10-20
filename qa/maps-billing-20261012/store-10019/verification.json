@@ -1,0 +1,11 @@
+{
+  "versionName": "1.1.5",
+  "versionCode": 10019,
+  "source": "Google Play Console signed universal APK from current 100% production release",
+  "apkSha256": "4bc7101a8b1c056effb3aa1c1d6163f56da73ae80cfa7323c617171333bd6f18",
+  "signerSha1": "db29be5e446e41e5874cd48d950d0b7423dc45dc",
+  "mapKeyFingerprint": "b6e60b856480",
+  "device": "Temporary Android 13 emulator",
+  "initialMapRendered": true,
+  "zoomPanRendered": true
+}

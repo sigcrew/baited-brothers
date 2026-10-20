@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-12",
+  "device": "iPhone 16",
+  "source": "Installed directly from Apple App Store",
+  "bundleIdentifier": "com.sigcrew.baitedbrothers",
+  "version": "1.1.5",
+  "build": "42",
+  "builtByDeveloper": false,
+  "checks": {
+    "map_display_and_zoom": "passed",
+    "kakao_query": "Haeundae",
+    "selected_place": "해운대해수욕장",
+    "selected_coordinates": [
+      35.15852,
+      129.15985
+    ],
+    "place_reflected_in_trip_form": "passed",
+    "draft_closed_without_saving": true,
+    "trip_count_after": 1
+  }
+}
