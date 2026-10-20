@@ -10,6 +10,13 @@ export type PendingCatchStatus =
   | "failed_retryable"
   | "failed_terminal";
 
+/**
+ * job을 지금 누가 다루는지. 포그라운드(record 화면)가 열어 둔 job은 백그라운드
+ * 워커가 건드리지 않아야 같은 사진을 두 번 올리거나, 백그라운드가 로컬 파일을
+ * 지운 뒤 포그라운드가 "저장 실패"를 띄우는 일이 없다.
+ */
+export type PendingCatchLockOwner = "foreground" | "background";
+
 export type PendingCatchCandidate = {
   fishId: string;
   confidence: number;
@@ -43,6 +50,8 @@ export type PendingCatchJob = {
   attemptCount: number;
   lastError: string | null;
   nextRetryAt: string | null;
+  lockedBy: PendingCatchLockOwner | null;
+  lockedAt: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -65,6 +74,17 @@ type PreservePendingCatchInput = {
 };
 
 const STORAGE_KEY = "pending-catch-queue-v1";
+/** 앱 강제 종료로 풀리지 않은 포그라운드 잠금은 이 시간이 지나면 무시한다. */
+export const PENDING_CATCH_LOCK_TTL_MS = 10 * 60_000;
+
+export const isPendingCatchLockedByForeground = (
+  job: Pick<PendingCatchJob, "lockedBy" | "lockedAt">,
+  now = Date.now(),
+) => {
+  if (job.lockedBy !== "foreground" || !job.lockedAt) return false;
+  const lockedAt = Date.parse(job.lockedAt);
+  return Number.isFinite(lockedAt) && now - lockedAt < PENDING_CATCH_LOCK_TTL_MS;
+};
 const QUEUE_FOLDER = "pending-catches";
 const RETRY_BASE_MS = 15_000;
 const RETRY_MAX_MS = 15 * 60_000;
@@ -166,6 +186,11 @@ export const normalizePendingCatchJobs = (
             : null,
         nextRetryAt:
           typeof job.nextRetryAt === "string" ? job.nextRetryAt : null,
+        lockedBy:
+          job.lockedBy === "foreground" || job.lockedBy === "background"
+            ? job.lockedBy
+            : null,
+        lockedAt: typeof job.lockedAt === "string" ? job.lockedAt : null,
       },
     ];
   });
@@ -261,6 +286,8 @@ export const preservePendingCatch = async (
     attemptCount: 0,
     lastError: null,
     nextRetryAt: null,
+    lockedBy: null,
+    lockedAt: null,
     createdAt: now,
     updatedAt: now,
   };
@@ -308,6 +335,8 @@ export const updatePendingCatch = async (
       | "attemptCount"
       | "lastError"
       | "nextRetryAt"
+      | "lockedBy"
+      | "lockedAt"
     >
   >,
 ) =>
@@ -324,6 +353,31 @@ export const updatePendingCatch = async (
     });
     return { jobs: next, result: updated };
   });
+
+export const lockPendingCatch = (
+  userId: string,
+  localId: string,
+  owner: PendingCatchLockOwner,
+) =>
+  updatePendingCatch(userId, localId, {
+    lockedBy: owner,
+    lockedAt: new Date().toISOString(),
+  });
+
+/** 자기 잠금만 푼다. 다른 주체가 그 사이 잠갔다면 건드리지 않는다. */
+export const unlockPendingCatch = (
+  userId: string,
+  localId: string,
+  owner: PendingCatchLockOwner,
+) =>
+  mutateJobs(async (jobs) => ({
+    jobs: jobs.map((job) =>
+      job.userId === userId && job.localId === localId && job.lockedBy === owner
+        ? { ...job, lockedBy: null, lockedAt: null, updatedAt: new Date().toISOString() }
+        : job,
+    ),
+    result: undefined,
+  }));
 
 export const removePendingCatch = async (
   userId: string,

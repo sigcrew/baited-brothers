@@ -7,6 +7,7 @@ import { useCreateCatch } from "@/src/hooks/useCreateCatch";
 import { useFishes } from "@/src/hooks/useFishes";
 import { useFishRecognition } from "@/src/hooks/useFishRecognition";
 import {
+  isPendingCatchLockedByForeground,
   listPendingCatches,
   readPendingCatchBase64,
   removePendingCatch,
@@ -159,6 +160,8 @@ export const PendingCatchLifecycle = () => {
       const jobs = await listPendingCatches(userId);
       const recoverable = jobs
         .filter(isDue)
+        // record 화면이 열어 둔 job은 그 화면이 책임진다(강제 종료로 남은 잠금은 TTL 후 무시).
+        .filter((job) => !isPendingCatchLockedByForeground(job))
         .filter((job) => {
           if (job.status === "pending_analysis") return true;
           if (job.status === "pending_upload") return true;

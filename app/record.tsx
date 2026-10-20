@@ -35,10 +35,12 @@ import { extractLibraryPhotoMetadata } from "@/src/lib/photoMetadata";
 import { trackAnalyticsEvent } from "@/src/lib/analytics";
 import {
   getPendingCatch,
+  lockPendingCatch,
   preservePendingCatch,
   readPendingCatchBase64,
   removePendingCatch,
   resolvePendingCatchFailure,
+  unlockPendingCatch,
   updatePendingCatch,
 } from "@/src/lib/pendingCatchQueue";
 import { FIELD_COLORS, bodyExtraBoldFont, bodyFont, monoFont } from "@/src/theme/fieldJournal";
@@ -99,6 +101,10 @@ const RecordScreen = () => {
   const flowTracked = useRef(false);
   const cameraOpenedTracked = useRef(false);
   const resumedPendingId = useRef<string | null>(null);
+  // 분석 세대. 다시 찍기/다른 사진/화면 이탈 뒤 도착한 이전 결과는 버린다.
+  const analysisGeneration = useRef(0);
+  const inFlightAnalysis = useRef<{ userId: string; pendingCatchId: string } | null>(null);
+  const slowTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { session } = useAuth();
   const { alert, confirm } = useFieldNotice();
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
@@ -305,13 +311,22 @@ const RecordScreen = () => {
       );
     }
 
-    const slowTimer = setTimeout(() => setRecognitionSlow(true), 20_000);
+    const generation = ++analysisGeneration.current;
+    inFlightAnalysis.current = session?.user.id
+      ? { userId: session.user.id, pendingCatchId: nextCapture.pendingCatchId }
+      : null;
+    if (slowTimerRef.current) clearTimeout(slowTimerRef.current);
+    slowTimerRef.current = setTimeout(() => setRecognitionSlow(true), 20_000);
     const result = await recognize({
       imageBase64: nextCapture.base64,
       mimeType: nextCapture.mimeType,
       fishes,
     });
-    clearTimeout(slowTimer);
+    // 그 사이 다시 찍기/다른 사진/화면 이탈이 있었으면 이 결과는 다른 사진의 것이다.
+    if (generation !== analysisGeneration.current) return;
+    inFlightAnalysis.current = null;
+    if (slowTimerRef.current) clearTimeout(slowTimerRef.current);
+    slowTimerRef.current = null;
     setRecognitionSlow(false);
     setRecognitionCandidates(result.candidates);
     setRecognitionNote(result.note);
@@ -499,12 +514,52 @@ const RecordScreen = () => {
     };
   }, [fishes, fishesLoading, pendingId, router, session?.user.id]);
 
+  // 이 화면이 다루는 job은 포그라운드 잠금으로 표시해 백그라운드 워커가 같은 job을
+  // 동시에 올리지 않게 한다. 오래 머무는 경우를 위해 주기적으로 갱신한다.
+  const lockedPendingCatchId = capture?.pendingCatchId ?? null;
+  const lockUserId = session?.user.id ?? null;
+  useEffect(() => {
+    if (!lockedPendingCatchId || !lockUserId) return;
+    void lockPendingCatch(lockUserId, lockedPendingCatchId, "foreground");
+    const refresh = setInterval(() => {
+      void lockPendingCatch(lockUserId, lockedPendingCatchId, "foreground");
+    }, 5 * 60_000);
+    return () => {
+      clearInterval(refresh);
+      void unlockPendingCatch(lockUserId, lockedPendingCatchId, "foreground");
+    };
+  }, [lockUserId, lockedPendingCatchId]);
+
+  // 화면을 떠날 때 분석이 진행 중이면 결과를 버리고, job은 백그라운드가 이어받도록
+  // pending_analysis로 되돌린다.
+  useEffect(
+    () => () => {
+      analysisGeneration.current += 1;
+      if (slowTimerRef.current) clearTimeout(slowTimerRef.current);
+      const inFlight = inFlightAnalysis.current;
+      if (inFlight) {
+        inFlightAnalysis.current = null;
+        void updatePendingCatch(inFlight.userId, inFlight.pendingCatchId, {
+          status: "pending_analysis",
+          nextRetryAt: null,
+        });
+      }
+    },
+    [],
+  );
+
   const retryRecognition = async () => {
     if (!capture || isRecognizing) return;
     await analyzeCapture(capture);
   };
 
   const retakePhoto = () => {
+    // 진행 중인 분석은 무효화한다. 결과가 와도 새 사진에 붙지 않는다.
+    analysisGeneration.current += 1;
+    inFlightAnalysis.current = null;
+    if (slowTimerRef.current) clearTimeout(slowTimerRef.current);
+    slowTimerRef.current = null;
+    setRecognitionSlow(false);
     if (capture && session?.user.id) {
       void removePendingCatch(session.user.id, capture.pendingCatchId);
     }
@@ -519,7 +574,6 @@ const RecordScreen = () => {
   };
 
   const pickLibraryPhoto = async () => {
-    if (isRecognizing) return;
     if (fishesLoading) {
       await alert({
         eyebrow: "FIELD GUIDE · LOADING",
@@ -1449,15 +1503,19 @@ const RecordScreen = () => {
                         fontFamily: bodyExtraBoldFont,
                       }}
                     >
-                      사진 위치 기반 인증
+                      {Platform.OS === "android"
+                        ? "일반 기록으로 저장"
+                        : "사진 위치 기반 인증"}
                     </Text>
                     <Text
                       className="mt-1 text-xs leading-5"
                       style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
                     >
-                      사진의 촬영 위치가 연안으로 확인되면 도감·배지·개인
-                      최대어에 반영됩니다. 위치가 없거나 확인할 수 없으면
-                      일반 기록으로 저장되며 랭킹에는 반영되지 않습니다.
+                      {Platform.OS === "android"
+                        // Android는 ACCESS_MEDIA_LOCATION을 쓰지 않아 보관함 사진의
+                        // 촬영 위치를 읽지 못한다. 위치 인증을 약속하면 거짓이 된다.
+                        ? "Android에서는 보관함 사진의 촬영 위치를 읽지 않아 일반 기록으로 저장됩니다. 조과 카드에는 남지만 도감 해금·배지·랭킹에는 반영되지 않습니다. 현장 인증이 필요하면 앱 카메라로 촬영해 주세요."
+                        : "사진의 촬영 위치가 연안으로 확인되면 도감·배지·개인 최대어에 반영됩니다. 위치가 없거나 확인할 수 없으면 일반 기록으로 저장되며 랭킹에는 반영되지 않습니다."}
                     </Text>
                   </View>
                 ) : null}

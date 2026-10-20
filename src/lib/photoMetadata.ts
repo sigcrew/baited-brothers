@@ -31,7 +31,7 @@ const signedCoordinate = (
     : coordinate;
 };
 
-const parseExifLocation = (exif: unknown) => {
+export const parseExifLocation = (exif: unknown) => {
   const root = asRecord(exif);
   const gps = asRecord(root.GPS);
   const latitude =
@@ -59,7 +59,7 @@ const parseExifLocation = (exif: unknown) => {
   };
 };
 
-const parseExifDate = (exif: unknown) => {
+export const parseExifDate = (exif: unknown) => {
   const root = asRecord(exif);
   const raw =
     root.DateTimeOriginal ??
@@ -77,9 +77,28 @@ const parseExifDate = (exif: unknown) => {
   return Number.isNaN(date.getTime()) ? null : date.toISOString();
 };
 
+/** 피커가 넘겨준 EXIF만으로 만든 메타데이터. MediaLibrary 권한 없이 얻는다. */
+export const metadataFromPickerExif = (exif: unknown): LibraryPhotoMetadata => {
+  const location = parseExifLocation(exif);
+  return {
+    capturedAt: parseExifDate(exif),
+    latitude: location.latitude,
+    longitude: location.longitude,
+  };
+};
+
+const isComplete = (metadata: LibraryPhotoMetadata) =>
+  metadata.capturedAt != null && metadata.latitude != null && metadata.longitude != null;
+
 export const extractLibraryPhotoMetadata = async (
   asset: ImagePickerAsset,
 ): Promise<LibraryPhotoMetadata> => {
+  // iOS PHPicker는 권한 없이도 EXIF를 준다. 촬영시각과 GPS가 모두 있으면 전체
+  // 사진 보관함 읽기 권한(NSPhotoLibraryUsageDescription)을 추가로 묻지 않는다.
+  // 그 프롬프트는 심사와 사용자 신뢰 양쪽에 비용이 크다.
+  const fromPicker = metadataFromPickerExif(asset.exif);
+  if (isComplete(fromPicker)) return fromPicker;
+
   let creationTime: number | null = null;
   let location: { latitude: number; longitude: number } | null = null;
   let fullExif: unknown = asset.exif;

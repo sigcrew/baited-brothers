@@ -5,7 +5,9 @@ jest.mock(
 );
 
 import {
+  PENDING_CATCH_LOCK_TTL_MS,
   PENDING_CATCH_MAX_ATTEMPTS,
+  isPendingCatchLockedByForeground,
   normalizePendingCatchJobs,
   pendingCatchRetryDelayMs,
   resolvePendingCatchFailure,
@@ -65,6 +67,37 @@ describe("pending catch queue", () => {
     expect(pendingCatchRetryDelayMs(1)).toBe(15_000);
     expect(pendingCatchRetryDelayMs(2)).toBe(30_000);
     expect(pendingCatchRetryDelayMs(20)).toBe(15 * 60_000);
+  });
+
+  it("defaults lock fields for records written before locking existed", () => {
+    expect(normalizePendingCatchJobs([validJob])[0]).toEqual(
+      expect.objectContaining({ lockedBy: null, lockedAt: null }),
+    );
+    expect(
+      normalizePendingCatchJobs([{ ...validJob, lockedBy: "someone-else", lockedAt: 5 }])[0],
+    ).toEqual(expect.objectContaining({ lockedBy: null, lockedAt: null }));
+  });
+
+  describe("isPendingCatchLockedByForeground", () => {
+    const now = Date.parse("2026-10-20T00:30:00.000Z");
+    it("honours a fresh foreground lock", () => {
+      expect(
+        isPendingCatchLockedByForeground(
+          { lockedBy: "foreground", lockedAt: new Date(now - 60_000).toISOString() },
+          now,
+        ),
+      ).toBe(true);
+    });
+    it("ignores a lock older than the TTL (app was killed) and non-foreground locks", () => {
+      expect(
+        isPendingCatchLockedByForeground(
+          { lockedBy: "foreground", lockedAt: new Date(now - PENDING_CATCH_LOCK_TTL_MS - 1).toISOString() },
+          now,
+        ),
+      ).toBe(false);
+      expect(isPendingCatchLockedByForeground({ lockedBy: "background", lockedAt: new Date(now).toISOString() }, now)).toBe(false);
+      expect(isPendingCatchLockedByForeground({ lockedBy: null, lockedAt: null }, now)).toBe(false);
+    });
   });
 
   it("keeps failed_terminal records instead of dropping them as unknown", () => {

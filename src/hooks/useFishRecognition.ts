@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { supabase } from "@/src/lib/supabase";
 import type { Fish } from "@/src/hooks/useFishes";
 import { toUserMessage, withTimeout } from "@/src/lib/appErrors";
@@ -23,6 +23,9 @@ type RecognizeInput = {
 export const useFishRecognition = () => {
   const [isRecognizing, setIsRecognizing] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  // 다시 찍기로 분석이 겹칠 수 있다. 먼저 끝난 이전 요청이 스피너를 끄지 않도록
+  // 진행 중인 요청 수로 관리한다.
+  const inFlight = useRef(0);
 
   const recognize = useCallback(
     async ({
@@ -31,6 +34,7 @@ export const useFishRecognition = () => {
       fishes,
     }: RecognizeInput) => {
       const startedAt = Date.now();
+      inFlight.current += 1;
       setIsRecognizing(true);
       setError(null);
       void trackAnalyticsEvent("ai_analysis_started", {
@@ -118,7 +122,8 @@ export const useFishRecognition = () => {
           error: normalized,
         };
       } finally {
-        setIsRecognizing(false);
+        inFlight.current = Math.max(0, inFlight.current - 1);
+        if (inFlight.current === 0) setIsRecognizing(false);
       }
     },
     [],
