@@ -1,7 +1,7 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import * as Location from "expo-location";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import {
   ActivityIndicator,
   Platform,
@@ -11,7 +11,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 
 import { FieldAlertModal } from "@/components/design/FieldAlertModal";
 import { FishingBobberMarker } from "@/components/map/FishingBobberMarker";
@@ -87,14 +87,16 @@ const distanceKm = (a: MapEntry, b: MapEntry) => {
   return 6371 * 2 * Math.atan2(Math.sqrt(value), Math.sqrt(1 - value));
 };
 
+// 조석·예보는 한국 연안 기준이므로 기기 시간대와 무관하게 KST로 표기한다.
 const formatClock = (value?: string | null) => {
   if (!value) return "-";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "-";
   return new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
     hour: "2-digit",
     minute: "2-digit",
-    hour12: false,
+    hourCycle: "h23",
   }).format(date);
 };
 
@@ -106,10 +108,19 @@ const formatObservedAgo = (value?: string | null) => {
   return hours < 24 ? `${hours}시간 전` : `${Math.round(hours / 24)}일 전`;
 };
 
+const kstDayIndex = (ms: number) => Math.floor((ms + 9 * 3_600_000) / 86_400_000);
+
 const formatTimelineClock = (value: string) => {
-  const date = new Date(value);
-  const isTomorrow = date.getDate() !== new Date().getDate();
-  return `${isTomorrow ? "내일 " : ""}${String(date.getHours()).padStart(2, "0")}:00`;
+  const ms = Date.parse(value);
+  if (!Number.isFinite(ms)) return "-";
+  const dayDiff = kstDayIndex(ms) - kstDayIndex(Date.now());
+  const hour = new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    hour: "2-digit",
+    hourCycle: "h23",
+  }).format(new Date(ms)).replace(/\D/g, "");
+  const prefix = dayDiff === 0 ? "" : dayDiff === 1 ? "내일 " : dayDiff === 2 ? "모레 " : `${dayDiff}일 뒤 `;
+  return `${prefix}${hour.padStart(2, "0")}:00`;
 };
 
 const formatRecordDate = (value?: string) => {
@@ -165,12 +176,13 @@ export default function MapScreen() {
   const infoSheetRef = useRef<BottomSheet>(null);
   const selectionRequestRef = useRef(0);
   const handledFocusRef = useRef<string | null>(null);
-  const { catches, isLoading: catchesLoading } = useUserCatches();
+  const { catches, isLoading: catchesLoading, refetch: refetchCatches } = useUserCatches();
   const {
     trips,
     isLoading: tripsLoading,
     isSaving,
     createTrip,
+    refetch: refetchTrips,
   } = useFishingTrips();
   const {
     spots: favoriteSpots,
@@ -179,7 +191,22 @@ export default function MapScreen() {
     isLoggedIn,
     findByCoordinate,
     toggleFavorite,
+    refetch: refetchFavorites,
   } = useFavoriteFishingSpots();
+  // 탭 화면은 마운트된 채 남아 있으므로, 다른 화면에서 조과를 기록하거나 출조를
+  // 바꾼 뒤 돌아왔을 때 다시 불러온다. 첫 마운트는 훅이 이미 가져온다.
+  const hasFocusedRef = useRef(false);
+  useFocusEffect(
+    useCallback(() => {
+      if (!hasFocusedRef.current) {
+        hasFocusedRef.current = true;
+        return;
+      }
+      void refetchCatches();
+      void refetchTrips();
+      void refetchFavorites();
+    }, [refetchCatches, refetchTrips, refetchFavorites]),
+  );
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<MapFilter>("all");
   const [currentEntry, setCurrentEntry] = useState<MapEntry | null>(null);

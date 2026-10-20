@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { supabase } from "@/src/lib/supabase";
 
@@ -71,6 +71,7 @@ export const useMarineConditions = (
   const [isStale, setIsStale] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
+  const lastKeyRef = useRef<string | null>(null);
   const fetchConditions = useCallback(async (force = false) => {
     if (latitude == null || longitude == null) {
       setData(null);
@@ -82,6 +83,13 @@ export const useMarineConditions = (
 
     const key = cacheKey(latitude, longitude);
     setIsLoading(true);
+    // 다른 장소로 바뀌었을 때만 패널을 비운다. 같은 장소의 "다시 확인"은 기존
+    // 값을 그대로 보여 주며 갱신해 깜빡임이 없다.
+    if (lastKeyRef.current !== key) {
+      setData(null);
+      setIsStale(false);
+    }
+    lastKeyRef.current = key;
     setError(null);
 
     let cached: CachedConditions | null = null;

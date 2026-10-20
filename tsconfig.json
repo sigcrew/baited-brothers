@@ -18,6 +18,10 @@
   ],
   "exclude": [
     "supabase/functions",
-    "admin-dashboard"
+    "admin-dashboard",
+    "official-blog",
+    "website",
+    "share-web",
+    "scripts/fish-detail-image.test.ts"
   ]
 }
