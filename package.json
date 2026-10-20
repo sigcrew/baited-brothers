@@ -44,6 +44,7 @@
     "test:apple-client-secret": "node --test scripts/generate-apple-client-secret.test.mjs",
     "test": "jest",
     "test:ci": "jest --runInBand --ci --no-watchman",
+    "test:functions": "npx --yes deno@2 test --node-modules-dir=none supabase/functions/verify-catch",
     "typecheck": "tsc --noEmit",
     "release:android:internal": "bash scripts/release-android-internal.sh"
   },
