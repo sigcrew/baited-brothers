@@ -18,6 +18,7 @@
       "usesAppleSignIn": true,
       "bundleIdentifier": "com.sigcrew.baitedbrothers",
       "infoPlist": {
+        "CFBundleName": "낚시당한 녀석들",
         "ITSAppUsesNonExemptEncryption": false
       }
     },
