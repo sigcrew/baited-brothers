@@ -3,10 +3,7 @@ import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/contexts/AuthContext";
 import type { Database, TablesInsert } from "@/src/types/database";
 import { toUserMessage, withTimeout } from "@/src/lib/appErrors";
-import {
-  removeUserMedia,
-  uploadUserPhotoVariants,
-} from "@/src/lib/userMedia";
+import { removeUserMedia, uploadUserPhotoVariants } from "@/src/lib/userMedia";
 import { trackAnalyticsEvent } from "@/src/lib/analytics";
 import { captureCatchConditions } from "@/src/lib/catchConditions";
 import {
@@ -100,23 +97,74 @@ export const useCreateCatch = () => {
     try {
       const customSpeciesName = input.customSpeciesName?.trim() || null;
       if (Boolean(input.fishId) === Boolean(customSpeciesName)) {
-        throw new Error("도감 어종 또는 도감 밖 어종 이름 중 하나를 선택해 주세요.");
+        throw new Error(
+          "도감 어종 또는 도감 밖 어종 이름 중 하나를 선택해 주세요.",
+        );
       }
-      const { data: discoveryRows, error: discoveryError } = await supabase
-        .from("user_catches")
-        .select("fish_id")
-        .eq("user_id", userId)
-        .in("verification_status", [
-          "verified",
-          "field_verified",
-          "metadata_verified",
-        ]);
+      const { data: discoveryRows, error: discoveryError } = await withTimeout(
+        Promise.resolve(
+          supabase
+            .from("user_catches")
+            .select("fish_id")
+            .eq("user_id", userId)
+            .in("verification_status", [
+              "verified",
+              "field_verified",
+              "metadata_verified",
+            ]),
+        ),
+        20_000,
+        "기존 조과 조회 시간이 초과되었습니다. 연결 후 다시 시도해 주세요.",
+      );
       if (discoveryError) throw discoveryError;
       const discoveredFishIds = new Set(
         (discoveryRows ?? [])
           .map((row) => row.fish_id)
           .filter((fishId): fishId is string => Boolean(fishId)),
       );
+      const recoverExisting = async (required: boolean) => {
+        const { data: existingCatch, error: lookupError } = await withTimeout(
+          Promise.resolve(
+            supabase
+              .from("user_catches")
+              .select("id, fish_id, verification_status, verification_reason")
+              .eq("user_id", userId)
+              .eq("client_request_id", input.clientRequestId)
+              .maybeSingle(),
+          ),
+          20_000,
+          "저장된 조과 확인 시간이 초과되었습니다. 연결 후 다시 시도해 주세요.",
+        );
+        if (lookupError) throw lookupError;
+        if (!existingCatch?.id) {
+          if (!required) return null;
+          throw new Error(
+            "저장된 조과를 확인하지 못했습니다. 연결 후 다시 시도해 주세요.",
+          );
+        }
+        const existingVerification =
+          existingCatch?.id && existingCatch.verification_status === "pending"
+            ? await verifySavedCatch(existingCatch.id)
+            : {
+                status: existingCatch?.verification_status ?? "pending",
+                reason: existingCatch?.verification_reason ?? null,
+              };
+        void trackAnalyticsEvent("catch_save_succeeded", {
+          capture_method: input.captureMethod ?? "live_camera",
+          idempotent_retry: true,
+          has_trip: Boolean(input.tripId),
+        });
+        return {
+          error: null,
+          catchId: existingCatch?.id ?? null,
+          isFirstDiscovery: false,
+          discoveredCount: discoveredFishIds.size,
+          verificationStatus: existingVerification.status,
+          verificationReason: existingVerification.reason,
+        };
+      };
+      const alreadySaved = await recoverExisting(false);
+      if (alreadySaved) return alreadySaved;
       saveStage = "photo_upload";
       const uploaded = await withTimeout(
         uploadUserPhotoVariants({
@@ -151,9 +199,7 @@ export const useCreateCatch = () => {
         size_cm: input.sizeCm ?? null,
         memo: input.memo?.trim() || null,
         capture_method: input.captureMethod ?? "live_camera",
-        id_method: input.fishId
-          ? input.idMethod ?? "fallback_catalog"
-          : null,
+        id_method: input.fishId ? (input.idMethod ?? "fallback_catalog") : null,
         candidate_fish_ids: input.candidateFishIds ?? [],
         verification_status: "pending",
         verification_reason: null,
@@ -161,54 +207,33 @@ export const useCreateCatch = () => {
       };
 
       saveStage = "database_insert";
-      const { data: insertedCatch, error: insertError } = await supabase
-        .from("user_catches")
-        .insert(payload)
-        .select("id")
-        .single();
+      const { data: insertedCatch, error: insertError } = await withTimeout(
+        Promise.resolve(
+          supabase.from("user_catches").insert(payload).select("id").single(),
+        ),
+        45_000,
+        "조과 저장 확인 시간이 초과되었습니다. 연결 후 다시 시도해 주세요.",
+      );
       if (insertError?.code === "23505") {
         await removeUserMedia(uploadedPaths);
-        const { data: existingCatch } = await supabase
-          .from("user_catches")
-          .select("id, fish_id, verification_status, verification_reason")
-          .eq("user_id", userId)
-          .eq("client_request_id", input.clientRequestId)
-          .maybeSingle();
-        const existingVerification =
-          existingCatch?.id && existingCatch.verification_status === "pending"
-            ? await verifySavedCatch(existingCatch.id)
-            : {
-                status: existingCatch?.verification_status ?? "pending",
-                reason: existingCatch?.verification_reason ?? null,
-              };
-        void trackAnalyticsEvent("catch_save_succeeded", {
-          capture_method: payload.capture_method ?? "unknown",
-          idempotent_retry: true,
-          has_trip: Boolean(input.tripId),
-        });
-        return {
-          error: null,
-          catchId: existingCatch?.id ?? null,
-          isFirstDiscovery: false,
-          discoveredCount: discoveredFishIds.size,
-          verificationStatus: existingVerification.status,
-          verificationReason: existingVerification.reason,
-        };
+        return (await recoverExisting(true))!;
       }
       if (insertError) {
-        await removeUserMedia(uploadedPaths);
+        // A lost response does not prove the insert failed. Its photos may
+        // already be referenced by a saved catch; retain them for recovery.
+        if (/^[0-9A-Z]{5}$/.test(insertError.code)) {
+          await removeUserMedia(uploadedPaths);
+        }
         throw insertError;
       }
 
-      const {
-        status: verificationStatus,
-        reason: verificationReason,
-      } = input.fishId
-        ? await verifySavedCatch(insertedCatch.id)
-        : {
-            status: "general_record" as const,
-            reason: "species_outside_catalog",
-          };
+      const { status: verificationStatus, reason: verificationReason } =
+        input.fishId
+          ? await verifySavedCatch(insertedCatch.id)
+          : {
+              status: "general_record" as const,
+              reason: "species_outside_catalog",
+            };
       const isVerified = countsForCollectionRewards(verificationStatus);
       const isFirstDiscovery =
         Boolean(input.fishId) &&
@@ -243,8 +268,7 @@ export const useCreateCatch = () => {
         error: null,
         catchId: insertedCatch.id,
         isFirstDiscovery,
-        discoveredCount:
-          discoveredFishIds.size + (isFirstDiscovery ? 1 : 0),
+        discoveredCount: discoveredFishIds.size + (isFirstDiscovery ? 1 : 0),
         verificationStatus,
         verificationReason,
       };

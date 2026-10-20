@@ -27,6 +27,7 @@ export default function SettingsScreen() {
         label="알림 설정"
         onPress={() => router.push("/settings/notifications")}
       />
+      <SettingsLinkRow icon="picture-o" label="사진 제공 관리" onPress={() => router.push("/settings/photo-contributions" as never)} />
       <SettingsLinkRow
         icon="shield"
         label="개인정보 처리방침"

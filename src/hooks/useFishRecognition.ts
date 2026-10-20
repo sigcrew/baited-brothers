@@ -4,6 +4,8 @@ import type { Fish } from "@/src/hooks/useFishes";
 import { toUserMessage, withTimeout } from "@/src/lib/appErrors";
 import {
   normalizeRecognitionResponse,
+  getRecognitionFunction,
+  buildRecognitionAnalysis,
   type RecognitionResponse,
 } from "@/src/lib/fishRecognition";
 import { trackAnalyticsEvent } from "@/src/lib/analytics";
@@ -34,6 +36,8 @@ export const useFishRecognition = () => {
       fishes,
     }: RecognizeInput) => {
       const startedAt = Date.now();
+      const analysisId = `analysis-${startedAt}-${Math.random().toString(36).slice(2,12)}`;
+      let metadata: RecognitionResponse["metadata"];
       inFlight.current += 1;
       setIsRecognizing(true);
       setError(null);
@@ -43,7 +47,7 @@ export const useFishRecognition = () => {
 
       try {
         const { data, error: invokeError } = await withTimeout(
-          supabase.functions.invoke<RecognitionResponse>("identify-fish", {
+          supabase.functions.invoke<RecognitionResponse>(getRecognitionFunction(__DEV__, process.env.EXPO_PUBLIC_FISH_RECOGNITION_FUNCTION), {
             body: {
               imageBase64,
               mimeType,
@@ -61,6 +65,7 @@ export const useFishRecognition = () => {
           "AI 판별 시간이 초과되었습니다.",
         );
 
+        metadata = data?.metadata;
         if (invokeError) {
           const response = (invokeError as { context?: unknown }).context;
           if (
@@ -68,6 +73,7 @@ export const useFishRecognition = () => {
           ) {
             try {
               const body = await response.clone().json();
+              metadata = body?.metadata;
               if (
                 body?.error_code === "ai_identification_quota_exceeded"
               ) {
@@ -103,6 +109,7 @@ export const useFishRecognition = () => {
 
         return {
           ...normalized,
+          analysis: buildRecognitionAnalysis(analysisId, normalized, metadata, Date.now() - startedAt),
           error: null,
         };
       } catch (recognitionError) {
@@ -116,6 +123,7 @@ export const useFishRecognition = () => {
         });
         setError(normalized);
         return {
+          analysis: buildRecognitionAnalysis(analysisId, {candidates:[],needsRetake:false,note:null}, metadata, durationMs, normalized.message.includes("초과") ? "timeout" : "request"),
           candidates: [] as FishRecognitionCandidate[],
           needsRetake: false,
           note: null,

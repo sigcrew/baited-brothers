@@ -1,3 +1,4 @@
+jest.mock('expo-file-system',()=>({Paths:{document:{uri:'file:///current/Documents/'}}}));
 jest.mock(
   "@react-native-async-storage/async-storage",
   () =>
@@ -142,4 +143,9 @@ describe("pending catch queue", () => {
       });
     });
   });
+});
+
+test('rebases a preserved photo to the current app container after an iOS update',()=>{
+ const [job]=normalizePendingCatchJobs([{...validJob,localImageUri:'file:///old-container/Documents/pending-catches/user-1/local-1.jpg'}]);
+ expect(job.localImageUri).toBe('file:///current/Documents/pending-catches/user-1/local-1.jpg');
 });

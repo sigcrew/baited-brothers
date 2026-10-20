@@ -1,0 +1,22 @@
+import React from 'react';
+import {act,create,ReactTestRenderer} from 'react-test-renderer';
+import {TouchableOpacity} from 'react-native';
+import {RecognitionContributionCard} from '../RecognitionContributionCard';
+import {recognitionContributionRequest} from '@/src/lib/recognitionContributions';
+jest.mock('@/src/lib/recognitionContributions',()=>({CONTRIBUTION_CONSENT_TEXT:'optional consent',CONTRIBUTION_CONSENT_VERSION:'recognition-photo-v1',recognitionContributionRequest:jest.fn().mockResolvedValue({provided:true})}));
+test('only explicit consent submits; opening and declining never uploads',async()=>{
+ let view!:ReactTestRenderer;
+ await act(async()=>{view=create(<RecognitionContributionCard analysis={{id:'a',status:'rejected',candidates:[],model:null,version:null,note:null,failureKind:null,durationMs:10}} imageBase64="/9j/2Q==" clientRequestId="p"/>);});
+ const press=async(label:string)=>{await act(async()=>{view.root.findAllByType(TouchableOpacity).find(x=>x.props.accessibilityLabel===label)!.props.onPress();});};
+ expect(recognitionContributionRequest).not.toHaveBeenCalled();
+ await press('이 사진과 판별 결과 제공');
+ expect(recognitionContributionRequest).not.toHaveBeenCalled();
+ await press('제공하지 않기');
+ expect(recognitionContributionRequest).not.toHaveBeenCalled();
+ await press('이 사진과 판별 결과 제공');
+ await press('동의하고 제공');
+ expect(recognitionContributionRequest).toHaveBeenCalledTimes(1);
+ expect(recognitionContributionRequest).toHaveBeenCalledWith(expect.objectContaining({consent:true,analysisId:'a',clientRequestId:'p',consentVersion:'recognition-photo-v1'}));
+ expect(view.root.findAllByType(TouchableOpacity)).toHaveLength(0);
+ await act(async()=>view.unmount());
+});

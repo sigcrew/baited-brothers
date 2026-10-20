@@ -1,3 +1,5 @@
+import { RecognitionContributionCard } from "@/components/record/RecognitionContributionCard";
+import type { RecognitionAnalysis } from "@/src/lib/fishRecognition";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -20,7 +22,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFishes, type Fish } from "@/src/hooks/useFishes";
 import { useCreateCatch } from "@/src/hooks/useCreateCatch";
 import { useAuth } from "@/src/contexts/AuthContext";
-import { useFieldNotice } from "@/src/contexts/FieldNoticeContext";
+import { FieldNoticeProvider, useFieldNotice } from "@/src/contexts/FieldNoticeContext";
 import {
   useFishRecognition,
   type FishRecognitionCandidate,
@@ -114,6 +116,7 @@ const RecordScreen = () => {
   }
   const effectiveCameraPermission =
     cameraPermission ?? lastCameraPermission.current;
+  const [recognitionAnalysis, setRecognitionAnalysis] = useState<RecognitionAnalysis | null>(null);
   const [capture, setCapture] = useState<Capture | null>(null);
   const [selectedFish, setSelectedFish] = useState<Fish | null>(null);
   const [customSpeciesName, setCustomSpeciesName] = useState<string | null>(
@@ -288,6 +291,7 @@ const RecordScreen = () => {
     setCompletion(null);
     setRecognitionCandidates([]);
     setRecognitionNote(null);
+    setRecognitionAnalysis(null);
     setNeedsRetake(false);
     setRecognitionSlow(false);
     setCatalogVisible(false);
@@ -329,12 +333,14 @@ const RecordScreen = () => {
     slowTimerRef.current = null;
     setRecognitionSlow(false);
     setRecognitionCandidates(result.candidates);
+    setRecognitionAnalysis(result.analysis);
     setRecognitionNote(result.note);
     setNeedsRetake(result.needsRetake);
     await updatePendingCatch(
       session?.user.id ?? "",
       nextCapture.pendingCatchId,
       {
+        recognitionAnalysis: result.analysis,
         candidates: result.candidates,
         candidateFishIds: result.candidates.map(
           (candidate) => candidate.fishId,
@@ -359,6 +365,7 @@ const RecordScreen = () => {
     setCompletion(null);
     setRecognitionCandidates([]);
     setRecognitionNote(null);
+    setRecognitionAnalysis(null);
     setNeedsRetake(false);
     setRecognitionSlow(false);
     setCatalogVisible(true);
@@ -465,6 +472,9 @@ const RecordScreen = () => {
       saveRequestId.current = pending.clientRequestId;
       setCapture(restoredCapture);
       setRecognitionCandidates(pending.candidates);
+      setRecognitionAnalysis(pending.recognitionAnalysis ?? null);
+      setRecognitionNote(pending.recognitionAnalysis?.note ?? null);
+      setNeedsRetake(pending.recognitionAnalysis?.status === "rejected");
       setSize(pending.sizeCm == null ? "" : String(pending.sizeCm));
       setMemo(pending.memo ?? "");
       setSelectedFish(
@@ -569,6 +579,7 @@ const RecordScreen = () => {
     setCompletion(null);
     setRecognitionCandidates([]);
     setRecognitionNote(null);
+    setRecognitionAnalysis(null);
     setNeedsRetake(false);
     setCatalogVisible(false);
   };
@@ -924,6 +935,7 @@ const RecordScreen = () => {
     setCustomSpeciesName(null);
     setRecognitionCandidates([]);
     setRecognitionNote(null);
+    setRecognitionAnalysis(null);
     setNeedsRetake(false);
     setRecognitionSlow(false);
     setSize("");
@@ -1001,7 +1013,7 @@ const RecordScreen = () => {
         >
           촬영한 물고기 사진은 어종 후보 추천을 위해 Supabase 보안 함수를
           거쳐 Anthropic으로 전송됩니다. 위치 정보는 AI에 전송하지 않으며,
-          사진은 어종을 확정해 기록할 때만 앱 저장소에 보관됩니다.
+          사진은 조과를 저장하거나, 별도의 선택 동의로 개선용 사진을 제공할 때 앱 저장소에 보관됩니다.
         </Text>
         <View
           className="mt-6 border-l-4 bg-white px-4 py-4"
@@ -1055,7 +1067,7 @@ const RecordScreen = () => {
     );
   }
 
-  if (!effectiveCameraPermission?.granted) {
+  if (!capture && !effectiveCameraPermission?.granted) {
     const isPermissionLoading = effectiveCameraPermission == null;
     const isPermissionBusy =
       isPermissionLoading || isRequestingCameraPermission;
@@ -1214,6 +1226,9 @@ const RecordScreen = () => {
                   : "도감 60종 밖이라면 이름을 직접 입력해 일반 기록으로 남길 수 있습니다."}
               </Text>
             </View>
+            {!isRecognizing && recognitionAnalysis && (
+              <RecognitionContributionCard key={recognitionAnalysis.id} analysis={recognitionAnalysis} imageBase64={capture.base64} clientRequestId={capture.clientRequestId} />
+            )}
             {selectedFish || customSpeciesName ? (
               <View
                 className="mt-4 border p-4"
@@ -1314,6 +1329,12 @@ const RecordScreen = () => {
                         TOP {candidateRows.length}
                       </Text>
                     </View>
+                    <Text
+                      className="mt-2 text-xs leading-5"
+                      style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
+                    >
+                      사진에서 추정한 후보입니다. 식별 포인트를 비교한 뒤 선택해 주세요.
+                    </Text>
                     {candidateRows.map(({ candidate, fish }, index) => {
                       const illustration = getField60Illustration(
                         fish.catalog_sort_order,
@@ -1405,8 +1426,18 @@ const RecordScreen = () => {
                       className="mt-1 text-xs leading-5"
                       style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
                     >
-                      다시 촬영하거나 아래 도감 검색에서 직접 선택할 수 있습니다.
+                      {recognitionError
+                        ? "다시 시도하거나 아래 도감 검색에서 직접 선택할 수 있습니다."
+                        : "반사와 가림을 줄이고, 한 마리의 머리부터 꼬리까지 보이는 옆면을 촬영해 주세요. 눈·입·지느러미가 선명하면 비교에 도움이 됩니다."}
                     </Text>
+                    {!recognitionError && recognitionNote ? (
+                      <Text
+                        className="mt-2 text-xs leading-5"
+                        style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
+                      >
+                        AI가 안내한 이유 · {recognitionNote}
+                      </Text>
+                    ) : null}
                     <View className="mt-4 flex-row">
                       {recognitionError ? (
                         <TouchableOpacity
@@ -1599,6 +1630,7 @@ const RecordScreen = () => {
   );
 };
 
+// Keep notices inside the native full-screen record route so iOS can present them.
 // 딥링크(baited-brothers://record)로 비로그인 진입하면 카메라 대신 로그인으로 보낸다.
 export default function RecordRoute() {
   const { session, isLoading } = useAuth();
@@ -1606,5 +1638,5 @@ export default function RecordRoute() {
     if (isLoading) return null;
     return <Redirect href="/(auth)/login" />;
   }
-  return <RecordScreen />;
+  return <FieldNoticeProvider><RecordScreen /></FieldNoticeProvider>;
 }

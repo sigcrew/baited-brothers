@@ -101,6 +101,7 @@ const RootLayoutNav = () => {
                   name="settings/feedback"
                   options={{ headerShown: false }}
                 />
+                <Stack.Screen name="settings/photo-contributions" options={{ headerShown: false }} />
                 <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
                 </Stack>
               </ThemeProvider>

@@ -126,9 +126,10 @@ const ProfileScreen = () => {
       <Text className="mb-1 mt-7 text-xl font-black" style={{ color: FIELD_COLORS.ink }}>계정</Text>
       <ProfileRow icon="user-o" label="프로필 수정" onPress={() => router.push("/settings/profile")} />
       <ProfileRow icon="bell-o" label="알림 설정" onPress={() => router.push("/settings/notifications")} />
+      <ProfileRow icon="picture-o" label="사진 제공 관리" onPress={() => router.push("/settings/photo-contributions" as never)} />
       <ProfileRow icon="shield" label="개인정보 처리방침" onPress={() => router.push("/privacy")} />
-      {session ? <ProfileRow icon="user-times" label="계정 탈퇴" color={FIELD_COLORS.red} onPress={() => router.push("/account/delete")} /> : null}
       {session ? <ProfileRow icon="sign-out" label="로그아웃" color={FIELD_COLORS.orange} onPress={() => void handleSignOut()} /> : <ProfileRow icon="sign-in" label="로그인" color={FIELD_COLORS.teal} onPress={handleGoLogin} />}
+      {session ? <ProfileRow icon="user-times" label="계정 탈퇴" color={FIELD_COLORS.red} onPress={() => router.push("/account/delete")} /> : null}
     </View>
   </ScrollView>;
 };

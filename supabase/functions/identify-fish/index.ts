@@ -1,7 +1,7 @@
+import { createDetailImage } from "./detail-image.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.49.1";
 import {
   expandSuggestedGroups,
-  getAdjacentGroups,
   normalizeQualityGate,
   normalizeScore,
   type QualityGateResult,
@@ -23,6 +23,10 @@ type IdentificationQuota = {
 };
 
 const MODEL = "claude-sonnet-5";
+const EVIDENCE_COMPARISON_ENABLED = Deno.env.get("FISH_EVIDENCE_COMPARISON") === "true";
+const AUTO_DETAIL_ENABLED = Deno.env.get("FISH_AUTO_DETAIL") === "true";
+
+const RECOGNITION_METADATA = { model: MODEL, version: "field60-v31" + (AUTO_DETAIL_ENABLED ? "+auto-detail-v1" : "") + (EVIDENCE_COMPARISON_ENABLED ? "+evidence-v1" : "") };
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -70,9 +74,15 @@ const parseClaudeJson = (text: string) => {
   return JSON.parse(withoutFence.slice(start, end + 1));
 };
 
-const qualityGateSchema = (groups: string[]) => ({
+const qualityGateSchema = (groups: string[], locateSubject = false) => ({
   type: "object",
   properties: {
+    ...(locateSubject ? { subject_box: {
+      type: ["object", "null"],
+      description: "가장 크게 선명하게 보이는 물고기 한 마리 전체의 경계. 위치가 불확실하면 null. 좌상단 원점, 이미지 폭/높이를 1로 정규화.",
+      properties: Object.fromEntries(["x", "y", "width", "height", "confidence"].map(key => [key, { type: "number", minimum: 0, maximum: 1 }])),
+      required: ["x", "y", "width", "height", "confidence"], additionalProperties: false,
+    } } : {}),
     subject_present: { type: "boolean" },
     subject_type: {
       type: "string",
@@ -117,6 +127,7 @@ const qualityGateSchema = (groups: string[]) => ({
     note: { type: "string" },
   },
   required: [
+    ...(locateSubject ? ["subject_box"] : []),
     "subject_present",
     "subject_type",
     "image_quality",
@@ -133,6 +144,10 @@ const qualityGateSchema = (groups: string[]) => ({
 const classificationSchema = (candidateCount: number) => ({
   type: "object",
   properties: {
+    observations: {
+      type: "string",
+      description: "주 피사체에서 실제 보이는 형태·무늬와 가려져 확인할 수 없는 특징. 종명 없이 먼저 기록합니다.",
+    },
     candidates: {
       type: "array",
       minItems: candidateCount,
@@ -151,7 +166,7 @@ const classificationSchema = (candidateCount: number) => ({
     needs_retake: { type: "boolean", enum: [false] },
     note: { type: "string" },
   },
-  required: ["candidates", "needs_retake", "note"],
+  required: ["observations", "candidates", "needs_retake", "note"],
   additionalProperties: false,
 });
 
@@ -162,6 +177,7 @@ const callClaude = async ({
   prompt,
   schema,
   maxTokens,
+  detailImageBase64,
 }: {
   apiKey: string;
   imageBase64: string;
@@ -169,6 +185,7 @@ const callClaude = async ({
   prompt: string;
   schema: Record<string, unknown>;
   maxTokens: number;
+  detailImageBase64?: string;
 }) => {
   for (let attempt = 0; attempt < 2; attempt += 1) {
     try {
@@ -209,6 +226,10 @@ const callClaude = async ({
                     data: imageBase64,
                   },
                 },
+                ...(detailImageBase64 ? [
+                  { type: "image", source: { type: "base64", media_type: "image/jpeg", data: detailImageBase64 } },
+                  { type: "text", text: "첫 사진은 전체 장면이고 두 번째는 같은 사진에서 주 피사체를 자른 확대 보기입니다. 같은 개체의 특징만 비교하세요. 확대는 새 디테일을 만들지 않습니다. 잘린 부위는 원본에서 확인하고, 확대 위치가 틀리면 원본을 기준으로 판단하세요." },
+                ] : []),
                 { type: "text", text: prompt },
               ],
             },
@@ -241,6 +262,9 @@ const callClaude = async ({
         );
       }
 
+      if (body.stop_reason === "max_tokens") {
+        throw new Error("Claude response exceeded output limit");
+      }
       const content = Array.isArray(body.content) ? body.content : [];
       const toolUse = content.find(
         (part: unknown) =>
@@ -281,6 +305,7 @@ const classifyCatalog = async ({
   catalog,
   groupLabel,
   maxCandidates,
+  detailImageBase64,
 }: {
   apiKey: string;
   imageBase64: string;
@@ -288,18 +313,28 @@ const classifyCatalog = async ({
   catalog: CatalogFish[];
   groupLabel: string;
   maxCandidates: number;
+  detailImageBase64?: string;
 }) => {
   const candidateCount = Math.min(maxCandidates, catalog.length);
   const result = await callClaude({
     apiKey,
     imageBase64,
     mimeType,
-    maxTokens: 900,
+    maxTokens: 1200,
+    detailImageBase64,
     schema: classificationSchema(candidateCount),
     prompt:
       `품질 검사를 통과한 사진을 ${groupLabel} 후보 안에서 판별합니다. ` +
       "아래 폐쇄형 후보 목록 밖의 종은 선택하지 마세요. 목록 순서는 가능성 순서가 아니므로 모든 항목을 동등하게 비교하세요. " +
+      "먼저 화면에서 가장 크게 선명하게 보이는 주 피사체 하나의 관찰 특징을 observations에 종명 없이 기록하세요. 여러 마리가 겹치면 서로 다른 개체의 특징을 섞지 마세요. " +
+      "사진의 회전·촬영 각도·좌우 반전을 고려하세요. 화면상의 좌우를 물고기의 해부학적 좌우로 간주하지 마세요. 눈이 몰린 방향을 확실히 판단할 수 없다면 좌안·우안을 근거로 종을 제외하지 마세요. " +
+      "조명과 수중 환경 때문에 달라질 수 있는 색보다 입 크기·체형·지느러미·무늬 등 실제 관찰한 특징을 종합하세요. 작은 반점이나 꼬리 테두리가 안 보이는 것과 실제로 없는 것을 구분하세요. " +
       "체형과 몸의 두께, 입과 머리, 지느러미 또는 팔의 배치, 꼬리 또는 외투막, 무늬와 색을 종별 특징과 유사종 설명에 대조하세요. " +
+      (EVIDENCE_COMPARISON_ENABLED ? (
+      "응답은 간결하게 쓰세요. observations는 180자 이내, 각 reason은 80자 이내, note는 100자 이내로 작성하세요. " +
+      "후보를 정하기 전에 가장 닮은 종들 사이의 구별점을 대조하세요. 각 구별점이 이 사진에서 실제 확인됨·가려짐·해상도 부족 중 어느 상태인지 observations에 짧게 명시하세요. 관찰되지 않는 구별점은 특정 종을 지지하거나 제외하는 근거가 아닙니다. " +
+      "후보 reason에는 공통 특징만 나열하지 말고 해당 후보를 다른 유사종보다 앞 또는 뒤에 둔 관찰 근거와 아직 확인할 수 없는 핵심 특징을 함께 쓰세요. 위치·흔한 정도·목록 순서·전반적 인상만으로 우선순위를 정하지 마세요. 핵심 구별점이 보이지 않아 여러 종을 가를 수 없으면 confidence를 낮추고 note에 확인이 필요한 부위를 설명하세요. "
+      ) : "") +
       `가장 가능성 높은 순서로 정확히 ${candidateCount}개를 반환하고 confidence는 해당 종 자체에 대한 식별 확신도 0~1로 평가하세요. ` +
       "사진은 이미 품질 검사를 통과했으므로 최소 1개의 후보를 반드시 반환하고 needs_retake=false로 설정하세요. fish_id는 아래 UUID를 정확히 복사하세요.\n\n" +
       `도감 후보:\n${catalogToText(catalog)}`,
@@ -379,6 +414,7 @@ Deno.serve(async (req) => {
     return json({ error: "Invalid JSON body." }, 400);
   }
 
+  const useAutoDetail = AUTO_DETAIL_ENABLED;
   const imageBase64 = payload.imageBase64?.replace(/^data:[^;]+;base64,/, "");
   const mimeType: "image/png" | "image/jpeg" =
     payload.mimeType === "image/png" ? "image/png" : "image/jpeg";
@@ -437,8 +473,9 @@ Deno.serve(async (req) => {
       imageBase64,
       mimeType,
       maxTokens: 700,
-      schema: qualityGateSchema(groups),
+      schema: qualityGateSchema(groups, useAutoDetail),
       prompt:
+        (useAutoDetail ? "주 피사체 한 마리의 머리부터 꼬리·지느러미 또는 팔 끝까지 포함하는 경계를 subject_box에 기록하세요. 여러 개체를 한 영역에 묶지 마세요. 위치 확신이 없으면 null입니다. " : "") +
         "이 요청은 식별 전 품질 검사입니다. 사진에 물고기 또는 두족류가 실제로 있는지 먼저 판단하세요. " +
         "음식, 낚시 장비, 풍경, 사람, 반려동물은 other입니다. 대상이 화면에서 차지하는 크기와 머리·몸통·지느러미 또는 팔·꼬리 또는 외투막이 실제로 구분되는지 평가하세요. " +
         "작은 피사체, 픽셀화, 심한 흐림, 과도한 어둠·노출, 주요 부위 잘림이나 가림은 구체적으로 quality_issues에 기록하세요. " +
@@ -450,7 +487,8 @@ Deno.serve(async (req) => {
 
     if (gate.needsRetake) {
       return json({
-        subject_present: gate.subjectPresent,
+        metadata: RECOGNITION_METADATA,
+      subject_present: gate.subjectPresent,
         subject_type: gate.subjectType,
         image_quality: gate.imageQuality,
         subject_size: gate.subjectSize,
@@ -469,7 +507,11 @@ Deno.serve(async (req) => {
       evaluatedGroups.length > 0
         ? catalog.filter((fish) => evaluatedGroups.includes(fish.group))
         : catalog;
+    const detailImageBase64 = useAutoDetail
+      ? await createDetailImage(imageBase64, qualityResult.subject_box)
+      : undefined;
     const primaryResult = await classifyCatalog({
+      detailImageBase64,
       apiKey: anthropicApiKey,
       imageBase64,
       mimeType,
@@ -480,66 +522,14 @@ Deno.serve(async (req) => {
           : "전체 도감",
       maxCandidates: 3,
     });
-    let candidates = primaryResult.candidates;
-    const catalogById = new Map(catalog.map((fish) => [fish.id, fish]));
-    const representedGroups = new Set(
-      candidates
-        .map((candidate) => catalogById.get(candidate.fish_id)?.group)
-        .filter((group): group is string => Boolean(group)),
-    );
-    const primaryGroup =
-      representedGroups.size === 1 ? [...representedGroups][0] : undefined;
-    const rescueGroup =
-      candidates.length > 0 && primaryGroup
-        ? [
-            ...getAdjacentGroups(primaryGroup),
-            ...evaluatedGroups,
-          ].find(
-            (group, index, groups) =>
-              groups.indexOf(group) === index &&
-              allowedGroups.has(group) &&
-              !representedGroups.has(group),
-          )
-        : undefined;
-
-    if (rescueGroup) {
-      const rescueCatalog = catalog.filter(
-        (fish) => fish.group === rescueGroup,
-      );
-      if (rescueCatalog.length > 0) {
-        try {
-          const rescueResult = await classifyCatalog({
-            apiKey: anthropicApiKey,
-            imageBase64,
-            mimeType,
-            catalog: rescueCatalog,
-            groupLabel: `${rescueGroup} 보조 검증`,
-            maxCandidates: 2,
-          });
-          const rescueCandidates = rescueResult.candidates
-            .filter(
-              (rescueCandidate) =>
-                !candidates.some(
-                  (candidate) =>
-                    candidate.fish_id === rescueCandidate.fish_id,
-                ),
-            )
-            .slice(0, 2);
-          if (rescueCandidates.length > 0) {
-            candidates = [
-              ...candidates.slice(0, 1),
-              ...rescueCandidates,
-            ].slice(0, 3);
-          }
-        } catch (error) {
-          console.error("Adjacent group rescue failed", error);
-        }
-      }
-    }
+    // Adjacent groups already participate in the same ranking above.
+    // Do not replace ranked candidates with results from a restricted second call.
+    const candidates = primaryResult.candidates;
 
     const needsRetake = candidates.length === 0;
 
     return json({
+      metadata: RECOGNITION_METADATA,
       subject_present: gate.subjectPresent,
       subject_type: gate.subjectType,
       image_quality: gate.imageQuality,
@@ -559,6 +549,7 @@ Deno.serve(async (req) => {
     return json(
       {
         error: "AI identification is temporarily unavailable.",
+        metadata: RECOGNITION_METADATA,
         error_code:
           error instanceof Error
             ? error.message.slice(0, 120)

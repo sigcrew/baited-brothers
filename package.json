@@ -53,7 +53,8 @@
     "testTimeout": 20000,
     "testPathIgnorePatterns": [
       "/node_modules/",
-      "/supabase/functions/"
+      "/supabase/functions/",
+      "/scripts/fish-detail-image.test.ts"
     ]
   },
   "expo": {

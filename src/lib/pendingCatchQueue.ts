@@ -1,3 +1,4 @@
+import type { RecognitionAnalysis } from "./fishRecognition";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Directory, File, Paths } from "expo-file-system";
 
@@ -44,6 +45,7 @@ export type PendingCatchJob = {
   customSpeciesName: string | null;
   candidateFishIds: string[];
   candidates: PendingCatchCandidate[];
+  recognitionAnalysis?: RecognitionAnalysis | null;
   sizeCm: number | null;
   memo: string | null;
   status: PendingCatchStatus;
@@ -179,6 +181,9 @@ export const normalizePendingCatchJobs = (
     return [
       {
         ...(job as PendingCatchJob),
+        // iOS changes its container path on updates; the Documents-relative
+        // location of our preserved photo remains stable.
+        localImageUri: `${Paths.document.uri.replace(/\/$/, "")}/${QUEUE_FOLDER}/${job.userId}/${job.localId}.${job.mimeType === "image/png" ? "png" : "jpg"}`,
         analysisRequested: job.analysisRequested !== false,
         customSpeciesName:
           typeof job.customSpeciesName === "string"
@@ -327,6 +332,7 @@ export const updatePendingCatch = async (
       PendingCatchJob,
       | "candidateFishIds"
       | "candidates"
+      | "recognitionAnalysis"
       | "selectedFishId"
       | "customSpeciesName"
       | "sizeCm"
