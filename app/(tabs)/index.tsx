@@ -99,6 +99,7 @@ const pendingCatchStatusLabel = (pending: PendingCatchJob) => {
     return "업로드 대기";
   }
   if (pending.status === "failed_retryable") return "다시 시도 필요";
+  if (pending.status === "failed_terminal") return "자동 재시도 중단 · 직접 이어가기";
   if (pending.status === "analyzing") return "AI 분석 중";
   return "AI 분석 대기";
 };
@@ -139,7 +140,7 @@ const HomeScreen = () => {
     createTrip,
     updateTripCover,
     removeTripCover,
-  } = useFishingTrips();
+  } = useFishingTrips({ syncReminders: true });
   const { catches } = useUserCatches();
 
   const refreshPendingCatches = useCallback(async () => {

@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useEffect, useMemo, useRef, useState } from "react";
+import React, { memo, useEffect, useMemo, useRef, useState } from "react";
 
 import { MapPointMarker } from "./MapPointMarker";
 import type { FishingMapPoint, FishingMapProps } from "./FishingMap.types";
@@ -43,10 +43,113 @@ const markerCenterOffsetY = (kind: FishingMapPoint["kind"], scale = 1) => {
   }
 };
 
+/**
+ * react-native-maps는 tracksViewChanges가 true인 동안 커스텀 마커 뷰를 매 프레임
+ * 다시 스냅샷한다. 기본값이 true라서 조과가 수백 개면 팬/줌마다 전부 재렌더된다.
+ * 외형에 영향을 주는 값이 바뀐 직후 잠깐만 추적하고 바로 끈다.
+ */
+const useTracksViewChanges = (appearanceKey: string) => {
+  const [tracks, setTracks] = useState(true);
+  useEffect(() => {
+    setTracks(true);
+    const timeout = setTimeout(() => setTracks(false), 350);
+    return () => clearTimeout(timeout);
+  }, [appearanceKey]);
+  return tracks;
+};
+
+type PointMarkerViewProps = {
+  kind: FishingMapPoint["kind"];
+  selected?: boolean;
+  favorite?: boolean;
+  scale: number;
+  accessibilityLabel: string;
+};
+
+const PointMarkerView = memo(
+  ({ kind, selected, favorite, scale, accessibilityLabel }: PointMarkerViewProps) => (
+    <View accessible accessibilityRole="button" accessibilityLabel={accessibilityLabel}>
+      <MapPointMarker kind={kind} selected={selected} favorite={favorite} scale={scale} />
+    </View>
+  ),
+);
+PointMarkerView.displayName = "PointMarkerView";
+
 const markerScaleForLatitudeDelta = (latitudeDelta: number) => {
   if (latitudeDelta >= 1.2) return 0.72;
   if (latitudeDelta <= 0.08) return 1.1;
   return 1;
+};
+
+type PointMarkerProps = {
+  point: FishingMapPoint;
+  scale: number;
+  onPress: () => void;
+};
+
+const PointMarker = memo(({ point, scale, onPress }: PointMarkerProps) => {
+  const label = `${point.favorite ? "즐겨찾기 " : ""}${point.label} 지도 위치 선택`;
+  const tracksViewChanges = useTracksViewChanges(
+    `${point.kind}|${point.selected}|${point.favorite}|${scale}`,
+  );
+  return (
+    <Marker
+      accessibilityLabel={label}
+      anchor={{ x: 0.5, y: 1 }}
+      centerOffset={{ x: 0, y: markerCenterOffsetY(point.kind, scale) }}
+      coordinate={{ latitude: point.latitude, longitude: point.longitude }}
+      onPress={(event) => {
+        event.stopPropagation();
+        onPress();
+      }}
+      tracksViewChanges={tracksViewChanges}
+    >
+      <PointMarkerView
+        kind={point.kind}
+        selected={point.selected}
+        favorite={point.favorite}
+        scale={scale}
+        accessibilityLabel={label}
+      />
+    </Marker>
+  );
+});
+PointMarker.displayName = "PointMarker";
+
+type ClusterMarkerProps = {
+  cluster: MapPointCluster<FishingMapPoint>;
+  scale: number;
+  accessibilityLabel: string;
+  appearanceKey: string;
+  onPress: () => void;
+  children: React.ReactNode;
+};
+
+const ClusterMarker = ({
+  cluster,
+  scale,
+  accessibilityLabel,
+  appearanceKey,
+  onPress,
+  children,
+}: ClusterMarkerProps) => {
+  const sameCoordinate = haveSameMapCoordinate(cluster.points);
+  const tracksViewChanges = useTracksViewChanges(appearanceKey);
+  return (
+    <Marker
+      accessibilityLabel={accessibilityLabel}
+      anchor={{ x: 0.5, y: 1 }}
+      centerOffset={{ x: 0, y: sameCoordinate ? -28 * scale : -24 }}
+      coordinate={{ latitude: cluster.latitude, longitude: cluster.longitude }}
+      onPress={(event) => {
+        event.stopPropagation();
+        onPress();
+      }}
+      tracksViewChanges={tracksViewChanges}
+    >
+      {children}
+    </Marker>
+  );
 };
 
 export const FishingMap = ({
@@ -189,22 +292,15 @@ export const FishingMap = ({
         if (cluster.points.length === 1) {
           const point = cluster.points[0];
           return (
-            <Marker
+            <PointMarker
               key={`point:${point.id}`}
-              accessibilityLabel={`${point.favorite ? "즐겨찾기 " : ""}${point.label} 지도 위치 선택`}
-              anchor={{ x: 0.5, y: 1 }}
-              centerOffset={{ x: 0, y: markerCenterOffsetY(point.kind, markerScale) }}
-              coordinate={{ latitude: point.latitude, longitude: point.longitude }}
-              onPress={(event) => {
+              point={point}
+              scale={markerScale}
+              onPress={() => {
                 lastMarkerPressAtRef.current = Date.now();
-                event.stopPropagation();
                 onSelectPoint(point.id);
               }}
-            >
-              <View accessible accessibilityRole="button" accessibilityLabel={`${point.favorite ? "즐겨찾기 " : ""}${point.label} 지도 위치 선택`}>
-                <MapPointMarker kind={point.kind} selected={point.selected} favorite={point.favorite} scale={markerScale} />
-              </View>
-            </Marker>
+            />
           );
         }
 
@@ -220,28 +316,28 @@ export const FishingMap = ({
             : "즐겨찾기 장소 보기"
           : `${locationCount}개 장소 묶음 확대`;
 
+        const clusterKind = hasRecords ? (catchCount > 0 ? "catch" : "trip") : "favorite";
+        const clusterSelected = cluster.points.some((point) => point.selected);
         return (
-          <Marker
+          <ClusterMarker
             key={`cluster:${cluster.id}`}
+            cluster={cluster}
+            scale={markerScale}
             accessibilityLabel={clusterAccessibilityLabel}
-            anchor={{ x: 0.5, y: 1 }}
-            centerOffset={{ x: 0, y: sameCoordinate ? -28 * markerScale : -24 }}
-            coordinate={{ latitude: cluster.latitude, longitude: cluster.longitude }}
-            onPress={(event) => {
+            appearanceKey={`${sameCoordinate}|${clusterKind}|${clusterSelected}|${hasRecords && isFavorite}|${locationCount}|${markerScale}`}
+            onPress={() => {
               lastMarkerPressAtRef.current = Date.now();
-              event.stopPropagation();
               zoomIntoCluster(cluster);
             }}
           >
             {sameCoordinate ? (
-              <View accessible accessibilityRole="button" accessibilityLabel={clusterAccessibilityLabel}>
-                <MapPointMarker
-                  kind={hasRecords ? (catchCount > 0 ? "catch" : "trip") : "favorite"}
-                  selected={cluster.points.some((point) => point.selected)}
-                  favorite={hasRecords && isFavorite}
-                  scale={markerScale}
-                />
-              </View>
+              <PointMarkerView
+                kind={clusterKind}
+                selected={clusterSelected}
+                favorite={hasRecords && isFavorite}
+                scale={markerScale}
+                accessibilityLabel={clusterAccessibilityLabel}
+              />
             ) : (
               <View
                 accessible
@@ -258,7 +354,7 @@ export const FishingMap = ({
                 </Text>
               </View>
             )}
-          </Marker>
+          </ClusterMarker>
         );
       })}
       </MapView>

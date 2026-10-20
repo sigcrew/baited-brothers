@@ -8,12 +8,13 @@ import { useFishes } from "@/src/hooks/useFishes";
 import { useFishRecognition } from "@/src/hooks/useFishRecognition";
 import {
   listPendingCatches,
-  pendingCatchRetryDelayMs,
   readPendingCatchBase64,
   removePendingCatch,
+  resolvePendingCatchFailure,
   updatePendingCatch,
   type PendingCatchJob,
 } from "@/src/lib/pendingCatchQueue";
+import type { RecognitionAnalysis } from "@/src/lib/fishRecognition";
 
 const isDue = (job: PendingCatchJob) =>
   !job.nextRetryAt || Date.parse(job.nextRetryAt) <= Date.now();
@@ -27,16 +28,17 @@ export const PendingCatchLifecycle = () => {
   const online = useRef(false);
   const mountedAt = useRef(Date.now());
 
+  // 실패 시 재시도 또는 종료(failed_terminal)를 큐 규칙에 맡긴다. 종료된 job은
+  // 홈 화면의 "이어가기"로만 다시 분석된다.
   const markRetry = useCallback(
-    async (job: PendingCatchJob, message: string) => {
-      const attemptCount = Math.max(1, job.attemptCount);
+    async (
+      job: PendingCatchJob,
+      message: string,
+      recognitionAnalysis?: RecognitionAnalysis | null,
+    ) => {
       await updatePendingCatch(job.userId, job.localId, {
-        status: "failed_retryable",
-        attemptCount,
-        lastError: message,
-        nextRetryAt: new Date(
-          Date.now() + pendingCatchRetryDelayMs(attemptCount),
-        ).toISOString(),
+        ...resolvePendingCatchFailure(job.attemptCount, message),
+        ...(recognitionAnalysis === undefined ? {} : { recognitionAnalysis }),
       });
     },
     [],
@@ -67,10 +69,15 @@ export const PendingCatchLifecycle = () => {
           fishes,
         });
         if (result.error) {
-          await markRetry({ ...job, attemptCount }, result.error.message);
+          await markRetry(
+            { ...job, attemptCount },
+            result.error.message,
+            result.analysis,
+          );
           return;
         }
         await updatePendingCatch(job.userId, job.localId, {
+          recognitionAnalysis: result.analysis,
           candidates: result.candidates,
           candidateFishIds: result.candidates.map(
             (candidate) => candidate.fishId,

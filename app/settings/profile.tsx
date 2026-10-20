@@ -18,6 +18,7 @@ import {
   removeUserMedia,
   uploadUserPhotoVariants,
 } from "@/src/lib/userMedia";
+import { pickDisplayName } from "@/src/lib/userProfile";
 import { SettingsScaffold } from "@/components/settings/SettingsScaffold";
 import {
   FIELD_COLORS,
@@ -41,9 +42,10 @@ export default function ProfileEditScreen() {
 
   useEffect(() => {
     setDisplayName(
-      session?.user.user_metadata?.display_name ??
-        session?.user.user_metadata?.full_name ??
-        "",
+      pickDisplayName(
+        session?.user.user_metadata?.display_name,
+        session?.user.user_metadata?.full_name,
+      ) ?? "",
     );
   }, [session]);
 

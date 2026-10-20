@@ -7,7 +7,8 @@ export type PendingCatchStatus =
   | "needs_confirmation"
   | "pending_upload"
   | "uploading"
-  | "failed_retryable";
+  | "failed_retryable"
+  | "failed_terminal";
 
 export type PendingCatchCandidate = {
   fishId: string;
@@ -67,6 +68,50 @@ const STORAGE_KEY = "pending-catch-queue-v1";
 const QUEUE_FOLDER = "pending-catches";
 const RETRY_BASE_MS = 15_000;
 const RETRY_MAX_MS = 15 * 60_000;
+/** 백그라운드 자동 재시도 상한. 넘으면 failed_terminal로 멈추고 사용자가 직접 이어간다. */
+export const PENDING_CATCH_MAX_ATTEMPTS = 5;
+
+/**
+ * 다시 시도해도 결과가 바뀌지 않는 실패. 자동 재시도는 AI 쿼터만 소진하므로
+ * 즉시 failed_terminal로 멈춘다. 메시지는 useFishRecognition / toUserMessage가
+ * 만든 사용자 문구 기준이다.
+ */
+const TERMINAL_ERROR_PATTERNS = [
+  /24시간에 30회/, // AI 식별 쿼터 소진
+  /사진 용량이 너무 큽니다/, // 413
+  /보관된 조과 사진을 찾을 수 없습니다/, // 로컬 파일 유실
+];
+
+export const isPendingCatchTerminalError = (message: string | null | undefined) =>
+  Boolean(message) && TERMINAL_ERROR_PATTERNS.some((pattern) => pattern.test(message!));
+
+export type PendingCatchFailure = Pick<
+  PendingCatchJob,
+  "status" | "attemptCount" | "lastError" | "nextRetryAt"
+>;
+
+/** 실패 후 큐 상태 결정. attemptCount는 방금 끝난 시도를 포함한 누적 횟수다. */
+export const resolvePendingCatchFailure = (
+  attemptCount: number,
+  message: string,
+  now = Date.now(),
+): PendingCatchFailure => {
+  const attempts = Math.max(1, attemptCount);
+  if (attempts >= PENDING_CATCH_MAX_ATTEMPTS || isPendingCatchTerminalError(message)) {
+    return {
+      status: "failed_terminal",
+      attemptCount: attempts,
+      lastError: message,
+      nextRetryAt: null,
+    };
+  }
+  return {
+    status: "failed_retryable",
+    attemptCount: attempts,
+    lastError: message,
+    nextRetryAt: new Date(now + pendingCatchRetryDelayMs(attempts)).toISOString(),
+  };
+};
 
 let mutationTail: Promise<void> = Promise.resolve();
 const queueListeners = new Set<() => void>();
@@ -86,7 +131,8 @@ const isPendingCatchStatus = (value: unknown): value is PendingCatchStatus =>
   value === "needs_confirmation" ||
   value === "pending_upload" ||
   value === "uploading" ||
-  value === "failed_retryable";
+  value === "failed_retryable" ||
+  value === "failed_terminal";
 
 export const normalizePendingCatchJobs = (
   value: unknown,

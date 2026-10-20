@@ -5,8 +5,10 @@ jest.mock(
 );
 
 import {
+  PENDING_CATCH_MAX_ATTEMPTS,
   normalizePendingCatchJobs,
   pendingCatchRetryDelayMs,
+  resolvePendingCatchFailure,
 } from "@/src/lib/pendingCatchQueue";
 
 const validJob = {
@@ -63,5 +65,48 @@ describe("pending catch queue", () => {
     expect(pendingCatchRetryDelayMs(1)).toBe(15_000);
     expect(pendingCatchRetryDelayMs(2)).toBe(30_000);
     expect(pendingCatchRetryDelayMs(20)).toBe(15 * 60_000);
+  });
+
+  it("keeps failed_terminal records instead of dropping them as unknown", () => {
+    expect(
+      normalizePendingCatchJobs([{ ...validJob, status: "failed_terminal" }]),
+    ).toHaveLength(1);
+  });
+
+  describe("resolvePendingCatchFailure", () => {
+    it("schedules a retry for transient errors below the attempt cap", () => {
+      const now = Date.parse("2026-10-20T00:00:00.000Z");
+      expect(
+        resolvePendingCatchFailure(2, "네트워크 연결을 확인한 뒤 다시 시도해 주세요.", now),
+      ).toEqual({
+        status: "failed_retryable",
+        attemptCount: 2,
+        lastError: "네트워크 연결을 확인한 뒤 다시 시도해 주세요.",
+        nextRetryAt: new Date(now + 30_000).toISOString(),
+      });
+    });
+
+    it("stops retrying once the attempt cap is reached", () => {
+      const failure = resolvePendingCatchFailure(
+        PENDING_CATCH_MAX_ATTEMPTS,
+        "네트워크 연결을 확인한 뒤 다시 시도해 주세요.",
+      );
+      expect(failure.status).toBe("failed_terminal");
+      expect(failure.nextRetryAt).toBeNull();
+    });
+
+    it.each([
+      "AI 추천은 24시간에 30회까지 사용할 수 있어요. 도감에서 직접 선택해 기록할 수 있습니다.",
+      "사진 용량이 너무 큽니다. 더 작은 사진으로 다시 시도해 주세요.",
+      "보관된 조과 사진을 찾을 수 없습니다.",
+    ])("stops immediately on a non-recoverable error (%s)", (message) => {
+      const failure = resolvePendingCatchFailure(1, message);
+      expect(failure).toEqual({
+        status: "failed_terminal",
+        attemptCount: 1,
+        lastError: message,
+        nextRetryAt: null,
+      });
+    });
   });
 });

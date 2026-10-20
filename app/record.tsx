@@ -38,6 +38,7 @@ import {
   preservePendingCatch,
   readPendingCatchBase64,
   removePendingCatch,
+  resolvePendingCatchFailure,
   updatePendingCatch,
 } from "@/src/lib/pendingCatchQueue";
 import { FIELD_COLORS, bodyExtraBoldFont, bodyFont, monoFont } from "@/src/theme/fieldJournal";
@@ -284,12 +285,20 @@ const RecordScreen = () => {
     setNeedsRetake(false);
     setRecognitionSlow(false);
     setCatalogVisible(false);
+    // 포그라운드 분석도 큐의 시도 횟수에 포함해 백그라운드 재시도 상한과 공유한다.
+    let attemptCount = 1;
     if (session?.user.id) {
+      const existing = await getPendingCatch(
+        session.user.id,
+        nextCapture.pendingCatchId,
+      );
+      attemptCount = (existing?.attemptCount ?? 0) + 1;
       await updatePendingCatch(
         session.user.id,
         nextCapture.pendingCatchId,
         {
           status: "analyzing",
+          attemptCount,
           lastError: null,
           nextRetryAt: null,
         },
@@ -315,11 +324,9 @@ const RecordScreen = () => {
         candidateFishIds: result.candidates.map(
           (candidate) => candidate.fishId,
         ),
-        status: result.error ? "failed_retryable" : "needs_confirmation",
-        lastError: result.error?.message ?? null,
-        nextRetryAt: result.error
-          ? new Date(Date.now() + 15_000).toISOString()
-          : null,
+        ...(result.error
+          ? resolvePendingCatchFailure(attemptCount, result.error.message)
+          : { status: "needs_confirmation", lastError: null, nextRetryAt: null }),
       },
     );
     void trackAnalyticsEvent("analysis_result_viewed", {
@@ -452,11 +459,19 @@ const RecordScreen = () => {
       );
       setCustomSpeciesName(pending.customSpeciesName);
 
+      // 분석이 아직 없거나 실패(status 'failed')로 끝난 기록은 이어갈 때 다시
+      // 분석한다. 'rejected'는 재촬영 안내가 뜨므로 재분석하지 않는다. 종료된
+      // (failed_terminal) 기록도 사용자가 직접 열었을 때는 한 번 더 시도한다.
+      const analysisUnresolved =
+        !pending.recognitionAnalysis ||
+        pending.recognitionAnalysis.status === "failed";
       if (
         pending.status === "pending_analysis" ||
-        (pending.status === "failed_retryable" &&
+        ((pending.status === "failed_retryable" ||
+          pending.status === "failed_terminal") &&
           !pending.selectedFishId &&
-          pending.candidates.length === 0)
+          pending.candidates.length === 0 &&
+          analysisUnresolved)
       ) {
         if (pending.analysisRequested) {
           await analyzeCapture(restoredCapture);

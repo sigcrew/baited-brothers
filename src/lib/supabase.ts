@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from "react-native";
+import { secureSessionStorage } from "@/src/lib/secureSessionStorage";
 import type { Database } from "@/src/types/database";
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL ?? "";
@@ -32,11 +32,7 @@ const storageAdapter =
           return Promise.resolve();
         },
       }
-    : {
-        getItem: (key: string) => AsyncStorage.getItem(key),
-        setItem: (key: string, value: string) => AsyncStorage.setItem(key, value),
-        removeItem: (key: string) => AsyncStorage.removeItem(key),
-      };
+    : secureSessionStorage;
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {

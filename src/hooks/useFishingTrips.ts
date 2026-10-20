@@ -58,9 +58,17 @@ const uploadTripCover = async (userId: string, image: TripCoverImage) => {
 
 type UseFishingTripsOptions = {
   autoFetch?: boolean;
+  /**
+   * 예정 출조와 OS 알림 예약을 맞춘다. 훅이 여러 화면에 마운트되므로 앱에서 항상
+   * 떠 있는 한 곳(홈 탭)만 켠다. CRUD 직후 예약/취소는 옵션과 무관하게 수행한다.
+   */
+  syncReminders?: boolean;
 };
 
-export const useFishingTrips = ({ autoFetch = true }: UseFishingTripsOptions = {}) => {
+export const useFishingTrips = ({
+  autoFetch = true,
+  syncReminders = false,
+}: UseFishingTripsOptions = {}) => {
   const { session } = useAuth();
   const userId = session?.user?.id;
 
@@ -155,13 +163,13 @@ export const useFishingTrips = ({ autoFetch = true }: UseFishingTripsOptions = {
   );
 
   useEffect(() => {
-    if (!autoFetch || isLoading || !userId) return;
+    if (!syncReminders || !autoFetch || isLoading || !userId) return;
     void syncTripReminders(plannedTrips.map((trip) => ({
       id: trip.id,
       spotName: trip.spot_name,
       scheduledAt: trip.scheduled_at,
     }))).catch(() => undefined);
-  }, [autoFetch, isLoading, plannedTrips, userId]);
+  }, [autoFetch, isLoading, plannedTrips, syncReminders, userId]);
 
   const createTrip = useCallback(
     async (input: CreateTripInput) => {

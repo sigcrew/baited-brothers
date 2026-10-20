@@ -14,6 +14,7 @@ import {
   createBadgeUnlockContext,
   isBadgeUnlocked,
 } from "@/src/data/badges";
+import { pickDisplayName } from "@/src/lib/userProfile";
 import { FIELD_COLORS, bodySemiBoldFont, monoFont } from "@/src/theme/fieldJournal";
 
 const PROFILE_IMAGE = require("@/assets/images/adaptive-icon-baited.png");
@@ -40,10 +41,10 @@ const ProfileScreen = () => {
   const { confirm } = useFieldNotice();
 
   const email = session?.user?.email;
-  const displayName =
-    session?.user?.user_metadata?.display_name ??
-    session?.user?.user_metadata?.full_name ??
-    null;
+  const displayName = pickDisplayName(
+    session?.user?.user_metadata?.display_name,
+    session?.user?.user_metadata?.full_name,
+  );
   const handleSignOut = async () => {
     const confirmed = await confirm({
       eyebrow: "ACCOUNT · SIGN OUT",
@@ -66,7 +67,7 @@ const ProfileScreen = () => {
   const acquiredBadgeCount = BADGE_CATALOG.filter((badge) =>
     isBadgeUnlocked(badge.id, badgeContext)
   ).length;
-  const name = displayName ?? email?.split("@")[0] ?? "바다형제";
+  const name = displayName ?? pickDisplayName(email?.split("@")[0]) ?? "바다형제";
   const profileStats = [
     { label: "수집 어종", value: unlockedFishIds.size, segment: "encyclopedia" },
     { label: "획득 배지", value: acquiredBadgeCount, segment: "badges" },

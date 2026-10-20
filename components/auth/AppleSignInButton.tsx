@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import { Platform } from "react-native";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { useFieldNotice } from "@/src/contexts/FieldNoticeContext";
+import { buildAppleNameUpdate } from "@/src/lib/appleName";
 import { supabase } from "@/src/lib/supabase";
 
 type AppleSignInButtonProps = {
@@ -34,20 +35,9 @@ const AppleSignInButton = ({ fieldJournal = false }: AppleSignInButtonProps) => 
 
       if (error) throw error;
 
-      if (credential.fullName) {
-        const fullName = [
-          credential.fullName.givenName,
-          credential.fullName.familyName,
-        ]
-          .filter(Boolean)
-          .join(" ");
-        await supabase.auth.updateUser({
-          data: {
-            full_name: fullName,
-            given_name: credential.fullName.givenName ?? undefined,
-            family_name: credential.fullName.familyName ?? undefined,
-          },
-        });
+      const nameUpdate = buildAppleNameUpdate(credential.fullName);
+      if (nameUpdate) {
+        await supabase.auth.updateUser({ data: nameUpdate });
       }
 
       router.replace("/(tabs)");
