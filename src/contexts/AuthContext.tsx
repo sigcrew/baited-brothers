@@ -11,6 +11,7 @@ import * as WebBrowser from "expo-web-browser";
 import { AppState, Platform } from "react-native";
 import { supabase } from "@/src/lib/supabase";
 import { parseGoogleAuthCallback } from "@/src/lib/googleAuthCallback";
+import { clearAllSharedResources } from "@/src/lib/sharedResource";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -66,7 +67,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT") clearAllSharedResources();
       setSession(session);
     });
 

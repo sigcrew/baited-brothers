@@ -14,6 +14,7 @@ import {
   scheduleTripReminder,
   syncTripReminders,
 } from "@/src/lib/tripNotifications";
+import { createSharedResource } from "@/src/lib/sharedResource";
 
 export type FishingTrip = Tables<"fishing_trips"> & {
   cover_thumbnail_url?: string | null;
@@ -56,6 +57,38 @@ const uploadTripCover = async (userId: string, image: TripCoverImage) => {
   });
 };
 
+const EMPTY_TRIPS: FishingTrip[] = [];
+
+export const tripsResource = createSharedResource<FishingTrip[]>({
+  name: "fishing_trips",
+  load: async (userId) => {
+    const { data, error: fetchError } = await supabase
+      .from("fishing_trips")
+      .select("*")
+      .eq("user_id", userId)
+      .order("scheduled_at", { ascending: true });
+    if (fetchError) throw fetchError;
+    const rows = data ?? [];
+    try {
+      const signedUrls = await createSignedUserMediaUrls(
+        rows.flatMap((trip) => [trip.cover_image_path, trip.cover_thumbnail_path]),
+      );
+      return rows.map((trip) => ({
+        ...trip,
+        cover_image_url:
+          (trip.cover_image_path ? signedUrls.get(trip.cover_image_path) : null) ??
+          trip.cover_image_url,
+        cover_thumbnail_url:
+          (trip.cover_thumbnail_path ? signedUrls.get(trip.cover_thumbnail_path) : null) ??
+          null,
+      }));
+    } catch (signError) {
+      console.warn("trip cover signing failed", signError);
+      return rows;
+    }
+  },
+});
+
 type UseFishingTripsOptions = {
   autoFetch?: boolean;
   /**
@@ -72,77 +105,22 @@ export const useFishingTrips = ({
   const { session } = useAuth();
   const userId = session?.user?.id;
 
-  const [trips, setTrips] = useState<FishingTrip[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const {
+    data: trips,
+    isLoading,
+    isRefreshing,
+    error,
+  } = tripsResource.useSharedResource(userId ?? null, EMPTY_TRIPS, { autoFetch });
   const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
 
+  // CRUD 뒤 전체 목록을 다시 받는다. 같은 사용자를 보는 다른 화면도 함께 갱신된다.
   const fetchTrips = useCallback(
-    async (isRefresh = false) => {
-      if (!userId) {
-        setTrips([]);
-        setIsLoading(false);
-        setIsRefreshing(false);
-        setError(null);
-        return;
-      }
-
-      if (isRefresh) setIsRefreshing(true);
-      else setIsLoading(true);
-      setError(null);
-
-      const { data, error: fetchError } = await supabase
-        .from("fishing_trips")
-        .select("*")
-        .eq("user_id", userId)
-        .order("scheduled_at", { ascending: true });
-
-      if (fetchError) {
-        setError(fetchError as Error);
-        setTrips([]);
-      } else {
-        const rows = data ?? [];
-        try {
-          const signedUrls = await createSignedUserMediaUrls(
-            rows.flatMap((trip) => [
-              trip.cover_image_path,
-              trip.cover_thumbnail_path,
-            ]),
-          );
-          setTrips(
-            rows.map((trip) => ({
-              ...trip,
-              cover_image_url:
-                (trip.cover_image_path
-                  ? signedUrls.get(trip.cover_image_path)
-                  : null) ?? trip.cover_image_url,
-              cover_thumbnail_url:
-                (trip.cover_thumbnail_path
-                  ? signedUrls.get(trip.cover_thumbnail_path)
-                  : null) ?? null,
-            })),
-          );
-        } catch (signError) {
-          setError(signError as Error);
-          setTrips(rows);
-        }
-      }
-
-      if (isRefresh) setIsRefreshing(false);
-      else setIsLoading(false);
+    async (_isRefresh = false) => {
+      if (!userId) return;
+      await tripsResource.refetch(userId);
     },
-    [userId]
+    [userId],
   );
-
-  useEffect(() => {
-    if (autoFetch) {
-      fetchTrips();
-    } else {
-      setIsLoading(false);
-      setIsRefreshing(false);
-    }
-  }, [autoFetch, fetchTrips]);
 
   const plannedTrips = useMemo(
     () => trips.filter((trip) => trip.status === "planned"),

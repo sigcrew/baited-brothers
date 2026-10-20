@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/contexts/AuthContext";
 import type { Tables } from "@/src/types/database";
@@ -9,6 +9,7 @@ import {
 import { trackAnalyticsEvent } from "@/src/lib/analytics";
 import { countsForCollectionRewards } from "@/src/lib/catchRewards";
 import { toUserMessage, withTimeout } from "@/src/lib/appErrors";
+import { createSharedResource } from "@/src/lib/sharedResource";
 
 export type UserCatch = Tables<"user_catches"> & {
   thumbnail_url?: string | null;
@@ -23,79 +24,75 @@ export type UserCatch = Tables<"user_catches"> & {
   > | null;
 };
 
+const EMPTY_CATCHES: UserCatch[] = [];
+
+// 키는 `${userId}|${tripId ?? ""}`. 같은 사용자의 전체 목록과 출조별 목록이 한
+// 스토어를 공유해, 홈·지도·수집·프로필이 각자 fetch하던 것을 한 번으로 줄인다.
+const catchKey = (userId: string, tripId?: string) => `${userId}|${tripId ?? ""}`;
+
+const loadCatches = async (key: string): Promise<UserCatch[]> => {
+  const [userId, tripId] = key.split("|");
+  let query = supabase
+    .from("user_catches")
+    .select(
+      "*, fish:fishes!user_catches_fish_id_fkey(id, name, name_ko, image_url, category, catalog_sort_order)"
+    )
+    .eq("user_id", userId);
+  if (tripId) query = query.eq("trip_id", tripId);
+  const { data, error: fetchError } = await query.order("caught_at", { ascending: false });
+  if (fetchError) throw fetchError;
+
+  const rows = (data as UserCatch[]) ?? [];
+  try {
+    const signedUrls = await createSignedUserMediaUrls(
+      rows.flatMap((item) => [item.image_path, item.thumbnail_path]),
+    );
+    return rows.map((item) => ({
+      ...item,
+      image_url:
+        (item.image_path ? signedUrls.get(item.image_path) : null) ?? item.image_url,
+      thumbnail_url:
+        (item.thumbnail_path ? signedUrls.get(item.thumbnail_path) : null) ?? null,
+    }));
+  } catch (signError) {
+    console.warn("catch media signing failed", signError);
+    return rows;
+  }
+};
+
+export const catchesResource = createSharedResource<UserCatch[]>({
+  name: "user_catches",
+  load: loadCatches,
+});
+
 export const useUserCatches = (tripId?: string) => {
   const { session } = useAuth();
   const userId = session?.user?.id;
+  const key = userId ? catchKey(userId, tripId) : null;
 
-  const [catches, setCatches] = useState<UserCatch[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const {
+    data: catches,
+    isLoading,
+    isRefreshing,
+    error,
+  } = catchesResource.useSharedResource(key, EMPTY_CATCHES);
   const pendingOperations = useRef(new Set<string>());
 
+  // 전체 목록과 출조별 목록을 함께 갱신한다.
   const fetchCatches = useCallback(
-    async (isRefresh = false) => {
-      if (!userId) {
-        setCatches([]);
-        setIsLoading(false);
-        setIsRefreshing(false);
-        setError(null);
-        return;
-      }
-
-      if (isRefresh) setIsRefreshing(true);
-      else setIsLoading(true);
-      setError(null);
-
-      let query = supabase
-        .from("user_catches")
-        .select(
-          "*, fish:fishes!user_catches_fish_id_fkey(id, name, name_ko, image_url, category, catalog_sort_order)"
-        )
-        .eq("user_id", userId);
-
-      if (tripId) query = query.eq("trip_id", tripId);
-
-      const { data, error: fetchError } = await query.order("caught_at", {
-        ascending: false,
-      });
-
-      if (fetchError) {
-        setError(fetchError as Error);
-        if (!isRefresh) setCatches([]);
-      } else {
-        const rows = (data as UserCatch[]) ?? [];
-        try {
-          const signedUrls = await createSignedUserMediaUrls(
-            rows.flatMap((item) => [item.image_path, item.thumbnail_path]),
-          );
-          setCatches(
-            rows.map((item) => ({
-              ...item,
-              image_url:
-                (item.image_path ? signedUrls.get(item.image_path) : null) ??
-                item.image_url,
-              thumbnail_url:
-                (item.thumbnail_path
-                  ? signedUrls.get(item.thumbnail_path)
-                  : null) ?? null,
-            })),
-          );
-        } catch (signError) {
-          setError(signError as Error);
-          setCatches(rows);
-        }
-      }
-
-      if (isRefresh) setIsRefreshing(false);
-      else setIsLoading(false);
+    async (_isRefresh = false) => {
+      if (!userId) return;
+      await catchesResource.invalidate(`${userId}|`);
     },
-    [tripId, userId]
+    [userId],
   );
-
-  useEffect(() => {
-    fetchCatches();
-  }, [fetchCatches]);
+  const setCatches = useCallback(
+    (updater: (items: UserCatch[]) => UserCatch[]) => {
+      if (!userId) return;
+      catchesResource.mutateAll(`${userId}|`, updater);
+    },
+    [userId],
+  );
 
   const unlockedFishIds = useMemo(() => {
     const ids = new Set<string>();

@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { useAuth } from "@/src/contexts/AuthContext";
 import { supabase } from "@/src/lib/supabase";
 import type { Tables, TablesInsert } from "@/src/types/database";
+import { createSharedResource } from "@/src/lib/sharedResource";
 
 export type FavoriteFishingSpot = Tables<"favorite_fishing_spots">;
 
@@ -19,41 +20,41 @@ const sameCoordinate = (
 ) => Math.abs(Number(spot.latitude) - latitude) < 0.00001 &&
   Math.abs(Number(spot.longitude) - longitude) < 0.00001;
 
-export const useFavoriteFishingSpots = () => {
-  const { session } = useAuth();
-  const userId = session?.user.id;
-  const [spots, setSpots] = useState<FavoriteFishingSpot[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+const EMPTY_SPOTS: FavoriteFishingSpot[] = [];
 
-  const fetchSpots = useCallback(async () => {
-    if (!userId) {
-      setSpots([]);
-      setIsLoading(false);
-      setError(null);
-      return;
-    }
-
-    setIsLoading(true);
+export const favoriteSpotsResource = createSharedResource<FavoriteFishingSpot[]>({
+  name: "favorite_fishing_spots",
+  load: async (userId) => {
     const { data, error: fetchError } = await supabase
       .from("favorite_fishing_spots")
       .select("*")
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
+    if (fetchError) throw fetchError;
+    return data ?? [];
+  },
+});
 
-    if (fetchError) {
-      setError(fetchError as Error);
-    } else {
-      setSpots(data ?? []);
-      setError(null);
-    }
-    setIsLoading(false);
-  }, [userId]);
-
-  useEffect(() => {
-    void fetchSpots();
-  }, [fetchSpots]);
+export const useFavoriteFishingSpots = () => {
+  const { session } = useAuth();
+  const userId = session?.user.id;
+  const key = userId ?? null;
+  const {
+    data: spots,
+    isLoading,
+    error: loadError,
+    refetch: fetchSpots,
+  } = favoriteSpotsResource.useSharedResource(key, EMPTY_SPOTS);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setError] = useState<Error | null>(null);
+  const error = saveError ?? loadError;
+  const setSpots = useCallback(
+    (updater: (current: FavoriteFishingSpot[]) => FavoriteFishingSpot[]) => {
+      if (!key) return;
+      favoriteSpotsResource.mutate(key, (current) => updater(current ?? []));
+    },
+    [key],
+  );
 
   const findByCoordinate = useCallback(
     (latitude: number, longitude: number) =>
