@@ -15,7 +15,7 @@ iPhone 16 Pro 시뮬레이터(iOS 26.3, Debug 빌드, 게스트 상태)로 홈·
 | 6 | 기록 완료 → 다음 행동 연결 | 중 | 중 | 완료 화면이 막다른 길 |
 | 7 | 영문 장식 라벨 정리 | 소 | 소 | DISCOVERY REQUIRED, ALL SPECIMENS, LOG OWNER 019 |
 | 버그 | 시스템 로그인 시트 앱 이름 'app' | 큼 | 완료 | app.json CFBundleName 추가(이 커밋) |
-| 버그 | PKCE가 sha256 대신 plain으로 동작 | 보안 | 소 | expo-crypto + crypto.subtle 폴리필 필요 |
+| 버그 | PKCE가 sha256 대신 plain으로 동작 | 보안 | 완료 | expo-crypto 폴리필(b55b0dc), 재빌드 후 경고 사라짐 확인 |
 
 ## 화면별 관찰
 
@@ -47,7 +47,7 @@ iPhone 16 Pro 시뮬레이터(iOS 26.3, Debug 빌드, 게스트 상태)로 홈·
 
 ### 로그인·가입·비밀번호 재설정
 - 세 화면 모두 디자인이 일관되고 문구가 좋다. "닫기"로 게스트 복귀가 가능한 점도 좋다.
-- Google 버튼을 누르면 iOS 시스템 시트에 "'app'이(가) 'supabase.co'을(를) 사용하여 로그인하려고 합니다"가 뜬다. 'app'은 CFBundleName이 PRODUCT_NAME(app)이라서다. 이번 커밋에서 `app.json`의 `ios.infoPlist.CFBundleName`을 앱 이름으로 지정했다(다음 네이티브 빌드부터 반영). 'supabase.co' 부분은 Supabase 커스텀 도메인을 써야 바뀐다.
+- Google 버튼을 누르면 iOS 시스템 시트에 "'app'이(가) 'supabase.co'을(를) 사용하여 로그인하려고 합니다"가 뜬다. 'app'은 CFBundleName이 PRODUCT_NAME(app)이라서다. `ios/` 프로젝트가 커밋된 bare 워크플로라 `app.json`의 infoPlist만으로는 반영되지 않아 `ios/app/Info.plist`의 CFBundleName도 직접 앱 이름으로 바꿨다. 재빌드 후 시트에 '낚시당한 녀석들'이 표시되는 것을 확인했다. 'supabase.co' 부분은 Supabase 커스텀 도메인을 써야 바뀐다.
 - Metro 경고: "WebCrypto API is not supported. Code challenge method will default to use plain instead of sha256." React Native에는 `crypto.subtle`이 없어 PKCE 챌린지가 plain으로 떨어진다. `expo-crypto`를 추가하고 앱 진입 시 `crypto.subtle.digest`를 폴리필해야 sha256이 된다. 동작에는 지장이 없지만 PKCE의 보호 효과가 줄어든다.
 
 ### 로그인 이후(코드로 확인)
