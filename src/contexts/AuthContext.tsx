@@ -31,6 +31,8 @@ type AuthContextType = {
     callbackUrlOrFragment: string,
   ) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
+  requestPasswordReset: (email: string) => Promise<{ error: Error | null }>;
+  updatePassword: (password: string) => Promise<{ error: Error | null }>;
   deleteAccount: () => Promise<{
     appleRevocation: AppleRevocationStatus;
     error: Error | null;
@@ -103,6 +105,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signOut = async () => {
     await supabase.auth.signOut();
+  };
+
+  // 재설정 메일의 링크는 PKCE 코드를 싣고 baited-brothers://reset-password로 돌아온다.
+  // (Supabase 대시보드 Redirect URLs에 이 주소가 등록돼 있어야 한다.)
+  const requestPasswordReset = async (email: string) => {
+    const scheme = Constants.expoConfig?.scheme ?? "baited-brothers";
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${scheme}://reset-password`,
+    });
+    return { error: error ?? null };
+  };
+
+  const updatePassword = async (password: string) => {
+    const { error } = await supabase.auth.updateUser({ password });
+    return { error: error ?? null };
   };
 
   const deleteAccount = async () => {
@@ -228,6 +245,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     signInWithGoogle,
     completeGoogleSignIn,
     signOut,
+    requestPasswordReset,
+    updatePassword,
     deleteAccount,
   };
 

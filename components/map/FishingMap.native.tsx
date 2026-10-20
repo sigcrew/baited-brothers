@@ -154,6 +154,7 @@ const ClusterMarker = ({
 
 export const FishingMap = ({
   points,
+  bottomInset = 0,
   focusPointId,
   focusLatitudeDelta,
   onSelectPoint,
@@ -258,6 +259,11 @@ export const FishingMap = ({
         maxZoomLevel={18}
         showsCompass={false}
         showsUserLocation={false}
+        // Apple 지도 로고·법적 고지와 Google 로고는 탭바에 가려지면 안 된다(스토어
+        // 심사 사유). mapPadding은 iOS에서 layoutMargins로, Android에서 지도 패딩으로
+        // 적용돼 양쪽 모두 attribution을 탭바 위로 올린다.
+        mapPadding={{ top: 0, left: 0, right: 0, bottom: bottomInset }}
+        legalLabelInsets={Platform.OS === "ios" ? { top: 0, left: 0, right: 0, bottom: bottomInset } : undefined}
         onMapReady={() => setMapLoadState("ready")}
         onPress={(event) => {
           if (

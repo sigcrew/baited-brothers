@@ -635,6 +635,7 @@ export default function MapScreen() {
       <View className="absolute inset-0">
         <FishingMap
           points={points}
+          bottomInset={insets.bottom + MAP_TAB_BAR_HEIGHT}
           focusPointId={focusPointId}
           focusLatitudeDelta={focusLatitudeDelta}
           onSelectPoint={selectPoint}
@@ -840,6 +841,18 @@ export default function MapScreen() {
       ) : null}
 
       {selected ? (
+        // 탭바(absolute)가 시트를 덮지 않도록, 시트가 차지하는 영역 자체를 탭바 위에서
+        // 끝나는 컨테이너로 제한한다. (gorhom v5의 bottomInset은 modal/detached 전용)
+        <View
+          pointerEvents="box-none"
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            top: 0,
+            bottom: insets.bottom + MAP_TAB_BAR_HEIGHT,
+          }}
+        >
           <BottomSheet
             ref={infoSheetRef}
             index={1}
@@ -864,7 +877,7 @@ export default function MapScreen() {
             <BottomSheetScrollView
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{
-                paddingBottom: insets.bottom + MAP_TAB_BAR_HEIGHT,
+                paddingBottom: 16,
                 paddingHorizontal: 16,
               }}
             >
@@ -1206,6 +1219,7 @@ export default function MapScreen() {
             )}
             </BottomSheetScrollView>
           </BottomSheet>
+        </View>
       ) : null}
 
       <TripFormModal

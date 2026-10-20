@@ -1,42 +1,46 @@
 import { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-} from "react-native";
-import { Link, router } from "expo-router";
+import { Platform, Text, View } from "react-native";
+import { router } from "expo-router";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { useFieldNotice } from "@/src/contexts/FieldNoticeContext";
 import AppleSignInButton from "@/components/auth/AppleSignInButton";
 import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
+import {
+  AuthBrand,
+  AuthDivider,
+  AuthErrorBox,
+  AuthHeadline,
+  AuthInlineLink,
+  AuthPolicyNotice,
+  AuthPrimaryButton,
+  AuthScreen,
+  AuthTextField,
+  JournalRule,
+} from "@/components/auth/FieldJournalAuth";
+import { validateNewPassword } from "@/src/lib/passwordReset";
+import { FIELD_COLORS, bodyFont } from "@/src/theme/fieldJournal";
 
 const SignupScreen = () => {
   const { signUp } = useAuth();
+  const { alert } = useFieldNotice();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  const { alert } = useFieldNotice();
+
+  const clearError = () => {
+    if (formError) setFormError(null);
+  };
 
   const handleSignup = async () => {
-    if (!email.trim() || !password || !passwordConfirm) {
-      setFormError("모든 항목을 입력해 주세요.");
+    if (!email.trim()) {
+      setFormError("이메일 주소를 입력해 주세요.");
       return;
     }
-
-    if (password.length < 6) {
-      setFormError("비밀번호는 6자 이상이어야 합니다.");
-      return;
-    }
-
-    if (password !== passwordConfirm) {
-      setFormError("비밀번호가 일치하지 않습니다.");
+    const passwordError = validateNewPassword(password, passwordConfirm);
+    if (passwordError) {
+      setFormError(passwordError);
       return;
     }
 
@@ -52,115 +56,97 @@ const SignupScreen = () => {
 
     if (session) {
       router.replace("/(tabs)");
-    } else {
-      await alert({
-        eyebrow: "ACCOUNT · EMAIL CHECK",
-        title: "이메일을 확인해 주세요",
-        message: "가입한 이메일로 확인 링크를 보냈습니다. 링크를 확인한 뒤 로그인해 주세요.",
-      });
-      router.replace("/(auth)/login");
+      return;
     }
+    await alert({
+      eyebrow: "ACCOUNT · EMAIL CHECK",
+      title: "이메일을 확인해 주세요",
+      message: "가입한 이메일로 확인 링크를 보냈습니다. 링크를 확인한 뒤 로그인해 주세요.",
+    });
+    router.replace("/(auth)/login");
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      className="flex-1 bg-white"
-    >
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1, justifyContent: "center", padding: 32 }}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View className="mb-12">
-          <Text className="text-3xl font-bold text-gray-900">회원가입</Text>
-          <Text className="mt-2 text-gray-600">이메일로 가입하고 시작하세요</Text>
-        </View>
+    <AuthScreen showBack={router.canGoBack()}>
+      <AuthBrand />
+      <AuthHeadline
+        title={"첫 출조 전에,\n기록장을 준비하세요."}
+        subtitle="이메일로 가입하면 출조·조과·도감이 한 계정에 모입니다."
+      />
+      <JournalRule />
 
-        <TextInput
-          className="mb-4 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-base"
-          placeholder="이메일"
-          placeholderTextColor="#9ca3af"
+      <View className="mt-7">
+        <AuthTextField
+          first
+          label="이메일"
+          placeholder="이메일 주소"
           value={email}
           onChangeText={(value) => {
             setEmail(value);
-            if (formError) setFormError(null);
+            clearError();
           }}
           autoCapitalize="none"
           keyboardType="email-address"
           autoComplete="email"
+          textContentType="emailAddress"
+          returnKeyType="next"
           editable={!isSubmitting}
         />
-
-        <TextInput
-          className="mb-4 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-base"
-          placeholder="비밀번호 (6자 이상)"
-          placeholderTextColor="#9ca3af"
+        <AuthTextField
+          secure
+          label="비밀번호"
+          placeholder="6자 이상"
           value={password}
           onChangeText={(value) => {
             setPassword(value);
-            if (formError) setFormError(null);
+            clearError();
           }}
-          secureTextEntry
           autoComplete="new-password"
+          textContentType="newPassword"
+          returnKeyType="next"
           editable={!isSubmitting}
         />
-
-        <TextInput
-          className="mb-6 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-base"
-          placeholder="비밀번호 확인"
-          placeholderTextColor="#9ca3af"
+        <AuthTextField
+          secure
+          label="비밀번호 확인"
+          placeholder="같은 비밀번호를 한 번 더"
           value={passwordConfirm}
           onChangeText={(value) => {
             setPasswordConfirm(value);
-            if (formError) setFormError(null);
+            clearError();
           }}
-          secureTextEntry
           autoComplete="new-password"
+          textContentType="newPassword"
+          returnKeyType="done"
+          onSubmitEditing={handleSignup}
           editable={!isSubmitting}
         />
+      </View>
 
-        {formError ? (
-          <Text accessibilityLiveRegion="polite" className="mb-4 text-sm text-orange-600">
-            {formError}
-          </Text>
-        ) : null}
+      <AuthErrorBox message={formError} />
+      <AuthPrimaryButton label="가입하기" onPress={handleSignup} busy={isSubmitting} />
+      <AuthPolicyNotice action="가입하면" />
 
-        <TouchableOpacity
-          className="rounded-xl bg-blue-600 py-3 active:bg-blue-700"
-          onPress={handleSignup}
+      <AuthDivider />
+
+      {Platform.OS === "ios" ? (
+        <View className="mb-3">
+          <AppleSignInButton fieldJournal />
+        </View>
+      ) : null}
+      <GoogleSignInButton fieldJournal />
+
+      <View className="mt-7 flex-row items-center justify-center">
+        <Text className="text-[14px]" style={{ color: FIELD_COLORS.ink, fontFamily: bodyFont }}>
+          이미 계정이 있으신가요?{" "}
+        </Text>
+        <AuthInlineLink
+          label="로그인"
           disabled={isSubmitting}
-        >
-          {isSubmitting ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <Text className="text-center font-semibold text-white">가입하기</Text>
-          )}
-        </TouchableOpacity>
-
-        <View className="mb-6 mt-8 flex-row items-center">
-          <View className="h-px flex-1 bg-gray-200" />
-          <Text className="mx-4 text-sm text-gray-500">또는</Text>
-          <View className="h-px flex-1 bg-gray-200" />
-        </View>
-
-        {Platform.OS === "ios" && (
-          <View className="mb-4">
-            <AppleSignInButton />
-          </View>
-        )}
-        <GoogleSignInButton />
-
-        <View className="mt-8 flex-row justify-center">
-          <Text className="text-gray-600">이미 계정이 있으신가요? </Text>
-          <Link href="/(auth)/login" asChild>
-            <TouchableOpacity disabled={isSubmitting}>
-              <Text className="font-semibold text-blue-600">로그인</Text>
-            </TouchableOpacity>
-          </Link>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+          onPress={() => (router.canGoBack() ? router.back() : router.replace("/(auth)/login"))}
+        />
+      </View>
+    </AuthScreen>
   );
 };
 
