@@ -51,3 +51,9 @@ expo-env.d.ts
 .DS_Store
 **/.DS_Store
 **/__pycache__/
+
+# 로컬 작업물 (별도 레포 또는 임시 산출물)
+.tmp/
+official-blog/
+website/node_modules/
+website/.next/
