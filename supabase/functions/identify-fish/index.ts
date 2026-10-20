@@ -28,6 +28,27 @@ const AUTO_DETAIL_ENABLED = Deno.env.get("FISH_AUTO_DETAIL") === "true";
 
 const RECOGNITION_METADATA = { model: MODEL, version: "field60-v31" + (AUTO_DETAIL_ENABLED ? "+auto-detail-v1" : "") + (EVIDENCE_COMPARISON_ENABLED ? "+evidence-v1" : "") };
 
+/**
+ * 클라이언트에는 안정적인 코드만 돌려준다. 내부 오류 문구(Anthropic 메시지 등)는
+ * 로그에만 남긴다.
+ */
+type IdentificationErrorCode =
+  | "anthropic_unavailable"
+  | "anthropic_rejected"
+  | "output_truncated"
+  | "invalid_result";
+
+class IdentificationError extends Error {
+  constructor(
+    readonly code: IdentificationErrorCode,
+    readonly retryable: boolean,
+    message: string,
+  ) {
+    super(message);
+    this.name = "IdentificationError";
+  }
+}
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -187,9 +208,13 @@ const callClaude = async ({
   maxTokens: number;
   detailImageBase64?: string;
 }) => {
+  // 일시적 실패(429·5xx·네트워크)만 한 번 더 시도한다. 400이나 응답 파싱 실패처럼
+  // 다시 보내도 같은 결과인 오류는 재시도하면 토큰만 두 배로 쓴다.
   for (let attempt = 0; attempt < 2; attempt += 1) {
     try {
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
+      let response: Response;
+      try {
+        response = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: {
           "x-api-key": apiKey,
@@ -235,17 +260,19 @@ const callClaude = async ({
             },
           ],
         }),
-      });
+        });
+      } catch (networkError) {
+        throw new IdentificationError(
+          "anthropic_unavailable",
+          true,
+          networkError instanceof Error ? networkError.message : "network error",
+        );
+      }
 
       const body = await response.json();
       if (!response.ok) {
         console.error("Anthropic request failed", response.status);
-        if (
-          attempt === 0 &&
-          (response.status === 429 || response.status >= 500)
-        ) {
-          continue;
-        }
+        const retryable = response.status === 429 || response.status >= 500;
         const apiMessage =
           body &&
           typeof body === "object" &&
@@ -256,14 +283,16 @@ const callClaude = async ({
           typeof body.error.message === "string"
             ? body.error.message
             : null;
-        throw new Error(
+        throw new IdentificationError(
+          retryable ? "anthropic_unavailable" : "anthropic_rejected",
+          retryable,
           `Anthropic request failed with ${response.status}` +
             `${apiMessage ? `: ${apiMessage.slice(0, 160)}` : ""}`,
         );
       }
 
       if (body.stop_reason === "max_tokens") {
-        throw new Error("Claude response exceeded output limit");
+        throw new IdentificationError("output_truncated", false, "Claude response exceeded output limit");
       }
       const content = Array.isArray(body.content) ? body.content : [];
       const toolUse = content.find(
@@ -278,14 +307,23 @@ const callClaude = async ({
       }
 
       const outputText = extractClaudeText(body);
-      if (!outputText) throw new Error("Claude returned no result");
-      return parseClaudeJson(outputText);
+      if (!outputText) throw new IdentificationError("invalid_result", false, "Claude returned no result");
+      try {
+        return parseClaudeJson(outputText);
+      } catch (parseError) {
+        throw new IdentificationError(
+          "invalid_result",
+          false,
+          parseError instanceof Error ? parseError.message : "unparseable result",
+        );
+      }
     } catch (error) {
-      if (attempt === 1) throw error;
+      const retryable = error instanceof IdentificationError && error.retryable;
+      if (attempt === 1 || !retryable) throw error;
     }
   }
 
-  throw new Error("Claude request failed");
+  throw new IdentificationError("anthropic_unavailable", true, "Claude request failed");
 };
 
 const catalogToText = (catalog: CatalogFish[]) =>
@@ -550,10 +588,7 @@ Deno.serve(async (req) => {
       {
         error: "AI identification is temporarily unavailable.",
         metadata: RECOGNITION_METADATA,
-        error_code:
-          error instanceof Error
-            ? error.message.slice(0, 120)
-            : "Unknown identification error",
+        error_code: error instanceof IdentificationError ? error.code : "identification_failed",
       },
       502,
     );

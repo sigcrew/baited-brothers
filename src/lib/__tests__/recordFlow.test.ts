@@ -1,4 +1,4 @@
-import { captureLocationLabel, parseOptionalSize } from "@/src/lib/recordFlow";
+import { AI_PHOTO_CONSENT_VERSION, captureLocationLabel, isAiConsentCurrent, parseOptionalSize } from "@/src/lib/recordFlow";
 
 describe("parseOptionalSize", () => {
   it("treats an empty value as not entered", () => {
@@ -34,5 +34,13 @@ describe("captureLocationLabel", () => {
   it("requires both position and capture time for library photos", () => {
     expect(captureLocationLabel({ source: "photo_library", latitude: 35, longitude: 129, capturedAt: "2026-10-20T00:00:00Z" })).toMatch(/심사 대상/);
     expect(captureLocationLabel({ source: "photo_library", latitude: 35, longitude: 129, capturedAt: null })).toMatch(/일반 기록/);
+  });
+});
+
+describe("isAiConsentCurrent", () => {
+  it("only accepts the current consent version, so changed wording re-prompts existing users", () => {
+    expect(isAiConsentCurrent(AI_PHOTO_CONSENT_VERSION)).toBe(true);
+    expect(isAiConsentCurrent("accepted")).toBe(false); // 구버전 플래그
+    expect(isAiConsentCurrent(null)).toBe(false);
   });
 });

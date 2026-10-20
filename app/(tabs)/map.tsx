@@ -168,20 +168,26 @@ export default function MapScreen() {
     recordEntries.flatMap((entry) => entry.fishId ? [entry.fishId] : []),
   ).size;
 
+  // `selected`는 entries가 바뀔 때마다 새 객체라서 그대로 deps에 넣으면 같은 장소에도
+  // 역지오코딩이 반복 호출된다(iOS 지오코더는 호출을 제한한다). 식별값만 본다.
+  const selectedName = selected?.name ?? null;
+  const selectedLatitude = selected?.latitude ?? null;
+  const selectedLongitude = selected?.longitude ?? null;
+  const selectedNeedsGeocode = Boolean(selected?.shouldReverseGeocode);
   useEffect(() => {
     let active = true;
-    setPlaceName(selected?.name ?? null);
-    if (!selected?.shouldReverseGeocode) return;
+    setPlaceName(selectedName);
+    if (!selectedNeedsGeocode || selectedLatitude == null || selectedLongitude == null) return;
 
     void reverseGeocodeKoreanPlaceName({
-      latitude: selected.latitude,
-      longitude: selected.longitude,
+      latitude: selectedLatitude,
+      longitude: selectedLongitude,
     }).then((result) => {
       if (!active || !result.name) return;
       setPlaceName(result.name);
     }).catch(() => undefined);
     return () => { active = false; };
-  }, [selected]);
+  }, [selectedLatitude, selectedLongitude, selectedName, selectedNeedsGeocode]);
 
   const {
     data: conditions,

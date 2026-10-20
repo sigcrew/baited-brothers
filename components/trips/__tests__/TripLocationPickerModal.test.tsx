@@ -9,7 +9,7 @@ import { FishingMap } from '@/components/map/FishingMap';
 import { reverseGeocodeKoreanPlaceName } from '@/src/lib/reverseGeocoding';
 
 jest.mock('@/components/map/FishingMap', () => ({ FishingMap: () => null }));
-jest.mock('@/src/lib/locationPermission', () => ({ ensureForegroundLocationPermission: async () => true }));
+jest.mock('@/src/lib/locationPermission', () => ({ ensureForegroundLocationPermission: jest.fn(async () => false) }));
 jest.mock('@/src/lib/reverseGeocoding', () => ({ reverseGeocodeKoreanPlaceName: jest.fn() }));
 jest.mock('react-native-safe-area-context', () => ({ useSafeAreaInsets: () => ({ top: 0, bottom: 0 }) }));
 
@@ -54,5 +54,18 @@ it('keeps manual selection available when provider search fails', async () => {
   expect(search().props.disabled).toBe(false);
   await act(async () => { await view.root.findByType(FishingMap).props.onSelectCoordinate({latitude:36.00623,longitude:126.15530}); });
   expect(view.root.findByType(FishingMap).props.points[0].label).toBe('선택한 낚시터');
+  await act(async () => view.unmount());
+});
+
+it('lets a user who denied location permission still pin a place manually', async () => {
+  const { ensureForegroundLocationPermission } = jest.requireMock('@/src/lib/locationPermission');
+  (reverseGeocodeKoreanPlaceName as jest.Mock).mockResolvedValue({ name: '부산광역시 앞바다', countryCode: 'KR' });
+  const confirm = jest.fn();
+  let view!: ReactTestRenderer;
+  await act(async () => { view = create(<TripLocationPickerModal visible placeName="부산" initialPlace={null} onClose={() => {}} onConfirm={confirm} />); });
+  await act(async () => { await view.root.findByType(FishingMap).props.onSelectCoordinate({ latitude: 35.05, longitude: 129.1 }); });
+  await act(async () => { view.root.findAllByType(TouchableOpacity).find(x => x.props.accessibilityLabel === '선택한 출조 장소 연결')!.props.onPress(); });
+  expect(ensureForegroundLocationPermission).not.toHaveBeenCalled();
+  expect(confirm).toHaveBeenCalledWith({ name: '부산광역시 앞바다', latitude: 35.05, longitude: 129.1 });
   await act(async () => view.unmount());
 });

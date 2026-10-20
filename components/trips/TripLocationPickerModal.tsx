@@ -19,7 +19,6 @@ import { FishingMap } from "@/components/map/FishingMap";
 import type { FishingMapPoint } from "@/components/map/FishingMap.types";
 import { searchPlaces, type PlaceSearchResult } from "@/src/lib/placeSearch";
 import { evaluateCoastalSelection } from "@/src/lib/coastalSelection";
-import { ensureForegroundLocationPermission } from "@/src/lib/locationPermission";
 import { reverseGeocodeKoreanPlaceName } from "@/src/lib/reverseGeocoding";
 import {
   FIELD_COLORS,
@@ -107,15 +106,8 @@ export const TripLocationPickerModal = ({
     setIsResolving(true);
     let resolvedName = "";
     try {
-      const hasPermission = await ensureForegroundLocationPermission();
-      if (requestRef.current !== requestId) return;
-      if (!hasPermission) {
-        setNotice({
-          title: "위치 권한이 필요합니다",
-          message: "선택한 장소의 지역명을 확인하려면 위치 접근을 허용해 주세요.",
-        });
-        return;
-      }
+      // 수동으로 고른 좌표는 기기 위치 권한과 무관하다. 지역명 조회는 best effort이고
+      // 실패하면 "선택한 낚시터"로 남긴다(지도 탭과 같은 동작).
       const result = await reverseGeocodeKoreanPlaceName(coordinate);
       if (requestRef.current !== requestId) return;
       const countryCode = result.countryCode;
@@ -145,9 +137,13 @@ export const TripLocationPickerModal = ({
   const locateCurrentPosition = async () => {
     if (isResolving) return;
     Keyboard.dismiss();
+    // GPS 조회도 요청 토큰을 가진다. 조회 중 지도를 누르면 늦게 온 GPS 결과가
+    // 사용자의 선택을 덮어쓰지 않고, 스피너도 그 선택이 끝날 때까지 유지된다.
+    const requestId = ++requestRef.current;
     setIsResolving(true);
     try {
       const permission = await Location.requestForegroundPermissionsAsync();
+      if (requestRef.current !== requestId) return;
       if (!permission.granted) {
         setNotice({
           title: "위치 권한이 필요합니다",
@@ -156,17 +152,20 @@ export const TripLocationPickerModal = ({
         return;
       }
       const position = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+      if (requestRef.current !== requestId) return;
       await selectCoordinate({
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
       });
     } catch {
+      if (requestRef.current !== requestId) return;
       setNotice({
         title: "현재 위치를 확인하지 못했습니다",
         message: "잠시 후 다시 시도하거나 지도에서 직접 장소를 선택해 주세요.",
       });
     } finally {
-      setIsResolving(false);
+      // selectCoordinate가 넘겨받았거나 다른 요청이 시작됐으면 그쪽이 스피너를 끈다.
+      if (requestRef.current === requestId) setIsResolving(false);
     }
   };
 

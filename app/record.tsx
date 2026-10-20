@@ -22,7 +22,9 @@ import { CameraCaptureScreen } from "@/components/record/CameraCaptureScreen";
 import { CatchReviewScreen } from "@/components/record/CatchReviewScreen";
 import {
   AI_PHOTO_CONSENT_KEY,
+  AI_PHOTO_CONSENT_VERSION,
   MAX_RECOGNITION_BASE64_LENGTH,
+  isAiConsentCurrent,
   parseOptionalSize as parseSizeInput,
   type AiConsentState,
   type RecordCapture as Capture,
@@ -164,7 +166,7 @@ const RecordScreen = () => {
           setAiConsent(
             __DEV__ && params.consentPreview === "1"
               ? "pending"
-              : value === "accepted"
+              : isAiConsentCurrent(value)
                 ? "accepted"
                 : "pending",
           );
@@ -214,7 +216,7 @@ const RecordScreen = () => {
   const acceptAiPhotoConsent = async () => {
     setAiConsent("accepted");
     try {
-      await AsyncStorage.setItem(AI_PHOTO_CONSENT_KEY, "accepted");
+      await AsyncStorage.setItem(AI_PHOTO_CONSENT_KEY, AI_PHOTO_CONSENT_VERSION);
     } catch {
       // 현재 사용 흐름에서는 동의를 유지하고 다음 실행에서 다시 안내합니다.
     }

@@ -72,37 +72,57 @@ const fetchFilteredRange = async ({
   return data ?? [];
 };
 
+/**
+ * "전체" 보기의 페이지 커서. 예정(오름차순)과 지난 출조(내림차순)를 각각 어디까지
+ * 읽었는지 따로 기억한다. 예전에는 첫 로드 때의 카운트로 오프셋을 계산해서, 사이에
+ * 출조가 생기거나 완료되면 행을 건너뛰거나 중복으로 읽었다.
+ */
+type JournalCursor = {
+  offset: number;
+  planned: number;
+  history: number;
+  plannedExhausted: boolean;
+};
+
+const INITIAL_CURSOR: JournalCursor = { offset: 0, planned: 0, history: 0, plannedExhausted: false };
+
 const fetchJournalRange = async ({
   userId,
   filter,
-  counts,
-  offset,
+  cursor,
 }: {
   userId: string;
   filter: JournalTripFilter;
-  counts: JournalTripCounts;
-  offset: number;
-}) => {
+  cursor: JournalCursor;
+}): Promise<{ rows: FishingTrip[]; cursor: JournalCursor; exhausted: boolean }> => {
   if (filter !== "all") {
-    return fetchFilteredRange({ userId, filter, offset, limit: PAGE_SIZE });
+    const rows = await fetchFilteredRange({ userId, filter, offset: cursor.offset, limit: PAGE_SIZE });
+    return {
+      rows,
+      cursor: { ...cursor, offset: cursor.offset + rows.length },
+      exhausted: rows.length < PAGE_SIZE,
+    };
   }
 
   const rows: FishingTrip[] = [];
   let remaining = PAGE_SIZE;
+  const next = { ...cursor };
 
-  if (offset < counts.planned) {
+  if (!next.plannedExhausted) {
     const plannedRows = await fetchFilteredRange({
       userId,
       filter: "planned",
-      offset,
-      limit: Math.min(remaining, counts.planned - offset),
+      offset: next.planned,
+      limit: remaining,
     });
     rows.push(...plannedRows);
+    next.planned += plannedRows.length;
     remaining -= plannedRows.length;
+    if (plannedRows.length < PAGE_SIZE) next.plannedExhausted = true;
   }
 
+  let historyExhausted = false;
   if (remaining > 0) {
-    const historyOffset = Math.max(0, offset - counts.planned);
     const { data, error } = await supabase
       .from("fishing_trips")
       .select("*")
@@ -110,13 +130,16 @@ const fetchJournalRange = async ({
       .in("status", ["done", "canceled"])
       .order("scheduled_at", { ascending: false })
       .order("id", { ascending: false })
-      .range(historyOffset, historyOffset + remaining - 1);
+      .range(next.history, next.history + remaining - 1);
 
     if (error) throw error;
-    rows.push(...(data ?? []));
+    const historyRows = data ?? [];
+    rows.push(...historyRows);
+    next.history += historyRows.length;
+    historyExhausted = historyRows.length < remaining;
   }
 
-  return rows;
+  return { rows, cursor: next, exhausted: next.plannedExhausted && historyExhausted };
 };
 
 export const useJournalTrips = (filter: JournalTripFilter) => {
@@ -130,7 +153,7 @@ export const useJournalTrips = (filter: JournalTripFilter) => {
   const [hasMore, setHasMore] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [loadMoreError, setLoadMoreError] = useState<Error | null>(null);
-  const nextOffsetRef = useRef(0);
+  const cursorRef = useRef<JournalCursor>(INITIAL_CURSOR);
   const requestVersionRef = useRef(0);
   const loadingMoreRef = useRef(false);
 
@@ -155,19 +178,16 @@ export const useJournalTrips = (filter: JournalTripFilter) => {
     setLoadMoreError(null);
 
     try {
-      const nextCounts = await fetchCounts(userId);
-      const firstPage = await fetchJournalRange({
-        userId,
-        filter,
-        counts: nextCounts,
-        offset: 0,
-      });
+      const [nextCounts, firstPage] = await Promise.all([
+        fetchCounts(userId),
+        fetchJournalRange({ userId, filter, cursor: INITIAL_CURSOR }),
+      ]);
 
       if (requestVersion !== requestVersionRef.current) return;
       setCounts(nextCounts);
-      setTrips(firstPage);
-      nextOffsetRef.current = firstPage.length;
-      setHasMore(firstPage.length < nextCounts[filter]);
+      setTrips(firstPage.rows);
+      cursorRef.current = firstPage.cursor;
+      setHasMore(!firstPage.exhausted);
     } catch (loadError) {
       if (requestVersion !== requestVersionRef.current) return;
       setTrips([]);
@@ -195,20 +215,15 @@ export const useJournalTrips = (filter: JournalTripFilter) => {
     setLoadMoreError(null);
 
     try {
-      const nextPage = await fetchJournalRange({
-        userId,
-        filter,
-        counts,
-        offset: nextOffsetRef.current,
-      });
+      const nextPage = await fetchJournalRange({ userId, filter, cursor: cursorRef.current });
 
       if (requestVersion !== requestVersionRef.current) return;
       setTrips((current) => {
         const knownIds = new Set(current.map((trip) => trip.id));
-        return [...current, ...nextPage.filter((trip) => !knownIds.has(trip.id))];
+        return [...current, ...nextPage.rows.filter((trip) => !knownIds.has(trip.id))];
       });
-      nextOffsetRef.current += nextPage.length;
-      setHasMore(nextOffsetRef.current < counts[filter] && nextPage.length > 0);
+      cursorRef.current = nextPage.cursor;
+      setHasMore(!nextPage.exhausted);
     } catch (nextError) {
       if (requestVersion !== requestVersionRef.current) return;
       setLoadMoreError(nextError instanceof Error ? nextError : new Error("다음 기록을 불러오지 못했습니다."));
@@ -218,7 +233,7 @@ export const useJournalTrips = (filter: JournalTripFilter) => {
         setIsLoadingMore(false);
       }
     }
-  }, [counts, filter, hasMore, isLoading, isRefreshing, userId]);
+  }, [filter, hasMore, isLoading, isRefreshing, userId]);
 
   return {
     trips,

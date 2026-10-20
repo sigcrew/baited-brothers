@@ -38,6 +38,14 @@ export type AiConsentState = "loading" | "pending" | "accepted" | "manual";
 /** identify-fish가 받는 base64 상한(≈10MB JPEG). */
 export const MAX_RECOGNITION_BASE64_LENGTH = 13_500_000;
 export const AI_PHOTO_CONSENT_KEY = "ai-photo-consent-v1";
+/**
+ * 동의 문구의 버전. 저장된 값이 이 문자열과 다르면 다시 동의를 받는다.
+ * AiConsentScreen의 안내 문구를 바꿀 때 함께 올릴 것.
+ */
+export const AI_PHOTO_CONSENT_VERSION = "2026-10-20";
+
+export const isAiConsentCurrent = (stored: string | null | undefined) =>
+  stored === AI_PHOTO_CONSENT_VERSION;
 export const PRIVACY_POLICY_URL = "https://sigcrew.github.io/baited-brothers/privacy/";
 /** 입력 가능한 최대 체장(cm). 국내 기록어 기준으로도 충분히 크다. */
 export const MAX_SIZE_CM = 500;
