@@ -1,4 +1,6 @@
 import 'react-native-gesture-handler';
+// Supabase PKCE가 sha256 챌린지를 쓰도록 crypto.subtle을 먼저 채운다.
+import '@/src/lib/webCryptoPolyfill';
 import "../global.css";
 
 import FontAwesome from '@expo/vector-icons/FontAwesome';
