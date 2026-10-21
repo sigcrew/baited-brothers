@@ -33,6 +33,7 @@ import {
   displayFont,
   monoFont,
 } from "@/src/theme/fieldJournal";
+import { isTripOverdue } from "@/src/lib/tripSchedule";
 
 type TripFilter = JournalTripFilter;
 
@@ -194,7 +195,7 @@ const TripTimelineRow = ({
           )}
 
           <Text className="mt-4 text-sm" style={{ color: accent, fontFamily: bodyExtraBoldFont }}>
-            {STATUS_LABEL[trip.status]}
+            {trip.status === "planned" && isTripOverdue(trip.scheduled_at) ? "예정일 지남" : STATUS_LABEL[trip.status]}
           </Text>
         </View>
         <View

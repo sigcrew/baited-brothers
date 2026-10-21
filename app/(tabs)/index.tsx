@@ -31,6 +31,7 @@ import { ArchiveTabHeader } from "@/components/design/ArchiveTabHeader";
 import { TripCoverActionSheet } from "@/components/trips/TripCoverActionSheet";
 import { TripFormModal } from "@/components/trips/TripFormModal";
 import { useFieldNotice } from "@/src/contexts/FieldNoticeContext";
+import { formatCountdown, pickNextTrip, tripCountdown } from "@/src/lib/tripSchedule";
 import {
   FIELD_COLORS,
   bodyExtraBoldFont,
@@ -39,6 +40,7 @@ import {
   dateNumberFont,
   displayFont,
   monoFont,
+  bodyFont,
 } from "@/src/theme/fieldJournal";
 
 const DEFAULT_HERO_IMAGE = require("@/assets/images/design/first-trip-cover-v1.png");
@@ -140,6 +142,7 @@ const HomeScreen = () => {
     createTrip,
     updateTripCover,
     removeTripCover,
+    markDone,
   } = useFishingTrips({ syncReminders: true });
   const { catches } = useUserCatches();
 
@@ -172,7 +175,25 @@ const HomeScreen = () => {
     return createError;
   };
 
-  const nextTrip = plannedTrips[0];
+  // 오늘 이후 예정 출조가 우선. 전부 지났으면 가장 최근 것을 보여 주고 정리를 유도한다.
+  const nextTripPick = pickNextTrip(plannedTrips);
+  const nextTrip = nextTripPick?.trip;
+  const nextTripCountdown = nextTrip ? tripCountdown(nextTrip.scheduled_at) : null;
+  const nextTripOverdue = nextTripCountdown?.kind === "overdue";
+  const overdueTripCount = nextTripPick?.overdueCount ?? 0;
+  const handleMarkNextTripDone = async () => {
+    if (!nextTrip) return;
+    const confirmed = await confirm({
+      eyebrow: "FIELD LOG · COMPLETE",
+      title: "출조를 완료로 표시할까요?",
+      message: `${nextTrip.spot_name} 출조의 예정일이 지났습니다. 완료로 표시하면 일지와 배지에 반영됩니다.`,
+      confirmLabel: "완료로 표시",
+      cancelLabel: "나중에",
+    });
+    if (!confirmed) return;
+    const { error: doneError } = await markDone(nextTrip.id);
+    if (doneError) alert({ eyebrow: "FIELD LOG · ERROR", title: "완료 처리에 실패했습니다", message: "잠시 후 다시 시도해 주세요." });
+  };
   const latestDoneTrip = recentDoneTrips[0];
   const hasTripHistory = Boolean(latestDoneTrip);
   const heroSource = nextTrip?.cover_image_url
@@ -189,9 +210,15 @@ const HomeScreen = () => {
   const dateWeekday = nextDate
     ? new Intl.DateTimeFormat("ko-KR", { weekday: "long" }).format(nextDate)
     : "";
-  const daysAway = nextDate
-    ? Math.max(0, Math.ceil((nextDate.getTime() - Date.now()) / 86400000))
-    : 0;
+  const countdownLabel = nextTripCountdown ? formatCountdown(nextTripCountdown) : "";
+  // "D", 부호, 숫자를 따로 그린다. 오늘은 숫자 대신 DAY.
+  const countdownSign = nextTripCountdown?.kind === "overdue" ? "+" : "-";
+  const countdownValue =
+    nextTripCountdown?.kind === "upcoming"
+      ? String(nextTripCountdown.daysAway)
+      : nextTripCountdown?.kind === "overdue"
+        ? String(nextTripCountdown.daysOverdue)
+        : "DAY";
   const handleRecord = () => isLoggedIn ? router.push("/record") : router.push("/(auth)/login");
   const handleAddTrip = () => isLoggedIn ? setAddVisible(true) : router.push("/(auth)/login");
   const discardPendingCatch = async (pending: PendingCatchJob) => {
@@ -341,9 +368,13 @@ const HomeScreen = () => {
                     lineHeight: heroSpotLineHeight,
                   }}
                 >
-                  다음 출조는 {nextTrip.spot_name}입니다.
+                  {nextTripOverdue ? `${nextTrip.spot_name} 출조가 지났습니다.` : `다음 출조는 ${nextTrip.spot_name}입니다.`}
                 </Text>
-                <Text className="mt-4 text-[15px] tracking-[1.6px]" style={{ color: heroTextColor, fontFamily: bodySemiBoldFont }}>{nextDate?.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })} 출조 예정</Text>
+                <Text className="mt-4 text-[15px] tracking-[1.6px]" style={{ color: heroTextColor, fontFamily: bodySemiBoldFont }}>
+                  {nextTripOverdue
+                    ? "완료 또는 취소로 정리해 주세요"
+                    : `${nextDate?.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })} 출조 예정`}
+                </Text>
               </>
             ) : hasTripHistory ? (
               <View className="pt-3">
@@ -505,7 +536,7 @@ const HomeScreen = () => {
         ) : null}
         <View className="mt-3 bg-white px-4 py-6">
           <View className="flex-row items-center justify-between">
-            <Text className="text-xl" style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>다가오는 출조</Text>
+            <Text className="text-xl" style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>{nextTripOverdue ? "정리할 출조" : "다가오는 출조"}</Text>
             {nextTrip ? (
               <TouchableOpacity accessibilityRole="button" accessibilityLabel="출조 일지 전체 보기" onPress={() => router.push("/(tabs)/journal")}>
                 <Text className="text-[11px] tracking-[1px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>ALL LOGS →</Text>
@@ -552,7 +583,7 @@ const HomeScreen = () => {
               <View
                 className="flex-row items-center"
                 accessible
-                accessibilityLabel={`D-${daysAway}`}
+                accessibilityLabel={nextTripOverdue ? `예정일 ${countdownValue}일 지남` : countdownLabel}
               >
                 <Text
                   style={{
@@ -566,29 +597,62 @@ const HomeScreen = () => {
                 >
                   D
                 </Text>
-                <View
-                  style={{
-                    width: 14,
-                    height: 4,
-                    marginHorizontal: 5,
-                    backgroundColor: FIELD_COLORS.orange,
-                  }}
-                />
+                {countdownSign === "+" ? (
+                  <Text
+                    style={{
+                      color: FIELD_COLORS.orange,
+                      fontFamily: dateNumberFont,
+                      fontSize: 34,
+                      lineHeight: 62,
+                      marginHorizontal: 3,
+                      paddingTop: 2,
+                    }}
+                  >
+                    +
+                  </Text>
+                ) : (
+                  <View
+                    style={{
+                      width: 14,
+                      height: 4,
+                      marginHorizontal: 5,
+                      backgroundColor: FIELD_COLORS.orange,
+                    }}
+                  />
+                )}
                 <Text
                   style={{
                     color: FIELD_COLORS.orange,
                     fontFamily: dateNumberFont,
-                    fontSize: 48,
+                    fontSize: countdownValue === "DAY" ? 30 : 48,
                     lineHeight: 62,
                     overflow: "visible",
                     paddingTop: 2,
                   }}
                 >
-                  {daysAway}
+                  {countdownValue}
                 </Text>
               </View>
             </TouchableOpacity>
-          ) : (
+          ) : null}
+          {nextTrip && nextTripOverdue ? (
+            <View className="flex-row items-center justify-between border-b py-3" style={{ borderColor: FIELD_COLORS.rule }}>
+              <Text className="flex-1 text-xs leading-5" style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}>
+                {overdueTripCount > 1 ? `지난 예정 출조가 ${overdueTripCount}건 있습니다. ` : ""}다녀왔다면 완료로, 못 갔다면 상세에서 취소로 표시해 주세요.
+              </Text>
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel={`${nextTrip.spot_name} 출조 완료로 표시`}
+                onPress={() => void handleMarkNextTripDone()}
+                disabled={isSaving}
+                className="ml-3 px-3 py-2"
+                style={{ backgroundColor: FIELD_COLORS.teal }}
+              >
+                <Text className="text-[13px] text-white" style={{ fontFamily: bodyExtraBoldFont }}>완료로 표시</Text>
+              </TouchableOpacity>
+            </View>
+          ) : null}
+          {!isLoading && !nextTrip ? (
             <TouchableOpacity
               accessibilityRole="button"
               accessibilityLabel={hasTripHistory ? "새 출조 추가" : "첫 출조 추가"}
@@ -603,7 +667,7 @@ const HomeScreen = () => {
               </Text>
               <FontAwesome name="long-arrow-right" size={25} color="#fff" />
             </TouchableOpacity>
-          )}
+          ) : null}
         </View>
 
         <View className="mt-3 bg-white px-4 py-6">
