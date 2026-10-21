@@ -69,7 +69,7 @@ const RecordScreen = () => {
   const inFlightAnalysis = useRef<{ userId: string; pendingCatchId: string } | null>(null);
   const slowTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { session } = useAuth();
-  const { alert, confirm } = useFieldNotice();
+  const { alert, confirm, choose, toast } = useFieldNotice();
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const lastCameraPermission = useRef(cameraPermission);
   if (cameraPermission) {
@@ -977,6 +977,27 @@ const RecordScreen = () => {
     );
   }
 
+  // 조과 확인 화면의 "취소". 사진은 촬영 순간 기기 큐에 저장돼 있으므로, 말없이 남기지
+  // 말고 임시 보관(홈의 "미완료 현장 기록"에서 이어가기)할지 삭제할지 묻는다.
+  const leaveReview = async () => {
+    const choice = await choose({
+      eyebrow: "FIELD CATCH · DRAFT",
+      title: "기록을 그만둘까요?",
+      message: "임시 보관하면 사진이 이 기기에 남아 홈의 미완료 현장 기록에서 이어서 저장할 수 있습니다. 삭제하면 사진과 판별 결과가 지워집니다.",
+      cancelLabel: "계속 작성",
+      secondaryLabel: "삭제",
+      secondaryDestructive: true,
+      confirmLabel: "임시 보관",
+    });
+    if (choice === "cancel") return;
+    if (choice === "secondary" && session?.user.id) {
+      await removePendingCatch(session.user.id, capture.pendingCatchId);
+    } else if (choice === "confirm") {
+      toast({ message: "홈의 미완료 현장 기록에 보관했습니다.", tone: "success" });
+    }
+    router.back();
+  };
+
   const selectFish = (fish: Fish) => {
     setSelectedFish(fish);
     setCustomSpeciesName(null);
@@ -999,7 +1020,7 @@ const RecordScreen = () => {
       selectedFish={selectedFish}
       customSpeciesName={customSpeciesName}
       form={{ size, sizeError, memo, isSaving }}
-      onBack={() => router.back()}
+      onBack={() => void leaveReview()}
       onChangePhoto={capture.source === "photo_library" ? pickLibraryPhoto : retakePhoto}
       onSelectFish={selectFish}
       onClearSelection={() => {

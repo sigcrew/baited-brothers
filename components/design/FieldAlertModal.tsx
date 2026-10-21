@@ -17,6 +17,10 @@ type FieldAlertModalProps = {
   cancelLabel?: string;
   onConfirm?: () => void;
   destructive?: boolean;
+  /** 있으면 취소와 확인 사이에 두 번째 행동 버튼을 그린다. */
+  secondaryLabel?: string;
+  secondaryDestructive?: boolean;
+  onSecondary?: () => void;
 };
 
 export const FieldAlertModal = ({
@@ -29,6 +33,9 @@ export const FieldAlertModal = ({
   cancelLabel = "취소",
   onConfirm,
   destructive = false,
+  secondaryLabel,
+  secondaryDestructive = false,
+  onSecondary,
 }: FieldAlertModalProps) => (
   <Modal
     visible={visible}
@@ -111,6 +118,26 @@ export const FieldAlertModal = ({
                   {cancelLabel}
                 </Text>
               </TouchableOpacity>
+              {onSecondary && secondaryLabel ? (
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  accessibilityLabel={secondaryLabel}
+                  activeOpacity={0.82}
+                  onPress={onSecondary}
+                  className="h-12 flex-1 items-center justify-center border"
+                  style={{ borderColor: secondaryDestructive ? FIELD_COLORS.orange : FIELD_COLORS.teal }}
+                >
+                  <Text
+                    className="text-[15px]"
+                    style={{
+                      color: secondaryDestructive ? FIELD_COLORS.orange : FIELD_COLORS.teal,
+                      fontFamily: bodyExtraBoldFont,
+                    }}
+                  >
+                    {secondaryLabel}
+                  </Text>
+                </TouchableOpacity>
+              ) : null}
               <TouchableOpacity
                 accessibilityRole="button"
                 accessibilityLabel={confirmLabel}

@@ -27,9 +27,20 @@ type NoticeOptions = {
   destructive?: boolean;
 };
 
+/** 세 갈래 선택 결과. 바깥을 누르거나 뒤로가기로 닫으면 "cancel". */
+export type NoticeChoice = "confirm" | "secondary" | "cancel";
+
+type ChoiceOptions = NoticeOptions & {
+  /** 확인과 취소 사이에 들어가는 두 번째 행동(예: 삭제). */
+  secondaryLabel: string;
+  secondaryDestructive?: boolean;
+};
+
 type ActiveNotice = NoticeOptions & {
-  kind: "alert" | "confirm";
-  resolve: (confirmed: boolean) => void;
+  kind: "alert" | "confirm" | "choose";
+  secondaryLabel?: string;
+  secondaryDestructive?: boolean;
+  resolve: (result: NoticeChoice) => void;
 };
 
 type ToastOptions = {
@@ -40,6 +51,7 @@ type ToastOptions = {
 type FieldNoticeContextValue = {
   alert: (options: NoticeOptions) => Promise<void>;
   confirm: (options: NoticeOptions) => Promise<boolean>;
+  choose: (options: ChoiceOptions) => Promise<NoticeChoice>;
   toast: (options: ToastOptions | string) => void;
 };
 
@@ -55,9 +67,9 @@ export const FieldNoticeProvider = ({ children }: PropsWithChildren) => {
 
   useEffect(() => () => {
     if (toastTimer.current) clearTimeout(toastTimer.current);
-    noticeRef.current?.resolve(false);
+    noticeRef.current?.resolve("cancel");
     noticeRef.current = null;
-    queueRef.current.splice(0).forEach((queued) => queued.resolve(false));
+    queueRef.current.splice(0).forEach((queued) => queued.resolve("cancel"));
   }, []);
 
   // 확인창이 떠 있는 동안 다른 알림이 오면, 예전에는 확인창을 false로 끝내 버려
@@ -82,15 +94,20 @@ export const FieldNoticeProvider = ({ children }: PropsWithChildren) => {
 
   const confirm = useCallback((options: NoticeOptions) =>
     new Promise<boolean>((resolve) => {
-      presentNotice({ ...options, kind: "confirm", resolve });
+      presentNotice({ ...options, kind: "confirm", resolve: (result) => resolve(result === "confirm") });
     }), [presentNotice]);
 
-  const closeNotice = useCallback((confirmed: boolean) => {
+  const choose = useCallback((options: ChoiceOptions) =>
+    new Promise<NoticeChoice>((resolve) => {
+      presentNotice({ ...options, kind: "choose", resolve });
+    }), [presentNotice]);
+
+  const closeNotice = useCallback((result: NoticeChoice) => {
     const current = noticeRef.current;
     const next = queueRef.current.shift() ?? null;
     noticeRef.current = next;
     setNotice(next);
-    current?.resolve(confirmed);
+    current?.resolve(result);
   }, []);
 
   const toast = useCallback((options: ToastOptions | string) => {
@@ -100,7 +117,7 @@ export const FieldNoticeProvider = ({ children }: PropsWithChildren) => {
     toastTimer.current = setTimeout(() => setToastNotice(null), 2600);
   }, []);
 
-  const value = useMemo(() => ({ alert, confirm, toast }), [alert, confirm, toast]);
+  const value = useMemo(() => ({ alert, confirm, choose, toast }), [alert, choose, confirm, toast]);
   const toastColor = toastNotice?.tone === "error"
     ? FIELD_COLORS.orange
     : toastNotice?.tone === "success"
@@ -118,8 +135,11 @@ export const FieldNoticeProvider = ({ children }: PropsWithChildren) => {
         confirmLabel={notice?.confirmLabel}
         cancelLabel={notice?.cancelLabel}
         destructive={notice?.destructive}
-        onClose={() => closeNotice(false)}
-        onConfirm={notice?.kind === "confirm" ? () => closeNotice(true) : undefined}
+        secondaryLabel={notice?.kind === "choose" ? notice.secondaryLabel : undefined}
+        secondaryDestructive={notice?.secondaryDestructive}
+        onClose={() => closeNotice("cancel")}
+        onConfirm={notice && notice.kind !== "alert" ? () => closeNotice("confirm") : undefined}
+        onSecondary={notice?.kind === "choose" ? () => closeNotice("secondary") : undefined}
       />
       {toastNotice ? (
         <View
