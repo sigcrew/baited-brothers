@@ -392,6 +392,18 @@ export default function MapScreen() {
     ? findByCoordinate(selected.latitude, selected.longitude)
     : null;
 
+  const planTripFromSelection = () => {
+    if (!isLoggedIn) {
+      showMapAlert(
+        "로그인이 필요합니다",
+        "출조 계획은 계정에 저장됩니다. 먼저 로그인해 주세요.",
+        "PLAN TRIP",
+      );
+      return;
+    }
+    setFormVisible(true);
+  };
+
   const toggleSelectedFavorite = async () => {
     if (!selected || favoriteSaving) return;
     if (!isLoggedIn) {
@@ -508,7 +520,9 @@ export default function MapScreen() {
           conditionsStale={isStale}
           conditionsError={conditionsError}
           onRefetchConditions={refetchConditions}
-          onPlanTrip={() => setFormVisible(true)}
+          onPlanTrip={planTripFromSelection}
+          isLoggedIn={isLoggedIn}
+          onLogin={() => router.push("/(auth)/login")}
         />
       ) : null}
 

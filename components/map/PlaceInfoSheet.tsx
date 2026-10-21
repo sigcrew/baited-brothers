@@ -98,10 +98,13 @@ type MarineConditionsPanelProps = {
   isLoading: boolean;
   error: Error | null;
   onRefetch: () => void;
+  /** 게스트에게는 실패 대신 로그인 안내를 보여 준다. */
+  isLoggedIn?: boolean;
+  onLogin?: () => void;
 };
 
 /** 24시간 예보·조석 스트립, 핵심 지표 3개, 관측소 설명. */
-export const MarineConditionsPanel = ({ conditions, isLoading, error, onRefetch }: MarineConditionsPanelProps) => {
+export const MarineConditionsPanel = ({ conditions, isLoading, error, onRefetch, isLoggedIn = true, onLogin }: MarineConditionsPanelProps) => {
   const highTide = nextTide(conditions?.tides ?? [], "high");
   const lowTide = nextTide(conditions?.tides ?? [], "low");
   return (
@@ -188,6 +191,13 @@ export const MarineConditionsPanel = ({ conditions, isLoading, error, onRefetch 
                 ) : null}
               </View>
             </>
+          ) : !isLoggedIn ? (
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="로그인하고 수온·물때 보기" onPress={onLogin} className="flex-row items-center">
+              <View className="border px-2 py-1" style={{ borderColor: FIELD_COLORS.teal, backgroundColor: "#E8F3F1" }}>
+                <Text className="text-[10px]" style={{ color: FIELD_COLORS.teal, fontFamily: bodyExtraBoldFont }}>로그인 필요</Text>
+              </View>
+              <Text className="ml-2 text-[11px]" style={{ color: FIELD_COLORS.ink, fontFamily: bodySemiBoldFont }}>로그인하면 수온·물때를 볼 수 있습니다</Text>
+            </TouchableOpacity>
           ) : isLoading ? (
             <View className="flex-row items-center">
               <ActivityIndicator size="small" color={FIELD_COLORS.teal} />
@@ -230,6 +240,8 @@ type PlaceInfoSheetProps = {
   conditionsError: Error | null;
   onRefetchConditions: () => void;
   onPlanTrip: () => void;
+  isLoggedIn?: boolean;
+  onLogin?: () => void;
 };
 
 /**
@@ -257,6 +269,8 @@ export const PlaceInfoSheet = ({
   conditionsError,
   onRefetchConditions,
   onPlanTrip,
+  isLoggedIn = true,
+  onLogin,
 }: PlaceInfoSheetProps) => {
   const displayName = placeName || selected.name;
   return (
@@ -383,6 +397,8 @@ export const PlaceInfoSheet = ({
                 isLoading={conditionsLoading}
                 error={conditionsError}
                 onRefetch={onRefetchConditions}
+                isLoggedIn={isLoggedIn}
+                onLogin={onLogin}
               />
               <View style={{ paddingBottom: 16, paddingTop: 16 }}>
                 <TouchableOpacity

@@ -12,3 +12,14 @@ export const pickDisplayName = (
   }
   return null;
 };
+
+/**
+ * 프로필 헤더의 "SINCE 2026.07" 표기. 가입 시각이 없거나 깨져 있으면 null.
+ */
+export const formatMemberSince = (createdAt: string | null | undefined): string | null => {
+  if (!createdAt) return null;
+  const date = new Date(createdAt);
+  if (Number.isNaN(date.getTime())) return null;
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  return `SINCE ${date.getFullYear()}.${month}`;
+};
