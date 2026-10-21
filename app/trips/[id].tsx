@@ -17,6 +17,7 @@ import * as MediaLibrary from "expo-media-library";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ArchiveRule } from "@/components/design/ArchiveRule";
+import { FieldDateLine } from "@/components/design/FieldDateLine";
 import { TripFormModal } from "@/components/trips/TripFormModal";
 import { CatchEditModal } from "@/components/catches/CatchEditModal";
 import { TripMiniMap } from "@/components/map/TripMiniMap";
@@ -32,8 +33,6 @@ import {
   bodyExtraBoldFont,
   bodyFont,
   bodySemiBoldFont,
-  dateKoreanFont,
-  dateNumberFont,
   displayFont,
   monoFont,
 } from "@/src/theme/fieldJournal";
@@ -365,13 +364,22 @@ const TripDetailScreen = () => {
         </ImageBackground>
 
         <View className="bg-white px-5 pb-6 pt-5">
-          <View className="min-h-[80px] flex-row items-end">
-            <Text style={{ color: FIELD_COLORS.ink, fontFamily: dateNumberFont, fontSize: 66, lineHeight: 80, overflow: "visible", paddingTop: 3 }}>{month}</Text>
-            <Text style={{ color: FIELD_COLORS.ink, fontFamily: dateKoreanFont, fontSize: 29, lineHeight: 49 }}>월 </Text>
-            <Text style={{ color: FIELD_COLORS.ink, fontFamily: dateNumberFont, fontSize: 66, lineHeight: 80, overflow: "visible", paddingTop: 3 }}>{day}</Text>
-            <Text style={{ color: FIELD_COLORS.ink, fontFamily: dateKoreanFont, fontSize: 29, lineHeight: 49 }}>일, </Text>
-            <Text style={{ color: FIELD_COLORS.ink, fontFamily: dateKoreanFont, fontSize: 34, lineHeight: 52 }}>{weekday}</Text>
-          </View>
+          {/* 홈 히어로와 같은 날짜 줄. 숫자 글리프가 예전 Text(66pt)와 같은 크기가 되도록 77로 둔다. */}
+          <FieldDateLine
+            color={FIELD_COLORS.ink}
+            numberSize={77}
+            unitSize={29}
+            weekdaySize={34}
+            lineHeightRatio={1}
+            style={{ marginTop: -6 }}
+            parts={[
+              { kind: "number", value: month },
+              { kind: "unit", value: "월 " },
+              { kind: "number", value: day },
+              { kind: "unit", value: "일, " },
+              { kind: "weekday", value: weekday },
+            ]}
+          />
           <Text className="mt-2 text-[30px] leading-[40px]" style={{ color: FIELD_COLORS.ink, fontFamily: displayFont }}>
             {trip.spot_name}
           </Text>

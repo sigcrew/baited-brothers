@@ -13,12 +13,14 @@ import {
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFocusEffect, useRouter } from "expo-router";
-import Svg, { Text as SvgText } from "react-native-svg";
 import {
   useFishingTrips,
   type UpdateTripInput,
 } from "@/src/hooks/useFishingTrips";
 import { useUserCatches } from "@/src/hooks/useUserCatches";
+import { useFishes } from "@/src/hooks/useFishes";
+import { HERO_FALLBACK_TITLE, HERO_SUBTITLE, pickSeasonalSpecies } from "@/src/lib/homeHero";
+import { FieldDateLine } from "@/components/design/FieldDateLine";
 import { useImageContrast } from "@/src/hooks/useImageContrast";
 import { useAuth } from "@/src/contexts/AuthContext";
 import {
@@ -36,7 +38,6 @@ import {
   FIELD_COLORS,
   bodyExtraBoldFont,
   bodySemiBoldFont,
-  dateKoreanFont,
   dateNumberFont,
   displayFont,
   monoFont,
@@ -48,42 +49,16 @@ const DEFAULT_HERO_IMAGE = require("@/assets/images/design/first-trip-cover-v1.p
 const HERO_TYPE_BASE_WIDTH = 430;
 const HERO_HORIZONTAL_PADDING = 56; // px-7 * 2
 
+// D-day 카운트다운의 "+"/"-" 막대. 오프셋은 iPhone 16 Pro 스크린샷에서 "D" 글리프
+// 중앙과 막대 중앙의 차이를 재서 정했다.
+const COUNTDOWN_SIGN_SIZE = 14;
+const COUNTDOWN_SIGN_STROKE = 4;
+const COUNTDOWN_SIGN_OFFSET_Y = -4;
+
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
 
 /** Anton 숫자는 RN Text ascent 클리핑이 있어 SVG + 상단 여유로 그림 */
-const AntonDateNumber = ({
-  value,
-  color,
-  fontSize,
-  height,
-}: {
-  value: string;
-  color: string;
-  fontSize: number;
-  height: number;
-}) => {
-  const width = Math.ceil(fontSize * 0.58 * Math.max(value.length, 1) + 10);
-  // 글자는 박스보다 작게, baseline은 아래로 → 윗부분이 절대 잘리지 않게
-  const renderSize = fontSize * 0.86;
-  const topPad = Math.max(10, height - renderSize * 1.02);
-  const baseline = topPad + renderSize * 0.92;
-  return (
-    <Svg width={width} height={height}>
-      <SvgText
-        fill={color}
-        fontSize={renderSize}
-        fontFamily={dateNumberFont}
-        fontWeight="400"
-        x={2}
-        y={baseline}
-      >
-        {value}
-      </SvgText>
-    </Svg>
-  );
-};
-
 const formatTripDate = (iso: string) => {
   const date = new Date(iso);
   return date.toLocaleString("ko-KR", {
@@ -118,8 +93,6 @@ const HomeScreen = () => {
   const heroDateNumberSize = Math.round(82 * heroTypeScale);
   const heroDateUnitSize = Math.round(39 * heroTypeScale);
   const heroDateWeekdaySize = Math.round(47 * heroTypeScale);
-  // SVG 숫자 박스와 동일 높이 (부모보다 튀어나오면 ScrollView가 상단을 자름)
-  const heroDateLineHeight = Math.round(heroDateNumberSize * 1.55);
   const heroTitleSize = Math.round(44 * heroTypeScale);
   const heroTitleLineHeight = Math.round(54 * heroTypeScale);
   const heroSpotSize = Math.round(25 * heroTypeScale);
@@ -145,6 +118,8 @@ const HomeScreen = () => {
     markDone,
   } = useFishingTrips({ syncReminders: true });
   const { catches } = useUserCatches();
+  const { fishes: catalogFishes } = useFishes();
+  const heroSeason = pickSeasonalSpecies(catalogFishes);
 
   const refreshPendingCatches = useCallback(async () => {
     const userId = session?.user.id;
@@ -180,6 +155,8 @@ const HomeScreen = () => {
   const nextTrip = nextTripPick?.trip;
   const nextTripCountdown = nextTrip ? tripCountdown(nextTrip.scheduled_at) : null;
   const nextTripOverdue = nextTripCountdown?.kind === "overdue";
+  // 히어로는 앞으로 갈 출조만 보여 준다. 지난 예정 출조는 아래 "정리할 출조" 칸에서만 다룬다.
+  const heroTrip = nextTripOverdue ? undefined : nextTrip;
   const overdueTripCount = nextTripPick?.overdueCount ?? 0;
   const handleMarkNextTripDone = async () => {
     if (!nextTrip) return;
@@ -196,15 +173,15 @@ const HomeScreen = () => {
   };
   const latestDoneTrip = recentDoneTrips[0];
   const hasTripHistory = Boolean(latestDoneTrip);
-  const heroSource = nextTrip?.cover_image_url
-    ? { uri: nextTrip.cover_image_url }
+  const heroSource = heroTrip?.cover_image_url
+    ? { uri: heroTrip.cover_image_url }
     : latestDoneTrip?.cover_image_url
       ? { uri: latestDoneTrip.cover_image_url }
       : DEFAULT_HERO_IMAGE;
   const isDarkHero = useImageContrast(heroSource);
   const heroTextColor = isDarkHero ? FIELD_COLORS.paper : FIELD_COLORS.ink;
   const heroRuleColor = isDarkHero ? "rgba(255,255,255,0.72)" : FIELD_COLORS.rule;
-  const nextDate = nextTrip ? new Date(nextTrip.scheduled_at) : null;
+  const nextDate = heroTrip ? new Date(heroTrip.scheduled_at) : null;
   const dateMonth = nextDate ? String(nextDate.getMonth() + 1) : "";
   const dateDay = nextDate ? String(nextDate.getDate()) : "";
   const dateWeekday = nextDate
@@ -237,7 +214,7 @@ const HomeScreen = () => {
     await refreshPendingCatches();
   };
   const handleChangeCover = () => {
-    if (!nextTrip || isSaving) return;
+    if (!heroTrip || isSaving) return;
     setCoverActionsVisible(true);
   };
 
@@ -291,70 +268,22 @@ const HomeScreen = () => {
               <View className="h-28 items-start justify-center">
                 <ActivityIndicator color={heroTextColor} />
               </View>
-            ) : nextTrip ? (
+            ) : heroTrip ? (
               <>
-                <View
-                  style={{
-                    height: heroDateLineHeight,
-                    flexDirection: "row",
-                    alignItems: "flex-end",
-                    overflow: "visible",
-                    marginTop: 4,
-                  }}
-                >
-                  <AntonDateNumber
-                    value={dateMonth}
-                    color={heroTextColor}
-                    fontSize={heroDateNumberSize}
-                    height={heroDateLineHeight}
-                  />
-                  <Text
-                    allowFontScaling={false}
-                    style={{
-                      color: heroTextColor,
-                      fontFamily: dateKoreanFont,
-                      fontSize: heroDateUnitSize,
-                      lineHeight: Math.round(heroDateUnitSize * 1.55),
-                      marginBottom: Math.round(8 * heroTypeScale),
-                    }}
-                  >
-                    월{" "}
-                  </Text>
-                  <AntonDateNumber
-                    value={dateDay}
-                    color={heroTextColor}
-                    fontSize={heroDateNumberSize}
-                    height={heroDateLineHeight}
-                  />
-                  <Text
-                    allowFontScaling={false}
-                    style={{
-                      color: heroTextColor,
-                      fontFamily: dateKoreanFont,
-                      fontSize: heroDateUnitSize,
-                      lineHeight: Math.round(heroDateUnitSize * 1.55),
-                      marginBottom: Math.round(6 * heroTypeScale),
-                    }}
-                  >
-                    일,{" "}
-                  </Text>
-                  <Text
-                    allowFontScaling={false}
-                    numberOfLines={1}
-                    adjustsFontSizeToFit
-                    minimumFontScale={0.75}
-                    style={{
-                      flexShrink: 1,
-                      color: heroTextColor,
-                      fontFamily: dateKoreanFont,
-                      fontSize: heroDateWeekdaySize,
-                      lineHeight: Math.round(heroDateWeekdaySize * 1.4),
-                      marginBottom: Math.round(4 * heroTypeScale),
-                    }}
-                  >
-                    {dateWeekday}
-                  </Text>
-                </View>
+                <FieldDateLine
+                  color={heroTextColor}
+                  numberSize={heroDateNumberSize}
+                  unitSize={heroDateUnitSize}
+                  weekdaySize={heroDateWeekdaySize}
+                  style={{ marginTop: 4 }}
+                  parts={[
+                    { kind: "number", value: dateMonth },
+                    { kind: "unit", value: "월 " },
+                    { kind: "number", value: dateDay },
+                    { kind: "unit", value: "일, " },
+                    { kind: "weekday", value: dateWeekday },
+                  ]}
+                />
                 <Text
                   numberOfLines={1}
                   adjustsFontSizeToFit
@@ -368,36 +297,62 @@ const HomeScreen = () => {
                     lineHeight: heroSpotLineHeight,
                   }}
                 >
-                  {nextTripOverdue ? `${nextTrip.spot_name} 출조가 지났습니다.` : `다음 출조는 ${nextTrip.spot_name}입니다.`}
+                  다음 출조는 {heroTrip.spot_name}입니다.
                 </Text>
-                <Text className="mt-4 text-[15px] tracking-[1.6px]" style={{ color: heroTextColor, fontFamily: bodySemiBoldFont }}>
-                  {nextTripOverdue
-                    ? "완료 또는 취소로 정리해 주세요"
-                    : `${nextDate?.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })} 출조 예정`}
+                <Text className="mt-4 text-[15px]" style={{ color: heroTextColor, fontFamily: bodySemiBoldFont }}>
+                  {nextDate?.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })} 출조 예정
                 </Text>
               </>
-            ) : hasTripHistory ? (
+            ) : hasTripHistory || nextTripOverdue ? (
               <View className="pt-3">
-                <Text
-                  numberOfLines={1}
-                  adjustsFontSizeToFit
-                  minimumFontScale={0.72}
-                  allowFontScaling={false}
-                  className="max-w-[580px] tracking-[-1.5px]"
-                  style={{
-                    color: heroTextColor,
-                    fontFamily: displayFont,
-                    fontSize: heroTitleSize,
-                    lineHeight: heroTitleLineHeight,
-                  }}
-                >
-                  다음 출조를 계획해볼까요
-                </Text>
-                <Text
-                  className="mt-4 text-lg tracking-[-0.3px]"
-                  style={{ color: heroTextColor, fontFamily: bodySemiBoldFont }}
-                >
-                  지난 기록을 이어 새로운 일지를 시작해보세요
+                {heroSeason ? (
+                  <>
+                    {/* 다가오는 출조 히어로와 같은 모양: 큰 숫자 날짜 줄 + 한 줄 제목 */}
+                    <FieldDateLine
+                      color={heroTextColor}
+                      numberSize={heroDateNumberSize}
+                      unitSize={heroDateUnitSize}
+                      style={{ marginTop: 4 }}
+                      parts={[
+                        { kind: "number", value: String(heroSeason.month) },
+                        { kind: "unit", value: "월," },
+                      ]}
+                    />
+                    <Text
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                      minimumFontScale={0.65}
+                      allowFontScaling={false}
+                      className="mt-1"
+                      style={{
+                        color: heroTextColor,
+                        fontFamily: displayFont,
+                        fontSize: heroSpotSize,
+                        lineHeight: heroSpotLineHeight,
+                      }}
+                    >
+                      {heroSeason.name} 시즌입니다.
+                    </Text>
+                  </>
+                ) : (
+                  <Text
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    minimumFontScale={0.72}
+                    allowFontScaling={false}
+                    className="max-w-[580px] tracking-[-1.5px]"
+                    style={{
+                      color: heroTextColor,
+                      fontFamily: displayFont,
+                      fontSize: heroTitleSize,
+                      lineHeight: heroTitleLineHeight,
+                    }}
+                  >
+                    {HERO_FALLBACK_TITLE}
+                  </Text>
+                )}
+                <Text className="mt-4 text-[15px]" style={{ color: heroTextColor, fontFamily: bodySemiBoldFont }}>
+                  {HERO_SUBTITLE}
                 </Text>
                 <TouchableOpacity
                   accessibilityRole="button"
@@ -450,7 +405,7 @@ const HomeScreen = () => {
               </View>
             )}
           </View>
-          {nextTrip && isLoggedIn ? (
+          {heroTrip && isLoggedIn ? (
             <TouchableOpacity
               accessibilityLabel="출조 커버 사진 변경"
               onPress={handleChangeCover}
@@ -597,29 +552,30 @@ const HomeScreen = () => {
                 >
                   D
                 </Text>
-                {countdownSign === "+" ? (
-                  <Text
-                    style={{
-                      color: FIELD_COLORS.orange,
-                      fontFamily: dateNumberFont,
-                      fontSize: 34,
-                      lineHeight: 62,
-                      marginHorizontal: 3,
-                      paddingTop: 2,
-                    }}
-                  >
-                    +
-                  </Text>
-                ) : (
-                  <View
-                    style={{
-                      width: 14,
-                      height: 4,
-                      marginHorizontal: 5,
-                      backgroundColor: FIELD_COLORS.orange,
-                    }}
-                  />
-                )}
+                {/* "+"와 "-"를 같은 굵기의 막대로 그리고 "D" 글자의 세로 중앙에 맞춘다.
+                    Anton 글자는 줄 상자 중앙보다 약 4pt 위에 그려지므로 그만큼 올린다. */}
+                <View
+                  style={{
+                    width: COUNTDOWN_SIGN_SIZE,
+                    height: COUNTDOWN_SIGN_SIZE,
+                    marginHorizontal: 5,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    transform: [{ translateY: COUNTDOWN_SIGN_OFFSET_Y }],
+                  }}
+                >
+                  <View style={{ width: COUNTDOWN_SIGN_SIZE, height: COUNTDOWN_SIGN_STROKE, backgroundColor: FIELD_COLORS.orange }} />
+                  {countdownSign === "+" ? (
+                    <View
+                      style={{
+                        position: "absolute",
+                        width: COUNTDOWN_SIGN_STROKE,
+                        height: COUNTDOWN_SIGN_SIZE,
+                        backgroundColor: FIELD_COLORS.orange,
+                      }}
+                    />
+                  ) : null}
+                </View>
                 <Text
                   style={{
                     color: FIELD_COLORS.orange,
@@ -796,18 +752,18 @@ const HomeScreen = () => {
         isSaving={isSaving}
       />
       <TripCoverActionSheet
-        hasCover={Boolean(nextTrip?.cover_image_url)}
+        hasCover={Boolean(heroTrip?.cover_image_url)}
         visible={coverActionsVisible}
         isBusy={isSaving}
         onClose={() => setCoverActionsVisible(false)}
         onSelect={async (image) => {
-          if (!nextTrip) return;
-          const { error: coverError } = await updateTripCover(nextTrip.id, image);
+          if (!heroTrip) return;
+          const { error: coverError } = await updateTripCover(heroTrip.id, image);
           if (coverError) void alert({ eyebrow: "TRIP COVER · ERROR", title: "사진 변경 실패", message: coverError.message });
         }}
         onRemove={async () => {
-          if (!nextTrip) return;
-          const { error: coverError } = await removeTripCover(nextTrip.id);
+          if (!heroTrip) return;
+          const { error: coverError } = await removeTripCover(heroTrip.id);
           if (coverError) void alert({ eyebrow: "TRIP COVER · ERROR", title: "커버 초기화 실패", message: coverError.message });
         }}
       />
