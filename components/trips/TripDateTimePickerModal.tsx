@@ -1,8 +1,9 @@
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePicker, { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import { useEffect, useState } from "react";
-import { Modal, Pressable, Text, TouchableOpacity, View } from "react-native";
+import { Modal, Platform, Pressable, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { withRoParticle } from "@/src/lib/korean";
 import {
   FIELD_COLORS,
   bodyExtraBoldFont,
@@ -32,6 +33,29 @@ export const TripDateTimePickerModal = ({
   useEffect(() => {
     if (visible) setDraft(value);
   }, [value, visible]);
+
+  // Android의 DateTimePicker는 화면 안에 그려지지 않고 시스템 다이얼로그를 띄운다.
+  // 그래서 Android에서는 시트 없이 시스템 다이얼로그만 열고, 그 결과를 바로 넘긴다.
+  useEffect(() => {
+    if (Platform.OS !== "android" || !visible) return;
+    DateTimePickerAndroid.open({
+      value,
+      mode,
+      display: mode === "time" ? "spinner" : "default",
+      minuteInterval: 5,
+      onChange: (event, next) => {
+        if (event.type === "set" && next) onConfirm(next);
+        else onClose();
+      },
+    });
+    return () => {
+      void DateTimePickerAndroid.dismiss(mode);
+    };
+    // value·콜백이 바뀔 때마다 다이얼로그를 다시 열지 않도록 열림 여부와 모드만 본다.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible, mode]);
+
+  if (Platform.OS === "android") return null;
 
   return (
     <Modal
@@ -101,7 +125,7 @@ export const TripDateTimePickerModal = ({
               style={{ backgroundColor: FIELD_COLORS.teal }}
             >
               <Text className="text-[14px] text-white" style={{ fontFamily: bodyExtraBoldFont }}>
-                이 {mode === "date" ? "날짜" : "시간"}로 선택
+                {`이 ${withRoParticle(mode === "date" ? "날짜" : "시간")} 선택`}
               </Text>
             </TouchableOpacity>
           </View>
