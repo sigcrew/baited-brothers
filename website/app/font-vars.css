@@ -1,0 +1,5 @@
+body {
+  --display: var(--font-black-han), sans-serif;
+  --body: var(--font-noto-sans), sans-serif;
+  --mono: var(--font-space-mono), monospace;
+}

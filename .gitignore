@@ -57,3 +57,9 @@ expo-env.d.ts
 official-blog/
 website/node_modules/
 website/.next/
+
+# 용량이 큰 로컬 자료(레포에 넣지 않음)
+qa/fish-recognition/input-model-comparison/
+qa/fish-recognition/supplemental-review/
+store-assets/meta-ads/
+store-assets/share-card-concepts/
