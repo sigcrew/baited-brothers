@@ -358,7 +358,7 @@ export const CardsPanel = ({
               accessibilityLabel={`카드 정렬, 현재 ${sortDirection === "newest" ? "최신순" : "오래된순"}`}
               className="flex-row items-center py-2"
             ><Text className="mr-2" style={{ color: FIELD_COLORS.teal, fontFamily: bodyExtraBoldFont }}>정렬</Text><FontAwesome name="sliders" size={18} color={FIELD_COLORS.teal} /></TouchableOpacity></View>
-            <Text className="mt-5 text-[12px] tracking-[1.5px]" style={{ color: FIELD_COLORS.ink, fontFamily: monoFont }}>CATCH ARCHIVE 2026</Text>
+            <Text className="mt-5 text-[12px] tracking-[1.5px]" style={{ color: FIELD_COLORS.ink, fontFamily: monoFont }}>조과 아카이브</Text>
           </View>
         }
         ListEmptyComponent={

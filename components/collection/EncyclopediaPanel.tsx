@@ -18,7 +18,7 @@ import {
 import { getField60Illustration } from "@/src/data/field60Illustrations";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Svg, { Circle, Path } from "react-native-svg";
-import { getFishCardGuide, getLockedFishHint } from "@/src/lib/fishCardGuide";
+import { getFishCardGuide, getLockedFishHint, scientificBinomial } from "@/src/lib/fishCardGuide";
 import { FIELD_COLORS, monoFont } from "@/src/theme/fieldJournal";
 
 const CATEGORIES: (CatalogGroup | null)[] = [null, ...CATALOG_GROUPS];
@@ -206,9 +206,9 @@ const FishRow = ({
           <Text
             className="mt-2 text-[10px] leading-[15px] tracking-[0.7px]"
             style={{ color: FIELD_COLORS.teal, fontFamily: monoFont }}
-            numberOfLines={2}
+            numberOfLines={1}
           >
-            {fish.name.toUpperCase()}
+            {scientificBinomial(fish.name).toUpperCase()}
           </Text>
           <View className="mt-3 h-px w-20" style={{ backgroundColor: FIELD_COLORS.rule }} />
           <Text
@@ -269,7 +269,7 @@ export const EncyclopediaPanel = ({
               {progressLabel}
             </Text>
           </View>
-          <Text className="text-[10px] tracking-[1px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>FIELD 60 · V1</Text>
+          <Text className="text-[10px] tracking-[1px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>국내 연안 60종</Text>
         </View>
         <View className="mt-3 h-[2px] bg-slate-200">
           <View
@@ -340,7 +340,7 @@ export const EncyclopediaPanel = ({
                 />
               );
             }}
-            ListHeaderComponent={<View className="border-b py-5" style={{ borderColor: FIELD_COLORS.rule }}><Text className="text-[12px] tracking-[1.5px]" style={{ color: FIELD_COLORS.ink, fontFamily: monoFont }}>01  {selectedCategory ? CATEGORY_LABELS[selectedCategory].toUpperCase() : "ALL SPECIMENS"}</Text></View>}
+            ListHeaderComponent={<View className="border-b py-5" style={{ borderColor: FIELD_COLORS.rule }}><Text className="text-[12px] tracking-[1.5px]" style={{ color: FIELD_COLORS.ink, fontFamily: monoFont }}>{selectedCategory ? CATEGORY_LABELS[selectedCategory] : "전체 어종"} · {fishes.length}종</Text></View>}
             contentContainerStyle={{ paddingBottom: insetsBottom + 28 }}
             ListEmptyComponent={
               <View className="items-center py-16">

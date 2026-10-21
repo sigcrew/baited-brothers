@@ -255,7 +255,7 @@ const HomeScreen = () => {
                 className="text-[10px] tracking-[1.5px]"
                 style={{ color: heroTextColor, fontFamily: monoFont }}
               >
-                FIELD LOG {String(trips.length).padStart(3, "0")}
+                출조 기록 {String(trips.length).padStart(3, "0")}
               </Text>
             )}
           />

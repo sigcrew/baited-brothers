@@ -1,4 +1,4 @@
-import { formatSeasonRanges, getFishCardGuide, getLockedFishHint } from "@/src/lib/fishCardGuide";
+import { formatSeasonRanges, getFishCardGuide, getLockedFishHint, scientificBinomial } from "@/src/lib/fishCardGuide";
 
 const fish = (overrides: Partial<Parameters<typeof getLockedFishHint>[0]> = {}) => ({
   collection_group: "flatfish",
@@ -58,5 +58,13 @@ describe("getLockedFishHint", () => {
   it("never leaks the species name or size", () => {
     const hint = getLockedFishHint(fish({ min_size_cm: 35 }));
     expect(hint.tactic).not.toMatch(/35/);
+  });
+});
+
+describe("scientificBinomial", () => {
+  it("drops the authority and year but keeps the binomial", () => {
+    expect(scientificBinomial("Paralichthys olivaceus (Temminck & Schlegel, 1846)")).toBe("Paralichthys olivaceus");
+    expect(scientificBinomial("Sebastes schlegelii Hilgendorf, 1880")).toBe("Sebastes schlegelii Hilgendorf");
+    expect(scientificBinomial("Pleuronichthys cornutus")).toBe("Pleuronichthys cornutus");
   });
 });

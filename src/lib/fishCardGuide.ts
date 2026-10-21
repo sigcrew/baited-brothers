@@ -80,3 +80,14 @@ export const getLockedFishHint = (fish: GuideFish): LockedFishHint => {
   const where = [regions, shortEnvironment].filter(Boolean).join(" · ") || null;
   return { tactic: `제철 ${season} · 미끼 ${bait}`, where };
 };
+
+/**
+ * 학명에서 명명자·연도를 뗀 이명법 부분. "Paralichthys olivaceus (Temminck & Schlegel, 1846)"
+ * → "Paralichthys olivaceus". 카드 한 줄에 들어가야 해서 상세 화면에서만 전체를 보여 준다.
+ */
+export const scientificBinomial = (name: string) =>
+  name
+    .replace(/\([^)]*\)/g, "")
+    .replace(/,\s*\d{4}.*$/, "")
+    .replace(/\s+/g, " ")
+    .trim();

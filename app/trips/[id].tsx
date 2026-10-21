@@ -483,7 +483,7 @@ const TripDetailScreen = () => {
 
           <View className="mt-8 flex-row items-end justify-between">
             <Text className="text-xl" style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>현장 기록</Text>
-            <Text className="text-[10px] tracking-[1.3px]" style={{ color: accent, fontFamily: monoFont }}>CATCHES {catches.length}</Text>
+            <Text className="text-[10px] tracking-[1.3px]" style={{ color: accent, fontFamily: monoFont }}>조과 {catches.length}건</Text>
           </View>
           <View className="mt-3 border-t" style={{ borderColor: FIELD_COLORS.rule }}>
             {catchesLoading ? (

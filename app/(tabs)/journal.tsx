@@ -385,7 +385,7 @@ const JournalScreen = () => {
                 </TouchableOpacity>
               ) : null}
               {!hasMore && !isLoadingMore ? (
-                <Text className="text-[10px] tracking-[1.4px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>END OF FIELD LOG</Text>
+                <Text className="text-[10px] tracking-[1.4px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>여기까지 기록했습니다</Text>
               ) : null}
             </View>
           ) : null
