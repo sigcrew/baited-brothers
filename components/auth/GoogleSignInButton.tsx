@@ -19,6 +19,21 @@ type GoogleSignInButtonProps = {
   fieldJournal?: boolean;
 };
 
+// iOS에서는 바로 위에 시스템이 그리는 Apple 버튼(높이 54pt)이 있다. 그 버튼 글자는
+// 시스템 글꼴·검정·약 20pt라서, 나란히 놓인 Google 버튼 글자도 같은 모양으로 맞춘다.
+// Android에는 Apple 버튼이 없으니 앱 글꼴을 그대로 쓴다.
+export const fieldJournalGoogleLabelStyle = () =>
+  Platform.OS === "ios"
+    ? { color: "#000000", fontSize: 20, fontWeight: "500" as const, lineHeight: 26 }
+    : {
+        color: FIELD_COLORS.ink,
+        fontFamily: bodySemiBoldFont,
+        fontSize: 16,
+        includeFontPadding: false,
+        // 16px Noto Sans의 g·p 꼬리가 들어가도록 1.5배. 20이면 Android에서 잘린다.
+        lineHeight: 24,
+      };
+
 const GoogleSignInButton = ({ fieldJournal = false }: GoogleSignInButtonProps) => {
   const { signInWithGoogle } = useAuth();
   const { alert } = useFieldNotice();
@@ -65,7 +80,7 @@ const GoogleSignInButton = ({ fieldJournal = false }: GoogleSignInButtonProps) =
           {fieldJournal ? (
             <FontAwesome
               name="google"
-              size={18}
+              size={Platform.OS === "ios" ? 20 : 18}
               color="#4285F4"
               style={{ marginRight: 10 }}
             />
@@ -75,18 +90,8 @@ const GoogleSignInButton = ({ fieldJournal = false }: GoogleSignInButtonProps) =
             </View>
           )}
           <Text
-            className={fieldJournal ? "text-[16px]" : "font-medium text-gray-700"}
-            style={
-              fieldJournal
-                ? {
-                    color: FIELD_COLORS.ink,
-                    fontFamily: bodySemiBoldFont,
-                    includeFontPadding: false,
-                    // 16px Noto Sans의 g·p 꼬리가 들어가도록 1.5배. 20이면 Android에서 잘린다.
-                    lineHeight: 24,
-                  }
-                : undefined
-            }
+            className={fieldJournal ? undefined : "font-medium text-gray-700"}
+            style={fieldJournal ? fieldJournalGoogleLabelStyle() : undefined}
           >
             Google로 계속하기
           </Text>
