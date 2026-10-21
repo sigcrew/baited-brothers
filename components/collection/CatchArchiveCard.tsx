@@ -467,7 +467,7 @@ export const CatchArchiveCard = ({
                   lineHeight: 18,
                 }}
               >
-                {sizeCm == null ? "SIZE N/R" : `${sizeCm} cm`}
+                {sizeCm == null ? "크기 미기록" : `${sizeCm} cm`}
               </Text>
             </View>
           </>
@@ -565,7 +565,7 @@ export const CatchArchiveCard = ({
                       textAlign: "center",
                     }}
                   >
-                    {sizeCm == null ? "SIZE NOT RECORDED" : `${sizeCm} cm`}
+                    {sizeCm == null ? "크기 미기록" : `${sizeCm} cm`}
                   </Text>
                 </View>
               </View>

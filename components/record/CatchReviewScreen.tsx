@@ -17,6 +17,8 @@ import type { RecognitionAnalysis } from "@/src/lib/fishRecognition";
 import { captureLocationLabel, type RecordCapture } from "@/src/lib/recordFlow";
 import { getField60Illustration } from "@/src/data/field60Illustrations";
 import { RecognitionContributionCard } from "@/components/record/RecognitionContributionCard";
+import { scientificBinomial } from "@/src/lib/fishCardGuide";
+import { withRoParticle } from "@/src/lib/korean";
 import { FIELD_COLORS, bodyExtraBoldFont, bodyFont, monoFont } from "@/src/theme/fieldJournal";
 
 export type CandidateRow = { candidate: FishRecognitionCandidate; fish: Fish };
@@ -144,7 +146,7 @@ export const CandidateList = ({ rows, onSelect }: CandidateListProps) => {
                 <Text className="text-sm" style={{ color: FIELD_COLORS.orange, fontFamily: bodyExtraBoldFont }}>{index + 1}순위</Text>
               </View>
               <Text numberOfLines={1} className="mt-1 text-[9px] uppercase tracking-[0.8px]" style={{ color: FIELD_COLORS.teal, fontFamily: monoFont }}>
-                {fish.name}
+                {scientificBinomial(fish.name)}
               </Text>
               <Text numberOfLines={2} className="mt-2 text-xs leading-5" style={{ color: FIELD_COLORS.ink, fontFamily: bodyFont }}>
                 식별 포인트 · {fish.identification_features ?? "형태와 무늬를 도감 설명과 비교해 주세요."}
@@ -165,6 +167,8 @@ export const CandidateList = ({ rows, onSelect }: CandidateListProps) => {
 type CatchDetailsFormProps = {
   capture: RecordCapture;
   customSpeciesName: string | null;
+  /** 저장 버튼에 넣을 선택 어종 이름("도다리로 기록하기"). */
+  selectedFishName?: string | null;
   size: string;
   sizeError: string | null;
   memo: string;
@@ -178,6 +182,7 @@ type CatchDetailsFormProps = {
 export const CatchDetailsForm = ({
   capture,
   customSpeciesName,
+  selectedFishName,
   size,
   sizeError,
   memo,
@@ -246,7 +251,11 @@ export const CatchDetailsForm = ({
         <ActivityIndicator color="#fff" />
       ) : (
         <Text className="text-center font-semibold text-white">
-          {customSpeciesName ? "도감 밖 일반 기록으로 저장" : "사용자 확인 후 이 어종으로 기록"}
+          {customSpeciesName
+            ? `${customSpeciesName} · 도감 밖 일반 기록으로 저장`
+            : selectedFishName
+              ? `${withRoParticle(selectedFishName)} 기록하기`
+              : "이 어종으로 기록하기"}
         </Text>
       )}
     </TouchableOpacity>
@@ -343,14 +352,6 @@ export const CatchReviewScreen = ({
               : "도감 60종 밖이라면 이름을 직접 입력해 일반 기록으로 남길 수 있습니다."}
           </Text>
         </View>
-        {!recognition.isRecognizing && recognition.analysis ? (
-          <RecognitionContributionCard
-            key={recognition.analysis.id}
-            analysis={recognition.analysis}
-            imageBase64={capture.base64}
-            clientRequestId={capture.clientRequestId}
-          />
-        ) : null}
         {hasSelection ? (
           <View className="mt-4 border p-4" style={{ borderColor: FIELD_COLORS.teal, backgroundColor: "#EAF4F1" }}>
             <View className="flex-row items-start justify-between">
@@ -359,7 +360,7 @@ export const CatchReviewScreen = ({
                   {selectedFish?.name_ko ?? selectedFish?.name ?? customSpeciesName}
                 </Text>
                 <Text className="mt-1 text-[10px] uppercase tracking-[1px]" style={{ color: FIELD_COLORS.teal, fontFamily: monoFont }}>
-                  {selectedFish?.name ?? "OUTSIDE FIELD 60"}
+                  {selectedFish ? scientificBinomial(selectedFish.name) : "도감 밖 어종 · 일반 기록"}
                 </Text>
               </View>
               <Text className="text-[10px] tracking-[1px]" style={{ color: FIELD_COLORS.teal, fontFamily: monoFont }}>사용자 확인</Text>
@@ -403,10 +404,20 @@ export const CatchReviewScreen = ({
             ) : null}
           </>
         )}
+        {/* 판별 개선 참여는 어종 선택보다 뒤에 둔다. 주 작업을 가리지 않도록. */}
+        {!recognition.isRecognizing && recognition.analysis ? (
+          <RecognitionContributionCard
+            key={recognition.analysis.id}
+            analysis={recognition.analysis}
+            imageBase64={capture.base64}
+            clientRequestId={capture.clientRequestId}
+          />
+        ) : null}
         {hasSelection ? (
           <CatchDetailsForm
             capture={capture}
             customSpeciesName={customSpeciesName}
+            selectedFishName={selectedFish?.name_ko ?? selectedFish?.name ?? null}
             size={form.size}
             sizeError={form.sizeError}
             memo={form.memo}
