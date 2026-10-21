@@ -7,7 +7,7 @@ import {
   removeUserMedia,
 } from "@/src/lib/userMedia";
 import { trackAnalyticsEvent } from "@/src/lib/analytics";
-import { countsForCollectionRewards } from "@/src/lib/catchRewards";
+import { summarizeCollectionCoverage } from "@/src/lib/catchRewards";
 import { toUserMessage, withTimeout } from "@/src/lib/appErrors";
 import { createSharedResource } from "@/src/lib/sharedResource";
 
@@ -94,18 +94,8 @@ export const useUserCatches = (tripId?: string) => {
     [userId],
   );
 
-  const unlockedFishIds = useMemo(() => {
-    const ids = new Set<string>();
-    for (const item of catches) {
-      if (
-        item.fish_id &&
-        countsForCollectionRewards(item.verification_status)
-      ) {
-        ids.add(item.fish_id);
-      }
-    }
-    return ids;
-  }, [catches]);
+  const coverage = useMemo(() => summarizeCollectionCoverage(catches), [catches]);
+  const unlockedFishIds = coverage.unlockedFishIds;
 
   const updateCatch = async (
     catchId: string,
@@ -269,6 +259,8 @@ export const useUserCatches = (tripId?: string) => {
   return {
     catches,
     unlockedFishIds,
+    generalRecordCount: coverage.generalRecordCount,
+    generalRecordOnlyFishIds: coverage.generalRecordOnlyFishIds,
     isLoading,
     isRefreshing,
     error,

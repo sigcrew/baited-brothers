@@ -51,7 +51,7 @@ const LockedFishOutline = () => (
   </View>
 );
 
-const LockedFishMetadata = ({ fish }: { fish: Fish }) => {
+const LockedFishMetadata = ({ fish, hasGeneralRecord = false }: { fish: Fish; hasGeneralRecord?: boolean }) => {
   const category =
     CATEGORY_LABELS[fish.collection_group as CatalogGroup] ?? "연안 어종";
   const hint = getLockedFishHint(fish);
@@ -80,10 +80,10 @@ const LockedFishMetadata = ({ fish }: { fish: Fish }) => {
       </View>
       <Text
         className="mt-2 text-[9px] tracking-[1px]"
-        style={{ color: FIELD_COLORS.teal, fontFamily: monoFont }}
+        style={{ color: hasGeneralRecord ? FIELD_COLORS.orange : FIELD_COLORS.teal, fontFamily: monoFont }}
         numberOfLines={1}
       >
-        발견하면 이름과 상세 공개
+        {hasGeneralRecord ? "일반 기록만 있음 · 위치 인증 시 발견" : "발견하면 이름과 상세 공개"}
       </Text>
       <View className="mt-3 h-px w-full" style={{ backgroundColor: FIELD_COLORS.rule }} />
       <Text
@@ -113,6 +113,10 @@ type EncyclopediaPanelProps = {
   unlockedFishIds: Set<string>;
   totalFishCount: number;
   unlockedCount: number;
+  /** 인증되지 않아 도감에 안 들어간 일반 기록 수. 0이면 안내를 숨긴다. */
+  generalRecordCount?: number;
+  /** 일반 기록으로만 잡힌 어종. 잠긴 카드에 "기록은 있음"을 표시한다. */
+  generalRecordOnlyFishIds?: Set<string>;
   onRefreshAll?: () => void;
   onRetry: () => void;
   onOpenFish: (fishId: string) => void;
@@ -121,10 +125,12 @@ type EncyclopediaPanelProps = {
 const FishRow = ({
   fish,
   unlocked,
+  hasGeneralRecord = false,
   onPress,
 }: {
   fish: Fish;
   unlocked: boolean;
+  hasGeneralRecord?: boolean;
   onPress: () => void;
 }) => {
   const localIllustration = getField60Illustration(
@@ -220,7 +226,7 @@ const FishRow = ({
           </Text>
         </View>
       ) : (
-        <LockedFishMetadata fish={fish} />
+        <LockedFishMetadata fish={fish} hasGeneralRecord={hasGeneralRecord} />
       )}
     </TouchableOpacity>
   );
@@ -235,6 +241,8 @@ export const EncyclopediaPanel = ({
   unlockedFishIds,
   totalFishCount,
   unlockedCount,
+  generalRecordCount = 0,
+  generalRecordOnlyFishIds,
   onRefreshAll,
   onRetry,
   onOpenFish,
@@ -277,6 +285,11 @@ export const EncyclopediaPanel = ({
             style={{ width: `${progressRatio * 100}%`, backgroundColor: FIELD_COLORS.teal }}
           />
         </View>
+        {generalRecordCount > 0 ? (
+          <Text className="mt-2 text-[11px] leading-4" style={{ color: FIELD_COLORS.muted }}>
+            위치가 확인된 조과만 도감에 반영됩니다 · 일반 기록 {generalRecordCount}건은 카드에만 남아 있어요
+          </Text>
+        ) : null}
 
         <ScrollView
           horizontal
@@ -336,6 +349,7 @@ export const EncyclopediaPanel = ({
                 <FishRow
                   fish={item}
                   unlocked={unlocked}
+                  hasGeneralRecord={!unlocked && Boolean(generalRecordOnlyFishIds?.has(item.id))}
                   onPress={() => onOpenFish(item.id)}
                 />
               );

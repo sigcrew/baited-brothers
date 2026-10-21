@@ -59,7 +59,7 @@ const ProfileScreen = () => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { session, signOut } = useAuth();
-  const { catches, unlockedFishIds } = useUserCatches();
+  const { catches, unlockedFishIds, generalRecordCount } = useUserCatches();
   const { trips } = useFishingTrips();
   const avatarUrl = useUserAvatar();
   const { confirm } = useFieldNotice();
@@ -147,6 +147,11 @@ const ProfileScreen = () => {
           </TouchableOpacity>
         ))}
       </View>
+      ) : null}
+      {session && generalRecordCount > 0 ? (
+        <Text className="mb-4 text-[11px] leading-4" style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}>
+          위치가 확인된 조과만 수집 어종과 배지에 반영됩니다 · 일반 기록 {generalRecordCount}건은 조과 카드에만 남아 있어요
+        </Text>
       ) : null}
       {session ? <ArchiveRule /> : null}
       {session ? (
