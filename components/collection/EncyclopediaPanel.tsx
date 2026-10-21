@@ -18,69 +18,10 @@ import {
 import { getField60Illustration } from "@/src/data/field60Illustrations";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Svg, { Circle, Path } from "react-native-svg";
+import { getFishCardGuide, getLockedFishHint } from "@/src/lib/fishCardGuide";
 import { FIELD_COLORS, monoFont } from "@/src/theme/fieldJournal";
 
 const CATEGORIES: (CatalogGroup | null)[] = [null, ...CATALOG_GROUPS];
-
-const GROUP_CARD_GUIDES: Record<
-  CatalogGroup,
-  { seasons: number[]; bait: string }
-> = {
-  flatfish: { seasons: [3, 4, 5, 9, 10, 11], bait: "웜" },
-  rockfish: { seasons: [3, 4, 5, 10, 11, 12], bait: "웜" },
-  bream: { seasons: [4, 5, 6, 9, 10, 11], bait: "크릴" },
-  seabass_croaker: { seasons: [5, 6, 7, 8, 9, 10], bait: "미노우" },
-  pelagic: { seasons: [6, 7, 8, 9, 10, 11], bait: "메탈지그" },
-  filefish: { seasons: [6, 7, 8, 9, 10], bait: "조개살" },
-  pufferfish: { seasons: [5, 6, 7, 8, 9], bait: "오징어살" },
-  eel: { seasons: [5, 6, 7, 8, 9, 10], bait: "오징어살" },
-  coastal: { seasons: [4, 5, 6, 7, 8, 9, 10], bait: "갯지렁이" },
-  squid: { seasons: [4, 5, 6, 9, 10, 11, 12], bait: "에기" },
-  octopus: { seasons: [3, 4, 5, 9, 10, 11], bait: "왕눈이에기" },
-};
-
-const formatSeasonRanges = (months: number[]) => {
-  const sorted = [...new Set(months)].sort((a, b) => a - b);
-  if (sorted.length === 0) return null;
-
-  const ranges: Array<[number, number]> = [];
-  let start = sorted[0];
-  let end = sorted[0];
-
-  for (const month of sorted.slice(1)) {
-    if (month === end + 1) {
-      end = month;
-    } else {
-      ranges.push([start, end]);
-      start = month;
-      end = month;
-    }
-  }
-  ranges.push([start, end]);
-
-  return `${ranges
-    .map(([rangeStart, rangeEnd]) =>
-      rangeStart === rangeEnd ? `${rangeStart}` : `${rangeStart}–${rangeEnd}`,
-    )
-    .join("·")}월`;
-};
-
-const getFishCardGuide = (fish: Fish) => {
-  const fallback =
-    GROUP_CARD_GUIDES[fish.collection_group as CatalogGroup] ??
-    GROUP_CARD_GUIDES.coastal;
-  const bait = fish.recommended_baits[0] ?? fallback.bait;
-
-  if (fish.min_size_cm) {
-    return `금지체장 ${fish.min_size_cm}cm · 미끼 ${bait}`;
-  }
-
-  const season =
-    formatSeasonRanges(
-      fish.peak_seasons.length > 0 ? fish.peak_seasons : fallback.seasons,
-    ) ?? "시즌 확인 중";
-  return `제철 ${season} · 미끼 ${bait}`;
-};
 
 const LockedFishOutline = () => (
   <View className="flex-1 items-center justify-center">
@@ -113,11 +54,12 @@ const LockedFishOutline = () => (
 const LockedFishMetadata = ({ fish }: { fish: Fish }) => {
   const category =
     CATEGORY_LABELS[fish.collection_group as CatalogGroup] ?? "연안 어종";
+  const hint = getLockedFishHint(fish);
 
   return (
     <View
       className="min-w-0 flex-1 justify-center py-2 pl-4"
-      accessibilityLabel={`${category} 미확인 어종, 발견 후 정보 공개`}
+      accessibilityLabel={`${category} 미확인 어종. ${hint.tactic}${hint.where ? `. ${hint.where}` : ""}. 발견하면 이름과 상세 공개`}
     >
       <Text
         className="text-[10px] tracking-[1px]"
@@ -141,26 +83,23 @@ const LockedFishMetadata = ({ fish }: { fish: Fish }) => {
         style={{ color: FIELD_COLORS.teal, fontFamily: monoFont }}
         numberOfLines={1}
       >
-        DISCOVERY REQUIRED
+        발견하면 이름과 상세 공개
       </Text>
       <View className="mt-3 h-px w-full" style={{ backgroundColor: FIELD_COLORS.rule }} />
       <Text
-        className="mt-3 text-[10px] leading-4"
+        className="mt-3 text-xs leading-5"
+        style={{ color: FIELD_COLORS.ink }}
+        numberOfLines={1}
+      >
+        {hint.tactic}
+      </Text>
+      <Text
+        className="text-[11px] leading-4"
         style={{ color: FIELD_COLORS.muted }}
         numberOfLines={1}
       >
-        금어기 · 금지체장 · 미끼 · 서식지
+        {hint.where ?? "금어기·금지체장은 발견 후 공개"}
       </Text>
-      <View className="mt-1 flex-row items-center">
-        <FontAwesome name="lock" size={9} color={FIELD_COLORS.muted} />
-        <Text
-          className="ml-1 text-[11px] font-semibold"
-          style={{ color: FIELD_COLORS.muted }}
-          numberOfLines={1}
-        >
-          발견 후 공개
-        </Text>
-      </View>
     </View>
   );
 };
