@@ -15,6 +15,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
 import {
   Gesture,
@@ -30,8 +31,7 @@ import {
 } from "@/src/data/badges";
 import {
   FIELD_COLORS,
-  monoFont,
-} from "@/src/theme/fieldJournal";
+  monoFont, bodyFont, bodySemiBoldFont, bodyExtraBoldFont } from "@/src/theme/fieldJournal";
 
 type BadgeDetailModalProps = {
   badge: BadgeDefinition;
@@ -61,6 +61,7 @@ export const BadgeDetailModal = ({
   const isFlippedRef = useRef(false);
   const [isFlipped, setIsFlipped] = useState(false);
   const progress = getBadgeProgress(badge.id, context);
+  const { height: windowHeight } = useWindowDimensions();
   const markNumber = `MRK-${String(badgeNumber).padStart(3, "0")}`;
   const acquiredAt = context.acquiredAt[badge.id];
   const acquiredDate = acquiredAt
@@ -213,7 +214,7 @@ export const BadgeDetailModal = ({
       enablePanDownToClose
       handleIndicatorStyle={styles.handleIndicator}
       handleStyle={styles.handle}
-      maxDynamicContentSize={560}
+      maxDynamicContentSize={Math.max(560, Math.round(windowHeight * 0.88))}
       onDismiss={onClose}
       style={styles.sheet}
     >
@@ -299,6 +300,37 @@ export const BadgeDetailModal = ({
               </View>
             </GestureDetector>
           </View>
+        </View>
+
+        {/* 뒷면을 뒤집지 않아도 이름·조건·진행도를 바로 읽을 수 있게 한다. */}
+        <View className="mt-4">
+          <Text className="text-xl" style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>
+            {badge.title}
+          </Text>
+          <Text className="mt-1 text-sm leading-5" style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}>
+            {badge.description}
+          </Text>
+          <View className="mt-3 flex-row items-start">
+            <Text className="w-16 text-xs" style={{ color: FIELD_COLORS.muted, fontFamily: bodySemiBoldFont }}>
+              {unlocked ? "획득일" : "획득 조건"}
+            </Text>
+            <Text className="flex-1 text-sm" style={{ color: FIELD_COLORS.ink, fontFamily: bodySemiBoldFont }}>
+              {unlocked ? acquiredDate : badge.requirement}
+            </Text>
+          </View>
+          {!unlocked && progress.target > 0 ? (
+            <View className="mt-2 flex-row items-start">
+              <Text className="w-16 text-xs" style={{ color: FIELD_COLORS.muted, fontFamily: bodySemiBoldFont }}>
+                진행
+              </Text>
+              <Text className="flex-1 text-sm" style={{ color: FIELD_COLORS.teal, fontFamily: bodySemiBoldFont }}>
+                {progress.current} / {progress.target} {progress.label}
+              </Text>
+            </View>
+          ) : null}
+          <Text className="mt-3 text-[11px]" style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}>
+            배지를 탭하거나 좌우로 밀면 뒷면이 보입니다.
+          </Text>
         </View>
       </BottomSheetView>
     </BottomSheetModal>
