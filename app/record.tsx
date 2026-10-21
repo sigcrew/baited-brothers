@@ -862,12 +862,13 @@ const RecordScreen = () => {
     });
   };
 
-  // 출조 중 기록이면 완료 후 그 출조 상세로 돌아간다. 기록 화면은 fullScreenModal이라
-  // replace로 닫는다.
+  // 출조 중 기록이면 완료 후 그 출조 상세로 돌아간다. 출조 상세에서 기록을 열었으면
+  // 스택에 그 화면이 이미 있으므로 dismissTo로 되돌아간다. replace로 새로 쌓으면 뒤로가기를
+  // 눌렀을 때 같은 출조 상세가 한 번 더 나온다. 스택에 없으면 dismissTo가 replace로 동작한다.
   const completionTripId = capture?.tripId ?? tripId ?? null;
   const viewCompletionTrip = () => {
     if (!completionTripId) return;
-    router.replace({ pathname: "/trips/[id]", params: { id: completionTripId } });
+    router.dismissTo({ pathname: "/trips/[id]", params: { id: completionTripId } });
   };
 
   const viewCompletionRecord = () => {

@@ -278,22 +278,27 @@ export const AuthInlineLink = ({
 
 /** 가입·로그인 하단의 개인정보 처리방침 고지. 앱 내 /privacy 화면으로 연결한다. */
 export const AuthPolicyNotice = ({ action = "계속하면" }: { action?: string }) => (
-  <View className="mt-6 flex-row flex-wrap items-center justify-center">
-    <Text className="text-[12px] leading-5" style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}>
-      {action} 낚시당한 녀석들의{" "}
+  // 한 Text 안에 링크를 넣어야 문장 전체가 자연스럽게 줄바꿈된다. 조각마다 Text를
+  // 따로 두면 "에 동의하게 됩니다."만 다음 줄로 떨어진다.
+  <Text
+    className="mt-6 text-center text-[12px] leading-5"
+    style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}
+  >
+    {action} 낚시당한 녀석들의{" "}
+    <Text
+      accessibilityRole="link"
+      onPress={() => router.push("/privacy")}
+      style={{
+        color: FIELD_COLORS.ink,
+        fontFamily: bodySemiBoldFont,
+        textDecorationLine: "underline",
+        textDecorationColor: FIELD_COLORS.muted,
+      }}
+    >
+      개인정보 처리방침
     </Text>
-    <TouchableOpacity onPress={() => router.push("/privacy")} accessibilityRole="link">
-      <Text
-        className="border-b text-[12px] leading-5"
-        style={{ borderColor: FIELD_COLORS.muted, color: FIELD_COLORS.ink, fontFamily: bodySemiBoldFont }}
-      >
-        개인정보 처리방침
-      </Text>
-    </TouchableOpacity>
-    <Text className="text-[12px] leading-5" style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}>
-      에 동의하게 됩니다.
-    </Text>
-  </View>
+    에 동의하게 됩니다.
+  </Text>
 );
 
 export const authStyles = StyleSheet.create({

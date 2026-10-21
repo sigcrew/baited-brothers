@@ -332,9 +332,12 @@ export const CatchArchiveCard = ({
             marginBottom: compact ? 6 : 10,
           }}
         >
+          {/* Android는 letterSpacing이 있는 텍스트의 폭을 실제보다 좁게 재서 "FIELD CAT…"으로
+              자르거나 두 줄로 꺾는다. 줄바꿈 없는 공백으로 한 단어로 묶고 오른쪽에 여유를 준다. */}
           <Text
-            numberOfLines={1}
             style={{
+              flexShrink: 0,
+              paddingRight: compact ? 2 : 6,
               color: CARD_COLORS.ink,
               fontFamily: monoFont,
               fontSize: compact ? 7 : 15,
@@ -343,7 +346,7 @@ export const CatchArchiveCard = ({
               includeFontPadding: false,
             }}
           >
-            FIELD CATCH
+            {"FIELD\u00A0CATCH"}
           </Text>
           <View
             className="flex-row items-center"
