@@ -19,6 +19,8 @@ export type MapEntry = {
   recordId?: string;
   recordedAt?: string;
   detailName?: string;
+  /** 사진 위치가 없어 출조 장소에 놓인 조과. 목록에서 "출조 장소 기준"으로 표시한다. */
+  placedByTrip?: boolean;
 };
 
 export type MapFilter = "all" | "favorite" | "trip" | "catch";
@@ -79,22 +81,38 @@ export const buildMapEntries = ({
   favoriteSpots: FavoriteFishingSpot[];
   currentEntry: MapEntry | null;
 }): MapEntry[] => {
+  // 사진 위치가 없는 조과라도 출조에 연결돼 있으면 그 출조 장소에 놓는다. 그래야
+  // 출조 시트의 "조과 N"과 기록 목록에 잡히고, 지도에서도 그 자리에 보인다.
+  const tripPlaces = new Map<string, { latitude: number; longitude: number; name: string }>();
+  for (const trip of trips) {
+    if (trip.spot_lat == null || trip.spot_lng == null) continue;
+    const latitude = Number(trip.spot_lat);
+    const longitude = Number(trip.spot_lng);
+    if (!isMappableCoastalPoint(latitude, longitude)) continue;
+    tripPlaces.set(trip.id, { latitude, longitude, name: trip.spot_name });
+  }
   const catchEntries = catches.flatMap((item): MapEntry[] => {
-    if (item.location_lat == null || item.location_lng == null) return [];
-    const latitude = Number(item.location_lat);
-    const longitude = Number(item.location_lng);
-    if (!isMappableCoastalPoint(latitude, longitude)) return [];
+    const ownPoint =
+      item.location_lat != null && item.location_lng != null
+        ? { latitude: Number(item.location_lat), longitude: Number(item.location_lng) }
+        : null;
+    const tripPlace = item.trip_id ? tripPlaces.get(item.trip_id) : undefined;
+    const placedByTrip = !(ownPoint && isMappableCoastalPoint(ownPoint.latitude, ownPoint.longitude)) && Boolean(tripPlace);
+    const point = placedByTrip ? tripPlace! : ownPoint;
+    if (!point || !isMappableCoastalPoint(point.latitude, point.longitude)) return [];
+    const { latitude, longitude } = point;
     return [{
       id: `catch:${item.id}`,
       kind: "catch",
       latitude,
       longitude,
       name:
-        item.location_name?.trim() ||
+        (placedByTrip ? tripPlace?.name : item.location_name?.trim()) ||
         item.fish?.name_ko ||
         item.custom_species_name ||
         "조과 기록",
-      shouldReverseGeocode: !item.location_name?.trim(),
+      shouldReverseGeocode: !placedByTrip && !item.location_name?.trim(),
+      placedByTrip,
       fishId: item.fish_id ?? undefined,
       recordId: item.id,
       recordedAt: item.caught_at,

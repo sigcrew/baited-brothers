@@ -28,6 +28,25 @@ const tripRow = (id: string, lat: number | null, lng: number | null, status = "p
   ({ id, spot_lat: lat, spot_lng: lng, spot_name: "부산 앞바다", scheduled_at: "2026-10-21T00:00:00Z", status }) as never;
 
 describe("buildMapEntries", () => {
+  it("places a catch without photo location at its trip's spot", () => {
+    const entries = buildMapEntries({
+      catches: [
+        catchRow("c-trip", null, null, { trip_id: "t1" }),
+        catchRow("c-orphan", null, null, { trip_id: "t-missing" }),
+        catchRow("c-own", BUSAN.lat + 0.01, BUSAN.lng, { trip_id: "t1", location_name: "광안리" }),
+      ],
+      trips: [tripRow("t1", BUSAN.lat, BUSAN.lng)],
+      favoriteSpots: [],
+      currentEntry: null,
+    });
+    const placed = entries.find((entry) => entry.id === "catch:c-trip");
+    expect(placed).toMatchObject({ kind: "catch", latitude: BUSAN.lat, longitude: BUSAN.lng, name: "부산 앞바다", placedByTrip: true, shouldReverseGeocode: false });
+    // 좌표가 있는 조과는 출조에 연결돼 있어도 제 위치를 쓴다.
+    expect(entries.find((entry) => entry.id === "catch:c-own")).toMatchObject({ latitude: BUSAN.lat + 0.01, name: "광안리", placedByTrip: false });
+    // 출조가 없거나 출조에 좌표가 없으면 여전히 지도에 올라가지 않는다.
+    expect(entries.find((entry) => entry.id === "catch:c-orphan")).toBeUndefined();
+  });
+
   it("keeps coastal Korean records and drops inland, missing or foreign coordinates", () => {
     const entries = buildMapEntries({
       catches: [catchRow("c1", BUSAN.lat, BUSAN.lng), catchRow("c2", SEOUL.lat, SEOUL.lng), catchRow("c3", null, null)],

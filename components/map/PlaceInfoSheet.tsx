@@ -83,7 +83,7 @@ export const PlaceRecordsList = ({ entries, onOpen }: PlaceRecordsListProps) => 
                 {entry.detailName ?? entry.name}
               </Text>
               <Text numberOfLines={1} className="mt-1 text-[11px]" style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}>
-                {entry.kind === "catch" ? "조과" : "출조"} · {formatRecordDate(entry.recordedAt)} · {entry.name}
+                {entry.kind === "catch" ? "조과" : "출조"} · {formatRecordDate(entry.recordedAt)} · {entry.name}{entry.placedByTrip ? " · 출조 장소 기준" : ""}
               </Text>
             </View>
             <FontAwesome name="long-arrow-right" size={15} color={FIELD_COLORS.ink} />
