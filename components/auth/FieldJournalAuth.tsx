@@ -181,7 +181,8 @@ export const AuthTextField = ({ label, secure = false, first = false, ...inputPr
             color: FIELD_COLORS.ink,
             fontFamily: bodyFont,
             includeFontPadding: false,
-            lineHeight: 20,
+            // 15px 입력값의 g·y·@ 꼬리가 잘리지 않게 넉넉히 둔다.
+            lineHeight: 22,
             outlineStyle: "none",
             paddingVertical: 0,
             textAlignVertical: "center",

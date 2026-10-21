@@ -82,7 +82,8 @@ const GoogleSignInButton = ({ fieldJournal = false }: GoogleSignInButtonProps) =
                     color: FIELD_COLORS.ink,
                     fontFamily: bodySemiBoldFont,
                     includeFontPadding: false,
-                    lineHeight: 20,
+                    // 16px Noto Sans의 g·p 꼬리가 들어가도록 1.5배. 20이면 Android에서 잘린다.
+                    lineHeight: 24,
                   }
                 : undefined
             }

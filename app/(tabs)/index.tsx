@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
+  Platform,
   useWindowDimensions,
 } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -54,7 +55,8 @@ const HERO_HORIZONTAL_PADDING = 56; // px-7 * 2
 // 중앙과 막대 중앙의 차이를 재서 정했다.
 const COUNTDOWN_SIGN_SIZE = 14;
 const COUNTDOWN_SIGN_STROKE = 4;
-const COUNTDOWN_SIGN_OFFSET_Y = -4;
+// iOS는 Anton 글자를 줄 상자 중앙보다 약 4pt 위에 그리고, Android는 중앙에 그린다(Galaxy S22에서 측정).
+const COUNTDOWN_SIGN_OFFSET_Y = Platform.OS === "ios" ? -4 : 0;
 
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
