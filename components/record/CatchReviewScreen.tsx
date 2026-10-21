@@ -121,7 +121,7 @@ export const CandidateList = ({ rows, onSelect }: CandidateListProps) => {
     <View className="mt-5">
       <View className="flex-row items-end justify-between">
         <Text className="text-lg" style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>AI 어종 후보 추천</Text>
-        <Text className="text-[9px] tracking-[1px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>후보 {rows.length}개</Text>
+        <Text className="text-[9px] tracking-[1px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>TOP {rows.length}</Text>
       </View>
       <Text className="mt-2 text-xs leading-5" style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}>
         사진에서 추정한 후보입니다. 식별 포인트를 비교한 뒤 선택해 주세요.

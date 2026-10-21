@@ -83,7 +83,7 @@ const LockedFishMetadata = ({ fish, hasGeneralRecord = false }: { fish: Fish; ha
         style={{ color: hasGeneralRecord ? FIELD_COLORS.orange : FIELD_COLORS.teal, fontFamily: monoFont }}
         numberOfLines={1}
       >
-        {hasGeneralRecord ? "일반 기록만 있음 · 위치 인증 시 발견" : "발견하면 이름과 상세 공개"}
+        {hasGeneralRecord ? "RECORDED · GPS REQUIRED" : "DISCOVERY REQUIRED"}
       </Text>
       <View className="mt-3 h-px w-full" style={{ backgroundColor: FIELD_COLORS.rule }} />
       <Text
@@ -277,7 +277,7 @@ export const EncyclopediaPanel = ({
               {progressLabel}
             </Text>
           </View>
-          <Text className="text-[10px] tracking-[1px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>국내 연안 60종</Text>
+          <Text className="text-[10px] tracking-[1px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>FIELD 60 · V1</Text>
         </View>
         <View className="mt-3 h-[2px] bg-slate-200">
           <View
@@ -354,7 +354,7 @@ export const EncyclopediaPanel = ({
                 />
               );
             }}
-            ListHeaderComponent={<View className="border-b py-5" style={{ borderColor: FIELD_COLORS.rule }}><Text className="text-[12px] tracking-[1.5px]" style={{ color: FIELD_COLORS.ink, fontFamily: monoFont }}>{selectedCategory ? CATEGORY_LABELS[selectedCategory] : "전체 어종"} · {fishes.length}종</Text></View>}
+            ListHeaderComponent={<View className="border-b py-5" style={{ borderColor: FIELD_COLORS.rule }}><Text className="text-[12px] tracking-[1.5px]" style={{ color: FIELD_COLORS.ink, fontFamily: monoFont }}>01  {selectedCategory ? CATEGORY_LABELS[selectedCategory].toUpperCase() : "ALL SPECIMENS"} · {fishes.length}</Text></View>}
             contentContainerStyle={{ paddingBottom: insetsBottom + 28 }}
             ListEmptyComponent={
               <View className="items-center py-16">
