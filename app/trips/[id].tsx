@@ -18,6 +18,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ArchiveRule } from "@/components/design/ArchiveRule";
 import { FieldDateLine } from "@/components/design/FieldDateLine";
+import { stampFullDateTime, stampTime } from "@/src/lib/stampDate";
 import { TripFormModal } from "@/components/trips/TripFormModal";
 import { CatchEditModal } from "@/components/catches/CatchEditModal";
 import { TripMiniMap } from "@/components/map/TripMiniMap";
@@ -165,14 +166,7 @@ const TripDetailScreen = () => {
   const month = String(date.getMonth() + 1);
   const day = String(date.getDate());
   const weekday = new Intl.DateTimeFormat("ko-KR", { weekday: "long" }).format(date);
-  const fullDate = new Intl.DateTimeFormat("ko-KR", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    weekday: "long",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
+  const fullDate = stampFullDateTime(date);
   const accent = actionColor(trip.status);
   const coverSource = trip.cover_image_url ? { uri: trip.cover_image_url } : DEFAULT_COVER;
 
@@ -533,10 +527,7 @@ const TripDetailScreen = () => {
                           }}
                         >
                           #{String(index + 1).padStart(2, "0")} ·{" "}
-                          {caughtDate.toLocaleTimeString("ko-KR", {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
+                          {stampTime(caughtDate)}
                         </Text>
                         <Text
                           className="mt-2 text-xl"

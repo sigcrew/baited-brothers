@@ -21,6 +21,7 @@ import { useUserCatches } from "@/src/hooks/useUserCatches";
 import { useFishes } from "@/src/hooks/useFishes";
 import { HERO_FALLBACK_TITLE, HERO_SUBTITLE, pickSeasonalSpecies } from "@/src/lib/homeHero";
 import { FieldDateLine } from "@/components/design/FieldDateLine";
+import { stampShortDateTime } from "@/src/lib/stampDate";
 import { useImageContrast } from "@/src/hooks/useImageContrast";
 import { useAuth } from "@/src/contexts/AuthContext";
 import {
@@ -59,17 +60,6 @@ const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
 
 /** Anton 숫자는 RN Text ascent 클리핑이 있어 SVG + 상단 여유로 그림 */
-const formatTripDate = (iso: string) => {
-  const date = new Date(iso);
-  return date.toLocaleString("ko-KR", {
-    month: "short",
-    day: "numeric",
-    weekday: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-};
-
 const pendingCatchStatusLabel = (pending: PendingCatchJob) => {
   if (pending.status === "needs_confirmation") return "어종 확인 필요";
   if (pending.status === "pending_upload" || pending.status === "uploading") {
@@ -303,7 +293,7 @@ const HomeScreen = () => {
                   {nextDate?.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })} 출조 예정
                 </Text>
               </>
-            ) : hasTripHistory || nextTripOverdue ? (
+            ) : (
               <View className="pt-3">
                 {heroSeason ? (
                   <>
@@ -356,7 +346,7 @@ const HomeScreen = () => {
                 </Text>
                 <TouchableOpacity
                   accessibilityRole="button"
-                  accessibilityLabel="새 출조 추가하기"
+                  accessibilityLabel={hasTripHistory || nextTripOverdue ? "새 출조 추가하기" : "첫 출조 추가하기"}
                   accessibilityHint="낚시터와 출조 날짜를 입력하는 화면을 엽니다"
                   onPress={handleAddTrip}
                   className="mt-6 w-full max-w-[280px] flex-row items-center px-5 py-4"
@@ -367,39 +357,8 @@ const HomeScreen = () => {
                     className="ml-3 flex-1 text-[17px] text-white"
                     style={{ fontFamily: bodyExtraBoldFont }}
                   >
-                    새 출조 추가하기
+                    {hasTripHistory || nextTripOverdue ? "새 출조 추가하기" : "첫 출조 추가하기"}
                   </Text>
-                  <FontAwesome name="long-arrow-right" size={22} color="#fff" />
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <View className="pt-3">
-                <Text
-                  numberOfLines={1}
-                  adjustsFontSizeToFit
-                  minimumFontScale={0.72}
-                  allowFontScaling={false}
-                  className="max-w-[580px] tracking-[-1.5px]"
-                  style={{
-                    color: heroTextColor,
-                    fontFamily: displayFont,
-                    fontSize: heroTitleSize,
-                    lineHeight: heroTitleLineHeight,
-                  }}
-                >
-                  첫 출조를 기다리는 중
-                </Text>
-                <Text className="mt-4 text-lg tracking-[-0.3px]" style={{ color: heroTextColor, fontFamily: bodySemiBoldFont }}>어디로 떠날지 기록해보세요</Text>
-                <TouchableOpacity
-                  accessibilityRole="button"
-                  accessibilityLabel="첫 출조 추가하기"
-                  accessibilityHint="낚시터와 출조 날짜를 입력하는 화면을 엽니다"
-                  onPress={handleAddTrip}
-                  className="mt-6 w-full max-w-[280px] flex-row items-center px-5 py-4"
-                  style={{ backgroundColor: FIELD_COLORS.teal }}
-                >
-                  <FontAwesome name="calendar-plus-o" size={21} color="#fff" />
-                  <Text className="ml-3 flex-1 text-[17px] text-white" style={{ fontFamily: bodyExtraBoldFont }}>첫 출조 추가하기</Text>
                   <FontAwesome name="long-arrow-right" size={22} color="#fff" />
                 </TouchableOpacity>
               </View>
@@ -532,7 +491,7 @@ const HomeScreen = () => {
                   className="mt-1 text-[11px] tracking-[1px]"
                   style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}
                 >
-                  {formatTripDate(nextTrip.scheduled_at)}
+                  {stampShortDateTime(nextTrip.scheduled_at)}
                 </Text>
               </View>
               <View
