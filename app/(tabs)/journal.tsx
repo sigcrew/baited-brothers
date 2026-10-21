@@ -233,6 +233,9 @@ const JournalScreen = () => {
     refetch,
     loadMore,
   } = useJournalTrips(filter);
+  // 출조가 하나도 없을 때는 집계·탭·"새 출조 추가" 행을 숨기고 빈 상태의 버튼 하나만 남긴다.
+  // 필터로 비어 보이는 것과 구분하려고 현재 필터가 아니라 전체 건수를 본다.
+  const hasAnyTrip = counts.all > 0;
 
   const openCreate = () => {
     if (!isLoggedIn) {
@@ -284,6 +287,7 @@ const JournalScreen = () => {
               actionAccessibilityLabel="새 출조 추가"
               onAction={openCreate}
             />
+            {hasAnyTrip ? (
             <View className="px-7" style={{ backgroundColor: FIELD_COLORS.foam }}>
               <View className="flex-row items-center py-6">
                 <Text className="text-xs tracking-[1.2px]" style={{ color: FIELD_COLORS.ink, fontFamily: monoFont }}>
@@ -319,7 +323,9 @@ const JournalScreen = () => {
                 })}
               </View>
             </View>
+            ) : null}
 
+            {hasAnyTrip ? (
             <View className="bg-white px-7">
               <TouchableOpacity
                 accessibilityRole="button"
@@ -337,6 +343,7 @@ const JournalScreen = () => {
                 <FontAwesome name="angle-right" size={38} color={FIELD_COLORS.teal} />
               </TouchableOpacity>
             </View>
+            ) : null}
           </>
         )}
         ListEmptyComponent={(

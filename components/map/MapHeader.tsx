@@ -2,7 +2,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import type { FavoriteFishingSpot } from "@/src/hooks/useFavoriteFishingSpots";
 import { MAP_FILTERS, MAP_LAYOUT, type MapFilter } from "@/src/lib/mapScreen";
-import { FIELD_COLORS, bodyExtraBoldFont, bodyFont, bodySemiBoldFont, monoFont } from "@/src/theme/fieldJournal";
+import { FIELD_COLORS, bodyExtraBoldFont, bodySemiBoldFont, monoFont } from "@/src/theme/fieldJournal";
 
 const shadow = {
   shadowColor: FIELD_COLORS.ink,
@@ -112,6 +112,7 @@ export const MapHeader = ({
               >
                 {filter.label}
               </Text>
+              {filterCounts[filter.key] > 0 ? (
               <Text
                 className="text-[9px]"
                 style={{
@@ -130,6 +131,7 @@ export const MapHeader = ({
               >
                 {filterCounts[filter.key]}
               </Text>
+              ) : null}
             </TouchableOpacity>
           );
         })}
@@ -175,17 +177,24 @@ export const mapHeaderHeight = (topInset: number, hasFavoriteRow: boolean) =>
   (hasFavoriteRow ? 8 + MAP_LAYOUT.favoriteRowHeight : 0) +
   12;
 
+/**
+ * 기록이 없을 때 헤더 아래 한 줄로 보여 주는 안내. 지도를 가리지 않도록 카드 대신
+ * 배너로 두고, 장소를 고르면 사라진다.
+ */
 export const MapEmptyState = ({ top }: { top: number }) => (
   <View
     pointerEvents="none"
-    className="absolute inset-x-5 rounded-2xl border bg-white px-5 py-4"
-    style={{ borderColor: FIELD_COLORS.rule, top }}
+    accessibilityRole="text"
+    className="absolute inset-x-4 flex-row items-center rounded-full border bg-white px-4 py-2"
+    style={{ borderColor: FIELD_COLORS.rule, top, ...shadow }}
   >
-    <Text className="text-xl" style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>
-      아직 지도에 표시할 기록이 없습니다
-    </Text>
-    <Text className="mt-2 text-sm leading-6" style={{ color: FIELD_COLORS.muted, fontFamily: bodyFont }}>
-      지도에서 바다를 누르거나 현재 위치 버튼을 누르면 인근 수온과 물때를 확인할 수 있습니다.
+    <FontAwesome name="hand-pointer-o" size={13} color={FIELD_COLORS.teal} />
+    <Text
+      numberOfLines={1}
+      className="ml-2 flex-1 text-[12px]"
+      style={{ color: FIELD_COLORS.ink, fontFamily: bodySemiBoldFont }}
+    >
+      기록이 없습니다 · 바다를 누르면 수온·물때 확인
     </Text>
   </View>
 );

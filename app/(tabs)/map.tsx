@@ -495,7 +495,7 @@ export default function MapScreen() {
         onSelectFavorite={selectFavoriteChip}
       />
 
-      {!isInitialLoading && entries.length === 0 ? (
+      {!isInitialLoading && entries.length === 0 && !selected ? (
         <MapEmptyState top={mapHeaderHeight(insets.top, hasFavoriteRow)} />
       ) : null}
 
