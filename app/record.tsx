@@ -862,6 +862,14 @@ const RecordScreen = () => {
     });
   };
 
+  // 출조 중 기록이면 완료 후 그 출조 상세로 돌아간다. 기록 화면은 fullScreenModal이라
+  // replace로 닫는다.
+  const completionTripId = capture?.tripId ?? tripId ?? null;
+  const viewCompletionTrip = () => {
+    if (!completionTripId) return;
+    router.replace({ pathname: "/trips/[id]", params: { id: completionTripId } });
+  };
+
   const viewCompletionRecord = () => {
     router.replace({
       pathname: "/(tabs)/encyclopedia",
@@ -917,6 +925,8 @@ const RecordScreen = () => {
           capture?.tripId || tripId ? recordAnotherCatch : undefined
         }
         onGoHome={() => router.replace("/(tabs)")}
+        tripName={capture?.tripName ?? tripName ?? null}
+        onViewTrip={completionTripId ? viewCompletionTrip : undefined}
         />
         <ShareCatchCardModal
           item={completionShareItem}

@@ -37,6 +37,55 @@ type CatchCompletionViewProps = {
   onShare: () => void;
   onRecordAnother?: () => void;
   onGoHome: () => void;
+  /** 출조 중에 기록했을 때 돌아갈 출조. 있으면 주 CTA가 출조로 바뀐다. */
+  tripName?: string | null;
+  onViewTrip?: () => void;
+};
+
+export type CompletionAction = {
+  key: "trip" | "encyclopedia" | "record" | "share" | "another" | "home";
+  label: string;
+  variant: "primary" | "secondary" | "text";
+};
+
+/**
+ * 완료 화면의 버튼 구성. 주 CTA는 하나다: 출조 중이면 그 출조로 돌아가고, 아니면
+ * 새 어종은 도감, 기존 어종은 카드로 간다. 홈은 출조로 돌아갈 수 있을 때는 숨긴다.
+ */
+export const resolveCompletionActions = ({
+  isFirstDiscovery,
+  hasFish,
+  tripName,
+  canReturnToTrip,
+  canRecordAnother,
+}: {
+  isFirstDiscovery: boolean;
+  hasFish: boolean;
+  tripName?: string | null;
+  canReturnToTrip: boolean;
+  canRecordAnother: boolean;
+}): CompletionAction[] => {
+  const detail: CompletionAction =
+    isFirstDiscovery && hasFish
+      ? { key: "encyclopedia", label: "도감 보기", variant: "text" }
+      : { key: "record", label: "카드 보기", variant: "text" };
+  const share: CompletionAction = { key: "share", label: "공유 카드 만들기", variant: "secondary" };
+
+  if (canReturnToTrip) {
+    const name = tripName?.trim();
+    return [
+      { key: "trip", label: name ? `${name} 출조로 돌아가기` : "출조 기록으로 돌아가기", variant: "primary" },
+      share,
+      ...(canRecordAnother ? [{ key: "another", label: "한 마리 더 기록하기", variant: "text" } as CompletionAction] : []),
+      detail,
+    ];
+  }
+  return [
+    { ...detail, variant: "primary" },
+    share,
+    ...(canRecordAnother ? [{ key: "another", label: "한 마리 더 기록하기", variant: "text" } as CompletionAction] : []),
+    { key: "home", label: "홈으로", variant: "text" },
+  ];
 };
 
 const reasonMessage = (reason: string | null) => {
@@ -163,7 +212,24 @@ export const CatchCompletionView = ({
   onShare,
   onRecordAnother,
   onGoHome,
+  tripName,
+  onViewTrip,
 }: CatchCompletionViewProps) => {
+  const actions = resolveCompletionActions({
+    isFirstDiscovery,
+    hasFish: Boolean(fish),
+    tripName,
+    canReturnToTrip: Boolean(onViewTrip),
+    canRecordAnother: Boolean(onRecordAnother),
+  });
+  const actionHandlers: Record<CompletionAction["key"], (() => void) | undefined> = {
+    trip: onViewTrip,
+    encyclopedia: onViewEncyclopedia,
+    record: onViewRecord,
+    share: onShare,
+    another: onRecordAnother,
+    home: onGoHome,
+  };
   const insets = useSafeAreaInsets();
   const illustration = fish
     ? getField60Illustration(fish.catalog_sort_order, "color")
@@ -381,36 +447,14 @@ export const CatchCompletionView = ({
 
         <View className="mt-auto pt-5">
           <CompletionRule />
-          {isFirstDiscovery && fish ? (
+          {actions.map((action) => (
             <CompletionButton
-              label="도감 보기"
-              variant="primary"
-              onPress={onViewEncyclopedia}
+              key={action.key}
+              label={action.label}
+              variant={action.variant}
+              onPress={actionHandlers[action.key] ?? onGoHome}
             />
-          ) : (
-            <CompletionButton
-              label="카드 보기"
-              variant="primary"
-              onPress={onViewRecord}
-            />
-          )}
-          <CompletionButton
-            label="공유 카드 만들기"
-            variant="secondary"
-            onPress={onShare}
-          />
-          {onRecordAnother ? (
-            <CompletionButton
-              label="한 마리 더 기록하기"
-              variant="text"
-              onPress={onRecordAnother}
-            />
-          ) : null}
-          <CompletionButton
-            label="홈으로"
-            variant="text"
-            onPress={onGoHome}
-          />
+          ))}
         </View>
       </ScrollView>
     </View>
