@@ -23,6 +23,10 @@ jest.mock("@/src/lib/supabase", () => ({
   },
 }));
 jest.mock("@/src/lib/sharedResource", () => ({ clearAllSharedResources: jest.fn() }));
+jest.mock("@/src/lib/googleNativeSignIn", () => ({
+  requestNativeGoogleIdToken: jest.fn(),
+  signOutNativeGoogle: jest.fn(),
+}));
 jest.mock("expo-constants", () => ({ __esModule: true, default: { expoConfig: { scheme: "baited-brothers" } } }));
 jest.mock("expo-web-browser", () => ({
   maybeCompleteAuthSession: jest.fn(),
@@ -32,6 +36,9 @@ jest.mock("expo-web-browser", () => ({
 import * as WebBrowser from "expo-web-browser";
 import { clearAllSharedResources } from "@/src/lib/sharedResource";
 import { AuthProvider, useAuth } from "@/src/contexts/AuthContext";
+import { requestNativeGoogleIdToken, signOutNativeGoogle } from "@/src/lib/googleNativeSignIn";
+
+const mockNativeGoogle = requestNativeGoogleIdToken as jest.Mock;
 
 const { supabase: mockSupabase } = jest.requireMock("@/src/lib/supabase") as {
   supabase: { auth: Record<string, jest.Mock>; functions: { invoke: jest.Mock } };
@@ -66,6 +73,7 @@ beforeEach(async () => {
     return { data: { subscription: { unsubscribe: jest.fn() } } };
   });
   mockAuth.signOut.mockResolvedValue({ error: null });
+  mockNativeGoogle.mockResolvedValue({ kind: "unavailable", reason: "module-missing" });
   jest.spyOn(AppState, "addEventListener").mockImplementation(((_type: string, listener: (state: string) => void) => {
     appStateListener = listener;
     return { remove: jest.fn() };
@@ -137,6 +145,45 @@ test("Google sign-in exchanges the PKCE code returned by the browser session", a
   );
   expect(mockAuth.exchangeCodeForSession).toHaveBeenCalledWith("pkce-code-1");
   expect(mockAuth.setSession).not.toHaveBeenCalled();
+});
+
+test("native Google sign-in hands the ID token to Supabase without opening the browser", async () => {
+  mockNativeGoogle.mockResolvedValue({ kind: "token", idToken: "google-id-token" });
+  mockAuth.signInWithIdToken.mockResolvedValue({ error: null });
+  const result = await api!.signInWithGoogle();
+  expect(result.error).toBeNull();
+  expect(mockAuth.signInWithIdToken).toHaveBeenCalledWith({ provider: "google", token: "google-id-token" });
+  expect(mockAuth.signInWithOAuth).not.toHaveBeenCalled();
+  expect(WebBrowser.openAuthSessionAsync).not.toHaveBeenCalled();
+});
+
+test("cancelling the native account picker does not fall back to the web flow", async () => {
+  mockNativeGoogle.mockResolvedValue({ kind: "cancelled" });
+  const result = await api!.signInWithGoogle();
+  expect(result.error?.message).toContain("취소");
+  expect(mockAuth.signInWithOAuth).not.toHaveBeenCalled();
+});
+
+test("a native token Supabase rejects falls back to the web flow", async () => {
+  jest.spyOn(console, "warn").mockImplementation(() => undefined);
+  mockNativeGoogle.mockResolvedValue({ kind: "token", idToken: "bad-audience" });
+  mockAuth.signInWithIdToken.mockResolvedValue({ error: new Error("Unacceptable audience") });
+  mockAuth.signInWithOAuth.mockResolvedValue({ data: { url: "https://accounts.google.com/o/oauth" }, error: null });
+  (WebBrowser.openAuthSessionAsync as jest.Mock).mockResolvedValue({
+    type: "success",
+    url: "baited-brothers://google-auth?code=pkce-code-2",
+  });
+  mockAuth.exchangeCodeForSession.mockResolvedValue({ error: null });
+  const result = await api!.signInWithGoogle();
+  expect(result.error).toBeNull();
+  expect(mockAuth.signInWithOAuth).toHaveBeenCalledTimes(1);
+  expect(mockAuth.exchangeCodeForSession).toHaveBeenCalledWith("pkce-code-2");
+});
+
+test("signing out also clears the device Google session", async () => {
+  await api!.signOut();
+  expect(mockAuth.signOut).toHaveBeenCalled();
+  expect(signOutNativeGoogle).toHaveBeenCalledTimes(1);
 });
 
 test("concurrent Google completions share one in-flight exchange", async () => {

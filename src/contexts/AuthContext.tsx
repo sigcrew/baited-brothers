@@ -11,6 +11,7 @@ import * as WebBrowser from "expo-web-browser";
 import { AppState, Platform } from "react-native";
 import { supabase } from "@/src/lib/supabase";
 import { parseGoogleAuthCallback } from "@/src/lib/googleAuthCallback";
+import { requestNativeGoogleIdToken, signOutNativeGoogle } from "@/src/lib/googleNativeSignIn";
 import { clearAllSharedResources } from "@/src/lib/sharedResource";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -111,6 +112,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    void signOutNativeGoogle();
   };
 
   // 재설정 메일의 링크는 PKCE 코드를 싣고 baited-brothers://reset-password로 돌아온다.
@@ -176,7 +178,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return { error: null };
   };
 
+  // Android는 네이티브 계정 선택 시트를 먼저 쓰고, 네이티브로 끝낼 수 없으면 웹 로그인으로 넘어간다.
+  // iOS는 처음부터 웹 로그인이다. 사용자가 취소한 경우에는 웹 로그인을 다시 띄우지 않는다.
   const signInWithGoogle = async () => {
+    const native = await requestNativeGoogleIdToken();
+    if (native.kind === "cancelled") {
+      return { error: new Error("Google 로그인이 취소되었습니다.") };
+    }
+    if (native.kind === "busy") {
+      return { error: new Error("Google 로그인이 이미 진행 중입니다. 잠시만 기다려 주세요.") };
+    }
+    if (native.kind === "token") {
+      const { error } = await supabase.auth.signInWithIdToken({
+        provider: "google",
+        token: native.idToken,
+      });
+      if (!error) return { error: null };
+      if (__DEV__) console.warn("[google-auth] native token rejected, falling back to web", error);
+    } else if (__DEV__) {
+      console.warn(`[google-auth] native sign-in unavailable (${native.reason}), using web`);
+    }
+    return signInWithGoogleWeb();
+  };
+
+  const signInWithGoogleWeb = async () => {
     const scheme = Constants.expoConfig?.scheme ?? "baited-brothers";
     const redirectUrl = `${scheme}://google-auth`;
 
