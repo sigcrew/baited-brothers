@@ -4,6 +4,7 @@ import {
   evaluateCoastalSelection,
   findNearestKoreanCoastCoordinate,
 } from "@/src/lib/coastalSelection";
+import { lookupKoreanRegionName } from "@/src/lib/regionLookup";
 
 type Coordinate = {
   latitude: number;
@@ -54,6 +55,28 @@ const addressName = (address?: Location.LocationGeocodedAddress) => {
   return uniqueParts.join(" ") || null;
 };
 
+// 기기 지오코더(iOS는 권한 없이 동작, Android는 위치 권한이 있어야 동작)를 먼저 쓴다.
+// 예외가 나거나 이름이 없으면 서버의 카카오 행정구역 조회로 넘어간다.
+const deviceAddress = async (coordinate: Coordinate) => {
+  try {
+    return (await Location.reverseGeocodeAsync(coordinate))[0];
+  } catch {
+    return undefined;
+  }
+};
+
+type NamedLookup = { name: string | null; countryCode: string | null };
+
+const lookupName = async (coordinate: Coordinate): Promise<NamedLookup> => {
+  const address = await deviceAddress(coordinate);
+  const countryCode = address?.isoCountryCode?.toUpperCase() || null;
+  const name = addressName(address);
+  if (name) return { name, countryCode };
+  if (countryCode && countryCode !== "KR") return { name: null, countryCode };
+  const serverName = await lookupKoreanRegionName(coordinate);
+  return serverName ? { name: serverName, countryCode: "KR" } : { name: null, countryCode };
+};
+
 export const reverseGeocodeKoreanPlaceName = async (
   coordinate: Coordinate,
 ): Promise<ReverseGeocodePlaceNameResult> => {
@@ -61,18 +84,16 @@ export const reverseGeocodeKoreanPlaceName = async (
     coordinate.latitude,
     coordinate.longitude,
   ).isOnLand;
-  const directAddress = (await Location.reverseGeocodeAsync(coordinate))[0];
-  const directCountryCode = directAddress?.isoCountryCode?.toUpperCase() || null;
-  const directName = addressName(directAddress);
+  const direct = await lookupName(coordinate);
 
-  if (directName) {
+  if (direct.name) {
     return {
-      name: isOnLand ? directName : `${directName} 앞바다`,
-      countryCode: directCountryCode,
+      name: isOnLand ? direct.name : `${direct.name} 앞바다`,
+      countryCode: direct.countryCode,
     };
   }
-  if (directCountryCode && directCountryCode !== "KR") {
-    return { name: null, countryCode: directCountryCode };
+  if (direct.countryCode && direct.countryCode !== "KR") {
+    return { name: null, countryCode: direct.countryCode };
   }
 
   const nearestCoast = findNearestKoreanCoastCoordinate(
@@ -80,19 +101,16 @@ export const reverseGeocodeKoreanPlaceName = async (
     coordinate.longitude,
   );
   if (!nearestCoast) {
-    return { name: null, countryCode: directCountryCode };
+    return { name: null, countryCode: direct.countryCode };
   }
 
-  const coastAddress = (await Location.reverseGeocodeAsync({
+  const coast = await lookupName({
     latitude: nearestCoast.latitude,
     longitude: nearestCoast.longitude,
-  }))[0];
-  const coastName = addressName(coastAddress);
+  });
 
   return {
-    name: coastName ? `${coastName} 앞바다` : null,
-    countryCode:
-      coastAddress?.isoCountryCode?.toUpperCase() ||
-      directCountryCode,
+    name: coast.name ? `${coast.name} 앞바다` : null,
+    countryCode: coast.countryCode || direct.countryCode,
   };
 };
