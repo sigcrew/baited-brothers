@@ -25,8 +25,8 @@ const LoginScreen = () => {
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  // 홈에서 push로 들어왔을 때만 닫기 버튼을 보여 준다. 앱 시작 시 Redirect로 온 경우에는
-  // 돌아갈 화면이 없다.
+  // 홈에서 push로 들어왔을 때만 닫기 버튼을 보여 준다. 온보딩이나 로그아웃 뒤 replace로
+  // 온 경우에는 돌아갈 화면이 없으므로 대신 "로그인 없이 둘러보기"를 보여 준다.
   const canGoBack = router.canGoBack();
 
   const handleLogin = async () => {
@@ -124,6 +124,16 @@ const LoginScreen = () => {
           onPress={() => router.push("/(auth)/signup")}
         />
       </View>
+
+      {canGoBack ? null : (
+        <View className="mt-4 items-center">
+          <AuthInlineLink
+            label="로그인 없이 둘러보기"
+            disabled={isSubmitting}
+            onPress={() => router.replace("/(tabs)")}
+          />
+        </View>
+      )}
 
       <AuthPolicyNotice action="로그인하면" />
     </AuthScreen>

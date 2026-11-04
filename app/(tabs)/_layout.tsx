@@ -1,19 +1,13 @@
-import { Redirect } from "expo-router";
 import { Tabs } from "expo-router";
 import { useArchiveTabBarStyle } from "@/components/navigation/useArchiveTabBarStyle";
 
 import { ArchiveTabIcon } from "@/components/navigation/ArchiveTabIcon";
-import { useAuth } from "@/src/contexts/AuthContext";
 import { FIELD_COLORS, bodySemiBoldFont } from "@/src/theme/fieldJournal";
 
 const TabLayout = () => {
-  const { session } = useAuth();
+  // 로그인하지 않아도 탭을 둘러볼 수 있다. 기록·출조·즐겨찾기는 각 화면에서 로그인을 요청한다.
   const tabBarStyle = useArchiveTabBarStyle();
   const tabBarIconMarginBottom = 3;
-
-  if (!__DEV__ && !session) {
-    return <Redirect href="/(auth)/login" />;
-  }
 
   return (
     <Tabs

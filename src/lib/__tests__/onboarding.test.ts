@@ -14,18 +14,12 @@ import {
 } from "@/src/lib/onboarding";
 
 describe("resolveLaunchRoute", () => {
-  it("shows onboarding first, whether or not a session exists", () => {
-    expect(resolveLaunchRoute({ seenOnboarding: false, hasSession: false })).toBe("/onboarding");
-    expect(resolveLaunchRoute({ seenOnboarding: false, hasSession: true })).toBe("/onboarding");
+  it("shows onboarding first", () => {
+    expect(resolveLaunchRoute({ seenOnboarding: false })).toBe("/onboarding");
   });
 
-  it("routes by session once onboarding was seen", () => {
-    expect(resolveLaunchRoute({ seenOnboarding: true, hasSession: true })).toBe("/(tabs)");
-    expect(resolveLaunchRoute({ seenOnboarding: true, hasSession: false })).toBe("/(auth)/login");
-  });
-
-  it("lets development builds reach the tabs as a guest", () => {
-    expect(resolveLaunchRoute({ seenOnboarding: true, hasSession: false, isDevelopment: true })).toBe("/(tabs)");
+  it("opens the tabs once onboarding was seen, signed in or browsing as a guest", () => {
+    expect(resolveLaunchRoute({ seenOnboarding: true })).toBe("/(tabs)");
   });
 });
 

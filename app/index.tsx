@@ -6,7 +6,7 @@ import { hasSeenOnboarding, resolveLaunchRoute } from "@/src/lib/onboarding";
 import { FIELD_COLORS } from "@/src/theme/fieldJournal";
 
 const Index = () => {
-  const { session, isLoading } = useAuth();
+  const { isLoading } = useAuth();
   const [seenOnboarding, setSeenOnboarding] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -29,11 +29,7 @@ const Index = () => {
 
   return (
     <Redirect
-      href={resolveLaunchRoute({
-        seenOnboarding,
-        hasSession: Boolean(session),
-        isDevelopment: __DEV__,
-      })}
+      href={resolveLaunchRoute({ seenOnboarding })}
     />
   );
 };

@@ -24,25 +24,17 @@ export const markOnboardingSeen = async () => {
   }
 };
 
-export type LaunchRoute = "/onboarding" | "/(tabs)" | "/(auth)/login";
+export type LaunchRoute = "/onboarding" | "/(tabs)";
 
 /**
- * 앱 진입 화면. 온보딩을 안 봤으면 온보딩, 봤으면 세션 유무로 탭 또는 로그인.
- * 개발 빌드는 세션이 없어도 탭으로 보내 게스트 화면을 바로 볼 수 있게 한다.
+ * 앱 진입 화면. 온보딩을 안 봤으면 온보딩, 봤으면 탭. 로그인하지 않았어도 탭에서
+ * 둘러보다가 기록·출조·즐겨찾기를 할 때 로그인한다.
  */
 export const resolveLaunchRoute = ({
   seenOnboarding,
-  hasSession,
-  isDevelopment = false,
 }: {
   seenOnboarding: boolean;
-  hasSession: boolean;
-  isDevelopment?: boolean;
-}): LaunchRoute => {
-  if (!seenOnboarding) return "/onboarding";
-  if (hasSession || isDevelopment) return "/(tabs)";
-  return "/(auth)/login";
-};
+}): LaunchRoute => (seenOnboarding ? "/(tabs)" : "/onboarding");
 
 export type OnboardingSlide = {
   key: string;
