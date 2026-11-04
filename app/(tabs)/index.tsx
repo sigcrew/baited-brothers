@@ -255,7 +255,7 @@ const HomeScreen = () => {
               </Text>
             )}
           />
-          <View className="px-7 pt-12">
+          <View className="px-7 pt-4">
             {isLoading ? (
               <View className="h-28 items-start justify-center">
                 <ActivityIndicator color={heroTextColor} />
@@ -267,6 +267,7 @@ const HomeScreen = () => {
                   numberSize={heroDateNumberSize}
                   unitSize={heroDateUnitSize}
                   weekdaySize={heroDateWeekdaySize}
+                  lineHeightRatio={1.1}
                   style={{ marginTop: 4 }}
                   parts={[
                     { kind: "number", value: dateMonth },
@@ -296,7 +297,7 @@ const HomeScreen = () => {
                 </Text>
               </>
             ) : (
-              <View className="pt-3">
+              <View>
                 {heroSeason ? (
                   <>
                     {/* 다가오는 출조 히어로와 같은 모양: 큰 숫자 날짜 줄 + 한 줄 제목 */}
@@ -304,6 +305,7 @@ const HomeScreen = () => {
                       color={heroTextColor}
                       numberSize={heroDateNumberSize}
                       unitSize={heroDateUnitSize}
+                      lineHeightRatio={1.1}
                       style={{ marginTop: 4 }}
                       parts={[
                         { kind: "number", value: String(heroSeason.month) },
