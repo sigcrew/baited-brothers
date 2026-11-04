@@ -64,3 +64,31 @@ export const sanitizeAnalyticsProperties = (
 
   return sanitized;
 };
+
+type FailureLike = {
+  name?: unknown;
+  code?: unknown;
+  status?: unknown;
+  statusCode?: unknown;
+  context?: { status?: unknown } | null;
+};
+
+/**
+ * 실패 이벤트에 붙이는 진단 정보. 오류 메시지 원문은 사용자 정보가 섞일 수 있어
+ * 오류 종류, 코드, HTTP 상태만 남긴다.
+ */
+export const failureDiagnostics = (
+  error: unknown,
+): Record<"error_name" | "error_code" | "http_status", AnalyticsPropertyValue> => {
+  const failure = (error && typeof error === "object" ? error : {}) as FailureLike;
+  const rawStatus = failure.status ?? failure.statusCode ?? failure.context?.status;
+  const status = typeof rawStatus === "string" ? Number(rawStatus) : rawStatus;
+  return {
+    error_name: typeof failure.name === "string" ? failure.name.slice(0, 40) : null,
+    error_code:
+      typeof failure.code === "string" || typeof failure.code === "number"
+        ? String(failure.code).slice(0, 40)
+        : null,
+    http_status: typeof status === "number" && Number.isFinite(status) ? status : null,
+  };
+};

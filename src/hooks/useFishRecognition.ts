@@ -9,6 +9,7 @@ import {
   type RecognitionResponse,
 } from "@/src/lib/fishRecognition";
 import { trackAnalyticsEvent } from "@/src/lib/analytics";
+import { failureDiagnostics } from "@/src/lib/analyticsPolicy";
 
 export type FishRecognitionCandidate = {
   fishId: string;
@@ -120,6 +121,7 @@ export const useFishRecognition = () => {
         void trackAnalyticsEvent("ai_analysis_failed", {
           duration_ms: durationMs,
           failure_kind: normalized.message.includes("초과") ? "timeout" : "request",
+          ...failureDiagnostics(recognitionError),
         });
         setError(normalized);
         return {

@@ -5,6 +5,7 @@ import type { Database, TablesInsert } from "@/src/types/database";
 import { toUserMessage, withTimeout } from "@/src/lib/appErrors";
 import { removeUserMedia, uploadUserPhotoVariants } from "@/src/lib/userMedia";
 import { trackAnalyticsEvent } from "@/src/lib/analytics";
+import { failureDiagnostics } from "@/src/lib/analyticsPolicy";
 import { captureCatchConditions } from "@/src/lib/catchConditions";
 import {
   isVerifiedCatch,
@@ -271,13 +272,16 @@ export const useCreateCatch = () => {
         error instanceof Error && error.message.includes("초과")
           ? "timeout"
           : saveStage;
+      const diagnostics = failureDiagnostics(error);
       void trackAnalyticsEvent("catch_save_failed", {
         failure_kind: failureKind,
         stage: saveStage,
+        ...diagnostics,
       });
       if (saveStage === "photo_upload") {
         void trackAnalyticsEvent("photo_upload_failed", {
           failure_kind: failureKind,
+          ...diagnostics,
         });
       }
       return {
