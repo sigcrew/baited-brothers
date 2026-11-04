@@ -20,7 +20,7 @@ import {
 } from "@/src/hooks/useFishingTrips";
 import { useUserCatches } from "@/src/hooks/useUserCatches";
 import { useFishes } from "@/src/hooks/useFishes";
-import { HERO_FALLBACK_TITLE, HERO_SUBTITLE, pickSeasonalSpecies } from "@/src/lib/homeHero";
+import { HERO_FALLBACK_TITLE, HERO_GUEST_SUBTITLE, HERO_SUBTITLE, pickSeasonalSpecies } from "@/src/lib/homeHero";
 import { FieldDateLine } from "@/components/design/FieldDateLine";
 import { stampShortDateTime } from "@/src/lib/stampDate";
 import { useImageContrast } from "@/src/hooks/useImageContrast";
@@ -34,6 +34,7 @@ import {
 import { ArchiveTabHeader } from "@/components/design/ArchiveTabHeader";
 import { TripCoverActionSheet } from "@/components/trips/TripCoverActionSheet";
 import { TripFormModal } from "@/components/trips/TripFormModal";
+import { TAB_BAR_HEIGHT } from "@/src/theme/tabBar";
 import { useFieldNotice } from "@/src/contexts/FieldNoticeContext";
 import { formatCountdown, pickNextTrip, tripCountdown } from "@/src/lib/tripSchedule";
 import {
@@ -50,6 +51,8 @@ const DEFAULT_HERO_IMAGE = require("@/assets/images/design/first-trip-cover-v1.p
 /** 히어로 타이포 기준 폭 (큰 기기에서 현재 룩이 맞는 너비) */
 const HERO_TYPE_BASE_WIDTH = 430;
 const HERO_HORIZONTAL_PADDING = 56; // px-7 * 2
+// 히어로 아래 "현장에서 기록하기" 묶음 높이(py-4 + 버튼 py-5 + 아이콘).
+const RECORD_ACTION_BLOCK_HEIGHT = 100;
 
 // D-day 카운트다운의 "+"/"-" 막대. 오프셋은 iPhone 16 Pro 스크린샷에서 "D" 글리프
 // 중앙과 막대 중앙의 차이를 재서 정했다.
@@ -76,7 +79,13 @@ const pendingCatchStatusLabel = (pending: PendingCatchJob) => {
 const HomeScreen = () => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { width: windowWidth } = useWindowDimensions();
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+  // 첫 화면 안에 "현장에서 기록하기"(약 100pt)가 탭 바 위로 보이도록 히어로 높이를 맞춘다.
+  const heroHeight = clamp(
+    windowHeight - insets.top - (TAB_BAR_HEIGHT + insets.bottom) - RECORD_ACTION_BLOCK_HEIGHT,
+    460,
+    650,
+  );
   const heroTypeScale = clamp(
     (windowWidth - HERO_HORIZONTAL_PADDING) / (HERO_TYPE_BASE_WIDTH - HERO_HORIZONTAL_PADDING),
     0.72,
@@ -219,7 +228,7 @@ const HomeScreen = () => {
         <ImageBackground
           source={heroSource}
           resizeMode="cover"
-          style={{ width: "100%", height: 650 }}
+          style={{ width: "100%", height: heroHeight }}
         >
           <ArchiveTabHeader
             title="낚시당한 녀석들"
@@ -346,24 +355,26 @@ const HomeScreen = () => {
                   </Text>
                 )}
                 <Text className="mt-4 text-[15px]" style={{ color: heroTextColor, fontFamily: bodySemiBoldFont }}>
-                  {HERO_SUBTITLE}
+                  {isLoggedIn ? HERO_SUBTITLE : HERO_GUEST_SUBTITLE}
                 </Text>
+                {/* 문구가 말하는 지도·물때로 바로 보낸다. 출조 추가는 아래 "다가오는 출조"에 있다.
+                    게스트는 지도에서 수온·물때를 볼 수 없으므로 "둘러보기"라고만 약속한다. */}
                 <TouchableOpacity
                   accessibilityRole="button"
-                  accessibilityLabel={hasTripHistory || nextTripOverdue ? "새 출조 추가하기" : "첫 출조 추가하기"}
-                  accessibilityHint="낚시터와 출조 날짜를 입력하는 화면을 엽니다"
-                  onPress={handleAddTrip}
+                  accessibilityLabel={isLoggedIn ? "지도에서 물때 보기" : "지도 둘러보기"}
+                  accessibilityHint="지도 탭을 엽니다"
+                  onPress={() => router.push("/(tabs)/map")}
                   className="mt-6 w-full max-w-[280px] flex-row items-center px-5 py-4"
-                  style={{ backgroundColor: FIELD_COLORS.teal }}
+                  style={{ backgroundColor: FIELD_COLORS.paper }}
                 >
-                  <FontAwesome name="calendar-plus-o" size={21} color="#fff" />
+                  <FontAwesome name="map-o" size={19} color={FIELD_COLORS.teal} />
                   <Text
-                    className="ml-3 flex-1 text-[17px] text-white"
-                    style={{ fontFamily: bodyExtraBoldFont }}
+                    className="ml-3 flex-1 text-[17px]"
+                    style={{ color: FIELD_COLORS.teal, fontFamily: bodyExtraBoldFont }}
                   >
-                    {hasTripHistory || nextTripOverdue ? "새 출조 추가하기" : "첫 출조 추가하기"}
+                    {isLoggedIn ? "지도에서 물때 보기" : "지도 둘러보기"}
                   </Text>
-                  <FontAwesome name="long-arrow-right" size={22} color="#fff" />
+                  <FontAwesome name="long-arrow-right" size={22} color={FIELD_COLORS.teal} />
                 </TouchableOpacity>
               </View>
             )}
@@ -577,14 +588,15 @@ const HomeScreen = () => {
               accessibilityLabel={hasTripHistory ? "새 출조 추가" : "첫 출조 추가"}
               accessibilityHint="낚시터와 출조 날짜를 입력하는 화면을 엽니다"
               onPress={handleAddTrip}
-              className="mt-3 flex-row items-center px-5 py-6"
-              style={{ backgroundColor: FIELD_COLORS.teal }}
+              // 주 행동인 "현장에서 기록하기"보다 약하게 보이도록 테두리 버튼으로 둔다.
+              className="mt-3 flex-row items-center border-2 px-5 py-4"
+              style={{ borderColor: FIELD_COLORS.teal, backgroundColor: FIELD_COLORS.paper }}
             >
-              <FontAwesome name="calendar-plus-o" size={24} color="#fff" />
-              <Text className="ml-4 flex-1 text-[22px] text-white" style={{ fontFamily: bodyExtraBoldFont }}>
+              <FontAwesome name="calendar-plus-o" size={21} color={FIELD_COLORS.teal} />
+              <Text className="ml-4 flex-1 text-[17px]" style={{ color: FIELD_COLORS.teal, fontFamily: bodyExtraBoldFont }}>
                 {hasTripHistory ? "새 출조 추가하기" : "첫 출조 추가하기"}
               </Text>
-              <FontAwesome name="long-arrow-right" size={25} color="#fff" />
+              <FontAwesome name="long-arrow-right" size={22} color={FIELD_COLORS.teal} />
             </TouchableOpacity>
           ) : null}
         </View>
@@ -601,13 +613,16 @@ const HomeScreen = () => {
               >
                 최근 조과
               </Text>
-              <Text
-                className="ml-2 text-[10px] tracking-[1px]"
-                style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}
-              >
-                최대 3개
-              </Text>
+              {catches.length ? (
+                <Text
+                  className="ml-2 text-[10px] tracking-[1px]"
+                  style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}
+                >
+                  LATEST 3
+                </Text>
+              ) : null}
             </View>
+            {catches.length ? (
             <TouchableOpacity
               accessibilityRole="button"
               accessibilityLabel="전체 조과 카드 보기"
@@ -625,6 +640,7 @@ const HomeScreen = () => {
                 ALL CARDS →
               </Text>
             </TouchableOpacity>
+            ) : null}
           </View>
           <View
             className="mt-3 flex-row border-t pt-3"
@@ -681,26 +697,26 @@ const HomeScreen = () => {
                 </TouchableOpacity>
               ))
             ) : (
-              <View
-                className="flex-1 items-center justify-center border"
-                style={{
-                  minHeight: 126,
-                  borderColor: FIELD_COLORS.rule,
-                  backgroundColor: FIELD_COLORS.locked,
-                }}
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="첫 조과 기록하기"
+                onPress={handleRecord}
+                activeOpacity={0.84}
+                className="flex-1 flex-row items-center justify-center border border-dashed py-4"
+                style={{ borderColor: FIELD_COLORS.rule }}
               >
                 <FontAwesome
                   name="camera"
-                  size={22}
+                  size={16}
                   color={FIELD_COLORS.muted}
                 />
                 <Text
-                  className="mt-2 text-xs font-semibold"
+                  className="ml-2 text-xs font-semibold"
                   style={{ color: FIELD_COLORS.muted }}
                 >
-                  첫 조과를 기록하세요
+                  첫 조과를 기록하면 여기에 카드가 쌓입니다
                 </Text>
-              </View>
+              </TouchableOpacity>
             )}
           </View>
           {error ? <Text className="mt-4 text-xs" style={{ color: FIELD_COLORS.orange }}>{error.message}</Text> : null}

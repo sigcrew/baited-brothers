@@ -61,6 +61,8 @@ export const pickSeasonalSpecies = (fishes: readonly SeasonalFish[], now: Date =
 
 export const HERO_FALLBACK_TITLE = "다음 손맛은 어디서?";
 export const HERO_SUBTITLE = "지도에서 포인트를 고르고 물때를 확인하세요";
+/** 게스트는 지도에서 수온·물때를 볼 수 없으므로 로그인하면 된다고 알려 준다. */
+export const HERO_GUEST_SUBTITLE = "로그인하면 포인트별 물때를 확인할 수 있어요";
 
 /** 다가오는 출조가 없을 때 히어로 제목. "10월, 갈치 시즌입니다". */
 export const seasonalHeroTitle = (fishes: readonly SeasonalFish[], now: Date = new Date()) => {

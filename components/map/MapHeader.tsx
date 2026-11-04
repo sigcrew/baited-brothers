@@ -179,22 +179,31 @@ export const mapHeaderHeight = (topInset: number, hasFavoriteRow: boolean) =>
 
 /**
  * 기록이 없을 때 헤더 아래 한 줄로 보여 주는 안내. 지도를 가리지 않도록 카드 대신
- * 배너로 두고, 장소를 고르면 사라진다.
+ * 배너로 두고, 장소를 고르면 사라진다. 게스트는 수온·물때를 볼 수 없으므로 로그인을 안내한다.
  */
-export const MapEmptyState = ({ top }: { top: number }) => (
+export const MapEmptyState = ({ top, isLoggedIn = true }: { top: number; isLoggedIn?: boolean }) => (
+  // 그림자는 바깥, 테두리·배경은 안쪽에 둔다. 한 View에 둘 다 두면 iOS에서 흰 배경이
+  // 테두리 아래로 1px 비쳐 아랫변이 겹쳐 보인다(overflow: hidden은 그림자를 지운다).
   <View
     pointerEvents="none"
     accessibilityRole="text"
-    className="absolute inset-x-4 flex-row items-center rounded-full border bg-white px-4 py-2"
-    style={{ borderColor: FIELD_COLORS.rule, top, ...shadow }}
+    className="absolute inset-x-4"
+    style={{ top, ...shadow }}
   >
-    <FontAwesome name="hand-pointer-o" size={13} color={FIELD_COLORS.teal} />
-    <Text
-      numberOfLines={1}
-      className="ml-2 flex-1 text-[12px]"
-      style={{ color: FIELD_COLORS.ink, fontFamily: bodySemiBoldFont }}
+    <View
+      className="h-9 flex-row items-center border bg-white px-4"
+      style={{ borderColor: FIELD_COLORS.rule, borderRadius: 18, overflow: "hidden" }}
     >
-      기록이 없습니다 · 바다를 누르면 수온·물때 확인
-    </Text>
+      <FontAwesome name="hand-pointer-o" size={13} color={FIELD_COLORS.teal} />
+      <Text
+        numberOfLines={1}
+        className="ml-2 flex-1 text-[12px]"
+        style={{ color: FIELD_COLORS.ink, fontFamily: bodySemiBoldFont }}
+      >
+        {isLoggedIn
+          ? "기록이 없습니다 · 바다를 누르면 수온·물때 확인"
+          : "둘러보는 중 · 로그인하면 수온·물때 확인"}
+      </Text>
+    </View>
   </View>
 );

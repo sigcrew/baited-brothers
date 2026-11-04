@@ -496,7 +496,7 @@ export default function MapScreen() {
       />
 
       {!isInitialLoading && entries.length === 0 && !selected ? (
-        <MapEmptyState top={mapHeaderHeight(insets.top, hasFavoriteRow)} />
+        <MapEmptyState top={mapHeaderHeight(insets.top, hasFavoriteRow)} isLoggedIn={isLoggedIn} />
       ) : null}
 
       {selected ? (
