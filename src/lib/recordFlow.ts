@@ -82,9 +82,9 @@ export const captureLocationLabel = (
   if (capture.source === "photo_library") {
     return hasPosition && capture.capturedAt
       ? "사진 위치 확인됨 · 인증 조과 심사 대상"
-      : "사진 위치 없음 · 일반 기록으로 저장";
+      : "사진 위치 없음 · 도감 반영 · 랭킹 제외";
   }
   return hasPosition
     ? "GPS 확보 완료 · 서버 인증 예정"
-    : "위치 미인증 · 지도와 도감 해금에서 제외";
+    : "위치 미인증 · 도감 반영 · 랭킹 제외";
 };

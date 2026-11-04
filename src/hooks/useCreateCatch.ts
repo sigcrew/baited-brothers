@@ -7,7 +7,7 @@ import { removeUserMedia, uploadUserPhotoVariants } from "@/src/lib/userMedia";
 import { trackAnalyticsEvent } from "@/src/lib/analytics";
 import { captureCatchConditions } from "@/src/lib/catchConditions";
 import {
-  countsForCollectionRewards,
+  isVerifiedCatch,
   type CatchVerificationStatus,
 } from "@/src/lib/catchRewards";
 
@@ -107,11 +107,7 @@ export const useCreateCatch = () => {
             .from("user_catches")
             .select("fish_id")
             .eq("user_id", userId)
-            .in("verification_status", [
-              "verified",
-              "field_verified",
-              "metadata_verified",
-            ]),
+            .not("fish_id", "is", null),
         ),
         20_000,
         "기존 조과 조회 시간이 초과되었습니다. 연결 후 다시 시도해 주세요.",
@@ -234,11 +230,9 @@ export const useCreateCatch = () => {
               status: "general_record" as const,
               reason: "species_outside_catalog",
             };
-      const isVerified = countsForCollectionRewards(verificationStatus);
+      const isVerified = isVerifiedCatch(verificationStatus);
       const isFirstDiscovery =
-        Boolean(input.fishId) &&
-        isVerified &&
-        !discoveredFishIds.has(input.fishId!);
+        Boolean(input.fishId) && !discoveredFishIds.has(input.fishId!);
 
       void trackAnalyticsEvent("catch_created", {
         id_method: payload.id_method ?? "unknown",

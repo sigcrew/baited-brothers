@@ -654,7 +654,7 @@ const RecordScreen = () => {
         const wantsLocation = await confirm({
           eyebrow: "FIELD CATCH · LOCATION",
           title: "촬영 위치를 인증할까요?",
-          message: "위치를 허용하면 조과를 지도와 도감 해금에 반영합니다. 위치 없이도 사진 분석과 조과 기록은 계속할 수 있습니다.",
+          message: "위치를 허용하면 조과가 지도에 표시되고 현장 인증으로 랭킹에 오릅니다. 위치 없이도 사진 분석, 조과 기록, 도감 수집은 그대로 할 수 있습니다.",
           cancelLabel: "위치 없이 계속",
           confirmLabel: "위치 허용",
         });

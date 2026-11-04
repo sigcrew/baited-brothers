@@ -353,7 +353,9 @@ export const CatchCompletionView = ({
               : isPending
                 ? "서버에서 사진 위치와 중복 여부를 확인하고 있습니다."
                 : isGeneralRecord
-                  ? reasonMessage(verificationReason)
+                  ? fish
+                    ? `${reasonMessage(verificationReason)} 도감과 배지에는 반영되고 랭킹에서만 빠집니다.`
+                    : reasonMessage(verificationReason)
                   : "촬영 당시 위치가 연안으로 확인되어 모든 인증 지표에 반영됩니다."}
           </Text>
         </View>

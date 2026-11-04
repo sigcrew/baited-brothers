@@ -28,12 +28,12 @@ describe("parseOptionalSize", () => {
 describe("captureLocationLabel", () => {
   it("describes camera captures by GPS availability", () => {
     expect(captureLocationLabel({ source: "camera", latitude: 35, longitude: 129, capturedAt: null })).toMatch(/GPS 확보/);
-    expect(captureLocationLabel({ source: "camera", latitude: null, longitude: null, capturedAt: null })).toMatch(/위치 미인증/);
+    expect(captureLocationLabel({ source: "camera", latitude: null, longitude: null, capturedAt: null })).toMatch(/위치 미인증 · 도감 반영/);
   });
 
   it("requires both position and capture time for library photos", () => {
     expect(captureLocationLabel({ source: "photo_library", latitude: 35, longitude: 129, capturedAt: "2026-10-20T00:00:00Z" })).toMatch(/심사 대상/);
-    expect(captureLocationLabel({ source: "photo_library", latitude: 35, longitude: 129, capturedAt: null })).toMatch(/일반 기록/);
+    expect(captureLocationLabel({ source: "photo_library", latitude: 35, longitude: 129, capturedAt: null })).toMatch(/사진 위치 없음 · 도감 반영/);
   });
 });
 

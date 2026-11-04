@@ -55,7 +55,7 @@ beforeEach(async () => {
     const q: any = {
       select: () => q,
       eq: () => q,
-      in: () => Promise.resolve(discoveryResponse),
+      not: () => Promise.resolve(discoveryResponse),
       insert: (payload: any) => {
         inserting = true;
         insertedPayloads.push(payload);

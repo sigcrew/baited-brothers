@@ -78,8 +78,6 @@ const CollectionScreen = () => {
   const {
     catches,
     unlockedFishIds,
-    generalRecordCount,
-    generalRecordOnlyFishIds,
     isLoading: catchesLoading,
     isRefreshing: catchesRefreshing,
     isLoggedIn,
@@ -257,8 +255,6 @@ const CollectionScreen = () => {
           unlockedFishIds={displayUnlockedFishIds}
           totalFishCount={totalFishCount}
           unlockedCount={unlockedCount}
-          generalRecordCount={previewMode ? 0 : generalRecordCount}
-          generalRecordOnlyFishIds={previewMode ? undefined : generalRecordOnlyFishIds}
           onRefreshAll={refreshCollection}
           onRetry={retryFishes}
           onOpenFish={(fishId) => router.push(`/fishes/${fishId}`)}

@@ -1,13 +1,10 @@
-import {
-  countsForCollectionRewards,
-  countsForRanking,
-} from "@/src/lib/catchRewards";
+import { countsForRanking, isVerifiedCatch } from "@/src/lib/catchRewards";
 
 describe("catch reward policy", () => {
   it.each(["field_verified", "metadata_verified"] as const)(
-    "allows %s to unlock collection rewards",
+    "marks %s as a location-verified catch",
     (status) => {
-      expect(countsForCollectionRewards(status)).toBe(true);
+      expect(isVerifiedCatch(status)).toBe(true);
     },
   );
 
@@ -17,9 +14,9 @@ describe("catch reward policy", () => {
   });
 
   it.each(["pending", "general_record"] as const)(
-    "does not reward %s records",
+    "does not mark %s as verified or ranked",
     (status) => {
-      expect(countsForCollectionRewards(status)).toBe(false);
+      expect(isVerifiedCatch(status)).toBe(false);
       expect(countsForRanking(status)).toBe(false);
     },
   );

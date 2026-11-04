@@ -208,10 +208,7 @@ const getSpeciesMilestoneDate = (
 ) => {
   const species = new Set<string>();
   for (const item of catches) {
-    if (
-      !item.fish_id ||
-      !countsForCollectionRewards(item.verification_status)
-    ) continue;
+    if (!item.fish_id) continue;
     species.add(item.fish_id);
     if (species.size >= target) return item.caught_at;
   }
@@ -253,9 +250,8 @@ export const createBadgeUnlockContext = (
   const sortedCatches = [...catches].sort((a, b) =>
     a.caught_at.localeCompare(b.caught_at)
   );
-  const rewardCatches = sortedCatches.filter((item) =>
-    countsForCollectionRewards(item.verification_status)
-  );
+  // 도감 60종 어종이면 위치 인증 여부와 상관없이 배지에 반영한다.
+  const rewardCatches = sortedCatches.filter((item) => Boolean(item.fish_id));
   const doneTrips = trips
     .filter((trip) => trip.status === "done")
     .sort((a, b) =>
@@ -433,4 +429,3 @@ export const getBadgeProgress = (
       return { current: 0, target: 1, label: "진행도" };
   }
 };
-import { countsForCollectionRewards } from "@/src/lib/catchRewards";

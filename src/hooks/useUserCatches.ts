@@ -259,8 +259,6 @@ export const useUserCatches = (tripId?: string) => {
   return {
     catches,
     unlockedFishIds,
-    generalRecordCount: coverage.generalRecordCount,
-    generalRecordOnlyFishIds: coverage.generalRecordOnlyFishIds,
     isLoading,
     isRefreshing,
     error,
