@@ -11,6 +11,7 @@ import {
   formatObservedAgo,
   formatRecordDate,
   formatTimelineClock,
+  upcomingForecasts,
   weatherIconName,
   type MapEntry,
 } from "@/src/lib/mapScreen";
@@ -107,9 +108,10 @@ type MarineConditionsPanelProps = {
 export const MarineConditionsPanel = ({ conditions, isLoading, error, onRefetch, isLoggedIn = true, onLogin }: MarineConditionsPanelProps) => {
   const highTide = nextTide(conditions?.tides ?? [], "high");
   const lowTide = nextTide(conditions?.tides ?? [], "low");
+  const timeline = upcomingForecasts(conditions?.weatherTimeline ?? []);
   return (
     <>
-      {conditions?.weatherTimeline?.length ? (
+      {timeline.length ? (
         <View className="mt-3 border-y py-3" style={{ borderColor: FIELD_COLORS.rule }}>
           <View className="mb-2 flex-row items-center justify-between">
             <Text className="text-[9px] tracking-[1.2px]" style={{ color: FIELD_COLORS.muted, fontFamily: monoFont }}>
@@ -118,7 +120,7 @@ export const MarineConditionsPanel = ({ conditions, isLoading, error, onRefetch,
             <Text className="text-[9px]" style={{ color: FIELD_COLORS.teal, fontFamily: bodySemiBoldFont }}>기상청 예보</Text>
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
-            {conditions.weatherTimeline.map((forecast) => (
+            {timeline.map((forecast) => (
               <View key={forecast.forecastAt} className="w-[92px] border px-2.5 py-2" style={{ borderColor: FIELD_COLORS.rule, backgroundColor: FIELD_COLORS.foam }}>
                 <Text className="text-[10px]" style={{ color: FIELD_COLORS.ink, fontFamily: bodyExtraBoldFont }}>
                   {formatTimelineClock(forecast.forecastAt)}
@@ -138,7 +140,7 @@ export const MarineConditionsPanel = ({ conditions, isLoading, error, onRefetch,
               </View>
             ))}
           </ScrollView>
-          {conditions.tides.length ? (
+          {conditions?.tides.length ? (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mt-2" contentContainerStyle={{ gap: 6 }}>
               {conditions.tides.map((tide) => (
                 <View key={`${tide.type}:${tide.at}`} className="flex-row items-center px-2 py-1" style={{ backgroundColor: tide.type === "high" ? "#E6F5F2" : FIELD_COLORS.locked }}>

@@ -54,6 +54,9 @@ export type MarineConditions = {
 };
 
 const CACHE_TTL_MS = 30 * 60 * 1_000;
+// 이보다 오래된 캐시는 새로 받는 동안에도 보여 주지 않는다. 몇 주 전 날씨·물때가
+// 오늘 정보처럼 잠깐 보이는 것보다 불러오는 중으로 두는 편이 낫다.
+const MAX_CACHED_AGE_MS = 6 * 60 * 60 * 1_000;
 
 const cacheKey = (latitude: number, longitude: number) =>
   `marine-conditions:v3:${latitude.toFixed(2)}:${longitude.toFixed(2)}`;
@@ -102,6 +105,7 @@ export const useMarineConditions = (
       const raw = await AsyncStorage.getItem(key);
       if (!isCurrent()) return;
       cached = raw ? (JSON.parse(raw) as CachedConditions) : null;
+      if (cached && Date.now() - cached.savedAt > MAX_CACHED_AGE_MS) cached = null;
       if (cached?.data) {
         setData(cached.data);
         setIsStale(

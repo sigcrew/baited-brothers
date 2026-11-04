@@ -219,6 +219,18 @@ export const formatTimelineClock = (value: string, now = Date.now()) => {
   return `${prefix}${hour.padStart(2, "0")}:00`;
 };
 
+/**
+ * 지난 시간대 예보를 뺀다. 오래된 캐시가 먼저 보일 때 "-23일 뒤" 같은 칸이 나오지 않게,
+ * 지금 시각이 속한 한 시간부터만 남긴다.
+ */
+export const upcomingForecasts = <T extends { forecastAt: string }>(timeline: readonly T[], now = Date.now()) => {
+  const currentHourStart = Math.floor(now / 3_600_000) * 3_600_000;
+  return timeline.filter((forecast) => {
+    const ms = Date.parse(forecast.forecastAt);
+    return Number.isFinite(ms) && ms >= currentHourStart;
+  });
+};
+
 export const formatRecordDate = (value?: string) => {
   if (!value) return "날짜 미기록";
   return new Intl.DateTimeFormat("ko-KR", {

@@ -67,3 +67,21 @@ test('a failed new location does not show the old location as its fallback',asyn
  expect(latest.error?.message).toBe('offline');
  expect(latest.isStale).toBe(false);
 });
+test('a cache older than six hours is not shown while the fresh request loads',async()=>{
+ const AsyncStorage=jest.requireMock('@react-native-async-storage/async-storage') as {getItem:jest.Mock};
+ AsyncStorage.getItem.mockResolvedValueOnce(JSON.stringify({savedAt:Date.now()-23*24*3_600_000,data:{station:{code:'OLD'},tides:[]}}));
+ const pending=deferred();invoke.mockReturnValueOnce(pending.promise);
+ await act(async()=>{view=create(<Probe lat={35}/>);});
+ expect(latest.data).toBeNull();
+ expect(latest.isLoading).toBe(true);
+ await act(async()=>pending.resolve(response('NEW')));
+ expect(latest.data?.station.code).toBe('NEW');
+});
+test('a recent cache is shown while the fresh request loads',async()=>{
+ const AsyncStorage=jest.requireMock('@react-native-async-storage/async-storage') as {getItem:jest.Mock};
+ AsyncStorage.getItem.mockResolvedValueOnce(JSON.stringify({savedAt:Date.now()-60*60_000,data:{station:{code:'RECENT'},tides:[]}}));
+ const pending=deferred();invoke.mockReturnValueOnce(pending.promise);
+ await act(async()=>{view=create(<Probe lat={35}/>);});
+ expect(latest.data?.station.code).toBe('RECENT');
+ await act(async()=>pending.resolve(response('NEW')));
+});

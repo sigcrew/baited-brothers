@@ -4,6 +4,7 @@ import {
   filterVisibleEntries,
   formatObservedAgo,
   formatTimelineClock,
+  upcomingForecasts,
   weatherIconName,
   type MapEntry,
 } from "@/src/lib/mapScreen";
@@ -104,6 +105,20 @@ describe("formatters", () => {
     expect(formatTimelineClock("2026-10-20T16:00:00.000Z", now)).toBe("내일 01:00");
     expect(formatTimelineClock("2026-10-22T00:00:00.000Z", now)).toBe("모레 09:00");
     expect(formatTimelineClock("garbage", now)).toBe("-");
+  });
+
+  it("upcomingForecasts drops hours that already passed, keeping the current hour", () => {
+    const timeline = [
+      { forecastAt: "2026-09-27T03:00:00.000Z" }, // 23일 전 캐시
+      { forecastAt: "2026-10-20T02:00:00.000Z" }, // 11:00 KST, 지난 시간
+      { forecastAt: "2026-10-20T03:00:00.000Z" }, // 12:00 KST, 지금 시간대
+      { forecastAt: "2026-10-20T04:00:00.000Z" },
+      { forecastAt: "garbage" },
+    ];
+    expect(upcomingForecasts(timeline, now).map((item) => item.forecastAt)).toEqual([
+      "2026-10-20T03:00:00.000Z",
+      "2026-10-20T04:00:00.000Z",
+    ]);
   });
 
   it("formatObservedAgo picks minutes, hours or days", () => {
